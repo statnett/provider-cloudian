@@ -37,10 +37,10 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 
-	"github.com/crossplane/provider-template/apis"
-	"github.com/crossplane/provider-template/apis/v1alpha1"
-	template "github.com/crossplane/provider-template/internal/controller"
-	"github.com/crossplane/provider-template/internal/features"
+	"github.com/statnett/provider-cloudian/apis"
+	"github.com/statnett/provider-cloudian/apis/v1alpha1"
+	template "github.com/statnett/provider-cloudian/internal/controller"
+	"github.com/statnett/provider-cloudian/internal/features"
 )
 
 func main() {

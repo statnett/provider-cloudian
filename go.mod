@@ -1,4 +1,4 @@
-module github.com/crossplane/provider-template
+module github.com/statnett/provider-cloudian
 
 go 1.21
 
