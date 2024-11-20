@@ -3,7 +3,7 @@ FROM gcr.io/distroless/static@sha256:41972110a1c1a5c0b6adb283e8aa092c43c31f7c5d7
 ARG TARGETOS
 ARG TARGETARCH
 
-ADD bin/$TARGETOS\_$TARGETARCH/provider /usr/local/bin/crossplane-template-provider
+ADD bin/$TARGETOS\_$TARGETARCH/provider /usr/local/bin/crossplane-cloudian-provider
 
 USER 65532
-ENTRYPOINT ["crossplane-template-provider"]
+ENTRYPOINT ["crossplane-cloudian-provider"]

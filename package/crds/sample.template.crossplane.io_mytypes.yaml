@@ -4,14 +4,14 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: mytypes.sample.template.crossplane.io
+  name: mytypes.sample.cloudian.crossplane.io
 spec:
-  group: sample.template.crossplane.io
+  group: sample.cloudian.crossplane.io
   names:
     categories:
     - crossplane
     - managed
-    - template
+    - cloudian
     kind: MyType
     listKind: MyTypeList
     plural: mytypes
