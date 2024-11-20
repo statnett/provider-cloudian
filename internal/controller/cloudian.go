@@ -23,7 +23,7 @@ import (
 	"github.com/statnett/provider-cloudian/internal/controller/config"
 )
 
-// Setup creates all Template controllers with the supplied logger and adds them to
+// Setup creates all Cloudian controllers with the supplied logger and adds them to
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{

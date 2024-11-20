@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: providerconfigs.template.crossplane.io
+  name: providerconfigs.cloudian.crossplane.io
 spec:
-  group: template.crossplane.io
+  group: cloudian.crossplane.io
   names:
     kind: ProviderConfig
     listKind: ProviderConfigList
@@ -25,7 +25,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: A ProviderConfig configures a Template provider.
+        description: A ProviderConfig configures a Cloudian provider.
         properties:
           apiVersion:
             description: |-
