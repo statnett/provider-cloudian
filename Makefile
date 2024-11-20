@@ -120,7 +120,7 @@ $(GOMPLATE):
 
 export GOMPLATE
 
-# This target prepares repo for your provider by replacing all "cloudian"
+# This target prepares repo for your provider by replacing all "template"
 # occurrences with your provider name.
 # This target can only be run once, if you want to rerun for some reason,
 # consider stashing/resetting your git state.

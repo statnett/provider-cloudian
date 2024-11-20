@@ -3,8 +3,8 @@ kind: Provider
 metadata:
   name: provider-cloudian
   annotations:
-    meta.crossplane.io/maintainer: Crossplane Maintainers <info@crossplane.io>
+    meta.crossplane.io/maintainer: Statnett SF <opensource@statnett.no>
     meta.crossplane.io/source: github.com/statnett/provider-cloudian
     meta.crossplane.io/license: Apache-2.0
     meta.crossplane.io/description: |
-      A cloudian that can be used to create Crossplane providers.
+      A Crossplane provider for Cloudian.
