@@ -197,8 +197,8 @@ func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 
 	resp, err := client.Do(req)
 
-	statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
 	if err != nil {
+		statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
 		fmt.Println("POST to cloudian /group got status code ["+statusErrStr+"]", err)
 		return nil, err
 	}
@@ -227,8 +227,8 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 
 	resp, err := client.Do(req)
 
-	statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
 	if err != nil {
+		statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
 		fmt.Println("PUT to cloudian /group got status code ["+statusErrStr+"]", err)
 	}
 
