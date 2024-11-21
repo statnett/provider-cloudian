@@ -87,6 +87,12 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 			return nil, err
 		}
 
+		err = resp.Body.Close()
+		if err != nil {
+			fmt.Println("Closing response body failed: ", err)
+			return nil, err
+		}
+
 		retVal = append(retVal, users...)
 
 		// list users is a paginated API endpoint, so we need to check the limit and use an offset to fetch more
@@ -126,6 +132,12 @@ func DeleteUser(user User, tokenBase64 string) (*User, error) {
 
 	if resp != nil && err != nil {
 		// Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
+		err = resp.Body.Close()
+		if err != nil {
+			fmt.Println("Closing response body failed: ", err)
+			return nil, err
+		}
+
 		return &user, nil
 	}
 	return nil, err
@@ -167,9 +179,15 @@ func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
 
 	resp, err := client.Do(req)
 
-	statusErrStr := strconv.Itoa(resp.StatusCode)
 	if err != nil {
+		statusErrStr := strconv.Itoa(resp.StatusCode)
 		fmt.Println("DELETE to cloudian /group got status code ["+statusErrStr+"]", err)
+		return nil, err
+	}
+
+	err = resp.Body.Close()
+	if err != nil {
+		fmt.Println("Closing response body failed: ", err)
 		return nil, err
 	}
 
@@ -203,6 +221,12 @@ func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 		return nil, err
 	}
 
+	err = resp.Body.Close()
+	if err != nil {
+		fmt.Println("Closing response body failed: ", err)
+		return nil, err
+	}
+
 	// Cloudian does not return a payload for this POST, but we can echo it to the callsite if all went well
 	return &group, nil
 }
@@ -232,6 +256,12 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 		fmt.Println("PUT to cloudian /group got status code ["+statusErrStr+"]", err)
 	}
 
+	err = resp.Body.Close()
+	if err != nil {
+		fmt.Println("Closing response body failed: ", err)
+		return nil, err
+	}
+
 	// Cloudian does not return a payload for this PUT, but we can echo it to the callsite if all went well
 	return &group, nil
 }
@@ -255,8 +285,6 @@ func GetGroup(groupId string, tokenBase64 string) (*Group, error) {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
 	if resp.StatusCode == 200 {
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
@@ -273,6 +301,12 @@ func GetGroup(groupId string, tokenBase64 string) (*Group, error) {
 		return &group, nil
 	}
 
+	err = resp.Body.Close()
+
+	if err != nil {
+		fmt.Println("Closing response body failed: ", err)
+		return nil, err
+	}
 	// Cloudian-API returns 204 if the group does not exist
 	return nil, nil
 }
