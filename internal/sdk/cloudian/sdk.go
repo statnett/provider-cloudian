@@ -133,7 +133,7 @@ func DeleteUser(user User, tokenBase64 string) (*User, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic " + tokenBase64)
+	req.Header.Set("Authorization", "Basic "+tokenBase64)
 
 	resp, err := client.Do(req)
 
