@@ -2,7 +2,6 @@ package cloudian
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -49,16 +48,6 @@ func unmarshalUsersJson(data []byte) ([]User, error) {
 }
 
 const baseUrl = "https://s3-admin.statnett.no:19443"
-
-// checks if a string is properly base64 encoded
-func decode(base64Encoded string) ([]byte, error) {
-	decoded, err := base64.StdEncoding.DecodeString(base64Encoded)
-	if err != nil {
-		fmt.Println("The provided token does not decode as base64 - is it correctly encoded? ", err)
-		return nil, err
-	}
-	return decoded, nil
-}
 
 var client = &http.Client{}
 
@@ -124,8 +113,6 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 func DeleteUser(user User, tokenBase64 string) (*User, error) {
 	url := baseUrl + "/user?userId=" + user.UserId + "&groupId=" + user.GroupId + "&canonicalUserId=" + user.CanonicalUserId
 
-	decode(tokenBase64)
-
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		fmt.Println("DELETE error creating request: ", err)
@@ -169,8 +156,6 @@ func DeleteGroupRecursive(groupId string, tokenBase64 string) (*string, error) {
 func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
 	url := baseUrl + "/group?groupId=" + groupId
 
-	decode(tokenBase64)
-
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		fmt.Println("DELETE error creating request: ", err)
@@ -194,8 +179,6 @@ func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
 
 func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 	url := baseUrl + "/group"
-
-	decode(tokenBase64)
 
 	jsonData, err := marshalGroup(group)
 	if err != nil {
@@ -227,8 +210,6 @@ func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 	url := baseUrl + "/group"
 
-	decode(tokenBase64)
-
 	jsonData, err := marshalGroup(group)
 	if err != nil {
 		fmt.Println("Error marshaling JSON:", err)
@@ -257,8 +238,6 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 
 func GetGroup(groupId string, tokenBase64 string) (*Group, error) {
 	url := baseUrl + "/group?groupId=" + groupId
-
-	decode(tokenBase64)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
