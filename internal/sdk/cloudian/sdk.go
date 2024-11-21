@@ -60,6 +60,8 @@ func decode(base64Encoded string) ([]byte, error) {
 	return decoded, nil
 }
 
+var client = &http.Client{}
+
 // List all users of a group
 func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User, error) {
 	var retVal []User
@@ -81,7 +83,6 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 		return nil, err
 	}
 
-	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	if err == nil {
@@ -134,7 +135,6 @@ func DeleteUser(user User, tokenBase64 string) (*User, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic " + tokenBase64)
 
-	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	if resp != nil && err != nil {
@@ -180,7 +180,6 @@ func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+tokenBase64)
 
-	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	statusErrStr := strconv.Itoa(resp.StatusCode)
@@ -213,7 +212,6 @@ func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+tokenBase64)
 
-	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
@@ -246,7 +244,6 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+tokenBase64)
 
-	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
@@ -272,7 +269,6 @@ func GetGroup(groupId string, tokenBase64 string) (*Group, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+tokenBase64)
 
-	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	if err != nil {
