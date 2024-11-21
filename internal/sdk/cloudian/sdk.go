@@ -2,11 +2,13 @@ package cloudian
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type Group struct {
@@ -66,7 +68,10 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 
 	url := baseUrl + "/user/list?groupId=" + groupId + "&userType=all&userStatus=all&limit=" + strconv.Itoa(limit) + offsetQueryParam
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	// Create a context with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		fmt.Println("GET error creating list request: ", err)
 		return nil, err
@@ -119,7 +124,10 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 func DeleteUser(user User, tokenBase64 string) (*User, error) {
 	url := baseUrl + "/user?userId=" + user.UserId + "&groupId=" + user.GroupId + "&canonicalUserId=" + user.CanonicalUserId
 
-	req, err := http.NewRequest(http.MethodDelete, url, nil)
+	// Create a context with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 	if err != nil {
 		fmt.Println("DELETE error creating request: ", err)
 		return nil, err
@@ -168,7 +176,10 @@ func DeleteGroupRecursive(groupId string, tokenBase64 string) (*string, error) {
 func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
 	url := baseUrl + "/group?groupId=" + groupId
 
-	req, err := http.NewRequest(http.MethodDelete, url, nil)
+	// Create a context with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 	if err != nil {
 		fmt.Println("DELETE error creating request: ", err)
 		return nil, err
@@ -204,7 +215,10 @@ func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
+	// Create a context with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println("POST error creating request: ", err)
 		return nil, err
@@ -240,7 +254,10 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonData))
+	// Create a context with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println("POST error creating request: ", err)
 		return nil, err
@@ -269,7 +286,10 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 func GetGroup(groupId string, tokenBase64 string) (*Group, error) {
 	url := baseUrl + "/group?groupId=" + groupId
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	// Create a context with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		fmt.Println("GET error creating request: ", err)
 		return nil, err
