@@ -10,25 +10,25 @@ import (
 )
 
 type Group struct {
-	Active             string
-	GroupId            string
-	GroupName          string
-	LdapEnabled        bool
-	LdapGroup          string
-	LdapMatchAttribute string
-	LdapSearch         string
-	LdapSearchUserBase string
-	LdapServerURL      string
-	LdapUserDNTemplate string
-	S3endpointshttp    []string
-	S3endpointshttps   []string
-	S3websiteendpoints []string
+	Active             string   `json:"active"`
+	GroupId            string   `json:"groupId"`
+	GroupName          string   `json:"groupName"`
+	LdapEnabled        bool     `json:"ldapEnabled"`
+	LdapGroup          string   `json:"ldapGroup"`
+	LdapMatchAttribute string   `json:"ldapMatchAttribute"`
+	LdapSearch         string   `json:"ldapSearch"`
+	LdapSearchUserBase string   `json:"ldapSearchUserBase"`
+	LdapServerURL      string   `json:"ldapServerURL"`
+	LdapUserDNTemplate string   `json:"ldapUserDNTemplate"`
+	S3endpointshttp    []string `json:"s3endpointshttp"`
+	S3endpointshttps   []string `json:"s3endpointshttps"`
+	S3websiteendpoints []string `json:"s3websiteendpoints"`
 }
 
 type User struct {
-	UserId          string
-	GroupId         string
-	CanonicalUserId string
+	UserId          string `json:"userId"`
+	GroupId         string `json:"groupId"`
+	CanonicalUserId string `json:"canonicalUserId"`
 }
 
 func marshalGroup(group Group) ([]byte, error) {
