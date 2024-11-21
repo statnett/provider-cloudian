@@ -66,7 +66,7 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 
 	url := baseUrl + "/user/list?groupId=" + groupId + "&userType=all&userStatus=all&limit=" + strconv.Itoa(limit) + offsetQueryParam
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		fmt.Println("GET error creating list request: ", err)
 		return nil, err
@@ -119,7 +119,7 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 func DeleteUser(user User, tokenBase64 string) (*User, error) {
 	url := baseUrl + "/user?userId=" + user.UserId + "&groupId=" + user.GroupId + "&canonicalUserId=" + user.CanonicalUserId
 
-	req, err := http.NewRequest("DELETE", url, nil)
+	req, err := http.NewRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		fmt.Println("DELETE error creating request: ", err)
 		return nil, err
@@ -168,7 +168,7 @@ func DeleteGroupRecursive(groupId string, tokenBase64 string) (*string, error) {
 func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
 	url := baseUrl + "/group?groupId=" + groupId
 
-	req, err := http.NewRequest("DELETE", url, nil)
+	req, err := http.NewRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		fmt.Println("DELETE error creating request: ", err)
 		return nil, err
@@ -204,7 +204,7 @@ func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println("POST error creating request: ", err)
 		return nil, err
@@ -240,7 +240,7 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println("POST error creating request: ", err)
 		return nil, err
@@ -269,7 +269,7 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 func GetGroup(groupId string, tokenBase64 string) (*Group, error) {
 	url := baseUrl + "/group?groupId=" + groupId
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		fmt.Println("GET error creating request: ", err)
 		return nil, err
