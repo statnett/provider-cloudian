@@ -125,7 +125,7 @@ func DeleteUser(user User, tokenBase64 string) (*User, error) {
 	resp, err := client.Do(req)
 
 	if resp != nil && err != nil {
-		//Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
+		// Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
 		return &user, nil
 	}
 	return nil, err
@@ -173,7 +173,7 @@ func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
 		return nil, err
 	}
 
-	//Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
+	// Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
 	return &groupId, nil
 }
 
@@ -203,7 +203,7 @@ func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 		return nil, err
 	}
 
-	//Cloudian does not return a payload for this POST, but we can echo it to the callsite if all went well
+	// Cloudian does not return a payload for this POST, but we can echo it to the callsite if all went well
 	return &group, nil
 }
 
@@ -232,7 +232,7 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 		fmt.Println("PUT to cloudian /group got status code ["+statusErrStr+"]", err)
 	}
 
-	//Cloudian does not return a payload for this PUT, but we can echo it to the callsite if all went well
+	// Cloudian does not return a payload for this PUT, but we can echo it to the callsite if all went well
 	return &group, nil
 }
 
