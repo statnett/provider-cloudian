@@ -17,7 +17,7 @@ type Client struct {
 	token      string
 }
 
-func MkClient(baseUrl string, tokenBase64 string) *Client {
+func NewClient(baseUrl string, tokenBase64 string) *Client {
 	return &Client{
 		baseURL:    baseUrl,
 		httpClient: &http.Client{},
