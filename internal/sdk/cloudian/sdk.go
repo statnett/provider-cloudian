@@ -25,6 +25,11 @@ func MkClient(baseUrl string, tokenBase64 string) *Client {
 	}
 }
 
+func (client Client) headerModifier(req *http.Request) {
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Basic "+client.token)
+}
+
 type Group struct {
 	Active             string   `json:"active"`
 	GroupID            string   `json:"groupId"`
@@ -131,8 +136,7 @@ func (client Client) DeleteUser(user User) error {
 		return fmt.Errorf("DELETE error creating request: %w", err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+client.token)
+	client.headerModifier(req)
 
 	resp, err := client.httpClient.Do(req)
 
@@ -175,8 +179,7 @@ func (client Client) DeleteGroup(groupId string) error {
 		return fmt.Errorf("DELETE error creating request: %w", err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+client.token)
+	client.headerModifier(req)
 
 	resp, err := client.httpClient.Do(req)
 
@@ -205,8 +208,7 @@ func (client Client) CreateGroup(group Group) error {
 		return fmt.Errorf("POST error creating request: %w", err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+client.token)
+	client.headerModifier(req)
 
 	resp, err := client.httpClient.Do(req)
 
@@ -235,8 +237,7 @@ func (client Client) UpdateGroup(group Group) error {
 		return fmt.Errorf("PUT error creating request: %w", err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+client.token)
+	client.headerModifier(req)
 
 	resp, err := client.httpClient.Do(req)
 
@@ -261,8 +262,7 @@ func (client Client) GetGroup(groupId string) (*Group, error) {
 		return nil, fmt.Errorf("GET error creating request: %w", err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+client.token)
+	client.headerModifier(req)
 
 	resp, err := client.httpClient.Do(req)
 
