@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -49,7 +50,7 @@ func unmarshalUsersJson(data []byte) ([]User, error) {
 	return users, err
 }
 
-const baseUrl = "https://s3-admin.statnett.no:19443"
+var baseUrl, _ = os.LookupEnv("CLOUDIAN_BASE_URL")
 
 var client = &http.Client{}
 
