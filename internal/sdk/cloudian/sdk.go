@@ -91,7 +91,9 @@ func (client Client) ListUsers(groupId string, offsetUserId *string) ([]User, er
 
 	resp, err := client.httpClient.Do(req)
 
-	if err == nil {
+	if err != nil {
+		return fmt.Errorf("GET list users failed: %w", err)
+	}
 		body, err := io.ReadAll(resp.Body)
 		defer resp.Body.Close() // nolint:errcheck
 		if err != nil {
