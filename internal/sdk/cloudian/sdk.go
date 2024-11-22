@@ -60,10 +60,8 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 
 	limit := 100
 
-	var offsetQueryParam string
-	if offsetUserId == nil {
-		offsetQueryParam = ""
-	} else {
+	var offsetQueryParam = ""
+	if offsetUserId != nil {
 		offsetQueryParam = "&offset=" + *offsetUserId
 	}
 
