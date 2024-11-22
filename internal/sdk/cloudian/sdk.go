@@ -7,10 +7,23 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 )
+
+type Client struct {
+	baseURL    string
+	httpClient *http.Client
+	token      string
+}
+
+func MkClient(baseUrl string, tokenBase64 string) *Client {
+	return &Client{
+		baseURL:    baseUrl,
+		httpClient: &http.Client{},
+		token:      tokenBase64,
+	}
+}
 
 type Group struct {
 	Active             string   `json:"active"`
@@ -50,12 +63,8 @@ func unmarshalUsersJson(data []byte) ([]User, error) {
 	return users, err
 }
 
-var baseUrl, _ = os.LookupEnv("CLOUDIAN_BASE_URL")
-
-var client = &http.Client{}
-
 // List all users of a group
-func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User, error) {
+func (client Client) ListUsers(groupId string, offsetUserId *string) ([]User, error) {
 	var retVal []User
 
 	limit := 100
@@ -65,7 +74,7 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 		offsetQueryParam = "&offset=" + *offsetUserId
 	}
 
-	url := baseUrl + "/user/list?groupId=" + groupId + "&userType=all&userStatus=all&limit=" + strconv.Itoa(limit) + offsetQueryParam
+	url := client.baseURL + "/user/list?groupId=" + groupId + "&userType=all&userStatus=all&limit=" + strconv.Itoa(limit) + offsetQueryParam
 
 	// Create a context with a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -76,7 +85,7 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 		return nil, err
 	}
 
-	resp, err := client.Do(req)
+	resp, err := client.httpClient.Do(req)
 
 	if err == nil {
 		body, err := io.ReadAll(resp.Body)
@@ -99,7 +108,7 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 			// There is some ambiguity in the GET /user/list endpoint documentation, but it seems
 			// that UserId is the correct key for this parameter (and not CanonicalUserId)
 			// Fetch more results
-			moreUsers, err := ListUsers(groupId, &users[limit].UserID, tokenBase64)
+			moreUsers, err := client.ListUsers(groupId, &users[limit].UserID)
 
 			if err == nil {
 				retVal = append(retVal, moreUsers...)
@@ -115,8 +124,8 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 }
 
 // Delete a single user
-func DeleteUser(user User, tokenBase64 string) error {
-	url := baseUrl + "/user?userId=" + user.UserID + "&groupId=" + user.GroupID + "&canonicalUserId=" + user.CanonicalUserID
+func (client Client) DeleteUser(user User) error {
+	url := client.baseURL + "/user?userId=" + user.UserID + "&groupId=" + user.GroupID + "&canonicalUserId=" + user.CanonicalUserID
 
 	// Create a context with a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -128,9 +137,9 @@ func DeleteUser(user User, tokenBase64 string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+tokenBase64)
+	req.Header.Set("Authorization", "Basic "+client.token)
 
-	resp, err := client.Do(req)
+	resp, err := client.httpClient.Do(req)
 
 	if resp != nil && err == nil {
 		// Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
@@ -142,27 +151,27 @@ func DeleteUser(user User, tokenBase64 string) error {
 }
 
 // Delete a group and all its members
-func DeleteGroupRecursive(groupId string, tokenBase64 string) error {
-	users, err := ListUsers(groupId, nil, tokenBase64)
+func (client Client) DeleteGroupRecursive(groupId string) error {
+	users, err := client.ListUsers(groupId, nil)
 
 	if err != nil {
 		for _, user := range users {
-			err := DeleteUser(user, tokenBase64)
+			err := client.DeleteUser(user)
 			if err != nil {
 				fmt.Println("Error deleting user: ", err)
 				return err
 			}
 		}
 
-		return DeleteGroup(groupId, tokenBase64)
+		return client.DeleteGroup(groupId)
 	}
 
 	return err
 }
 
 // Deletes a group if it is without members
-func DeleteGroup(groupId string, tokenBase64 string) error {
-	url := baseUrl + "/group?groupId=" + groupId
+func (client Client) DeleteGroup(groupId string) error {
+	url := client.baseURL + "/group?groupId=" + groupId
 
 	// Create a context with a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -174,9 +183,9 @@ func DeleteGroup(groupId string, tokenBase64 string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+tokenBase64)
+	req.Header.Set("Authorization", "Basic "+client.token)
 
-	resp, err := client.Do(req)
+	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
 		statusErrStr := strconv.Itoa(resp.StatusCode)
@@ -188,8 +197,8 @@ func DeleteGroup(groupId string, tokenBase64 string) error {
 	return nil
 }
 
-func CreateGroup(group Group, tokenBase64 string) error {
-	url := baseUrl + "/group"
+func (client Client) CreateGroup(group Group) error {
+	url := client.baseURL + "/group"
 
 	jsonData, err := marshalGroup(group)
 	if err != nil {
@@ -207,9 +216,9 @@ func CreateGroup(group Group, tokenBase64 string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+tokenBase64)
+	req.Header.Set("Authorization", "Basic "+client.token)
 
-	resp, err := client.Do(req)
+	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
 		statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
@@ -221,8 +230,8 @@ func CreateGroup(group Group, tokenBase64 string) error {
 	return err
 }
 
-func UpdateGroup(group Group, tokenBase64 string) error {
-	url := baseUrl + "/group"
+func (client Client) UpdateGroup(group Group) error {
+	url := client.baseURL + "/group"
 
 	jsonData, err := marshalGroup(group)
 	if err != nil {
@@ -240,9 +249,9 @@ func UpdateGroup(group Group, tokenBase64 string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+tokenBase64)
+	req.Header.Set("Authorization", "Basic "+client.token)
 
-	resp, err := client.Do(req)
+	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
 		statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
@@ -254,8 +263,8 @@ func UpdateGroup(group Group, tokenBase64 string) error {
 	return nil
 }
 
-func GetGroup(groupId string, tokenBase64 string) (*Group, error) {
-	url := baseUrl + "/group?groupId=" + groupId
+func (client Client) GetGroup(groupId string) (*Group, error) {
+	url := client.baseURL + "/group?groupId=" + groupId
 
 	// Create a context with a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -267,9 +276,9 @@ func GetGroup(groupId string, tokenBase64 string) (*Group, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+tokenBase64)
+	req.Header.Set("Authorization", "Basic "+client.token)
 
-	resp, err := client.Do(req)
+	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
 		fmt.Println("GET errored towards Cloudian /group: ", err)
