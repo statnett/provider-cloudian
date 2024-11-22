@@ -143,12 +143,13 @@ func (client Client) DeleteUser(user User) error {
 
 	resp, err := client.httpClient.Do(req)
 
-	if resp != nil && err == nil {
-		// Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
-		defer resp.Body.Close() // nolint:errcheck
-
-		return nil
+	if err != nil {
+		return err
 	}
+	if resp != nil {
+		defer resp.Body.Close() // nolint:errcheck
+	}
+
 	return err
 }
 
