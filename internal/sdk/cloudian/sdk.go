@@ -154,9 +154,7 @@ func DeleteGroupRecursive(groupId string, tokenBase64 string) (*string, error) {
 			}
 		}
 
-		retVal, err := DeleteGroup(groupId, tokenBase64)
-
-		return retVal, err
+		return DeleteGroup(groupId, tokenBase64)
 	}
 
 	return nil, err
