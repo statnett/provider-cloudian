@@ -92,8 +92,8 @@ func (client Client) ListUsers(groupId string, offsetUserId *string) ([]User, er
 	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
-		return fmt.Errorf("GET list users failed: %w", err)
-	}
+		return nil, fmt.Errorf("GET list users failed: %w", err)
+	} else {
 		body, err := io.ReadAll(resp.Body)
 		defer resp.Body.Close() // nolint:errcheck
 		if err != nil {
@@ -120,10 +120,7 @@ func (client Client) ListUsers(groupId string, offsetUserId *string) ([]User, er
 		}
 
 		return retVal, nil
-	} else {
-		return nil, fmt.Errorf("GET list users failed: %w", err)
 	}
-
 }
 
 // Delete a single user
@@ -159,16 +156,14 @@ func (client Client) DeleteGroupRecursive(groupId string) error {
 	}
 
 	for _, user := range users {
-			err := client.DeleteUser(user)
-			if err != nil {
-				return fmt.Errorf("Error deleting user: %w", err)
-			}
+		err := client.DeleteUser(user)
+		if err != nil {
+			return fmt.Errorf("Error deleting user: %w", err)
 		}
 
-		return client.DeleteGroup(groupId)
 	}
 
-	return err
+	return client.DeleteGroup(groupId)
 }
 
 // Deletes a group if it is without members
