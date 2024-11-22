@@ -115,7 +115,7 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 }
 
 // Delete a single user
-func DeleteUser(user User, tokenBase64 string) (*User, error) {
+func DeleteUser(user User, tokenBase64 string) error {
 	url := baseUrl + "/user?userId=" + user.UserID + "&groupId=" + user.GroupID + "&canonicalUserId=" + user.CanonicalUserID
 
 	// Create a context with a timeout
@@ -124,7 +124,7 @@ func DeleteUser(user User, tokenBase64 string) (*User, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 	if err != nil {
 		fmt.Println("DELETE error creating request: ", err)
-		return nil, err
+		return err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -136,32 +136,32 @@ func DeleteUser(user User, tokenBase64 string) (*User, error) {
 		// Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
 		defer resp.Body.Close() // nolint:errcheck
 
-		return &user, nil
+		return nil
 	}
-	return nil, err
+	return err
 }
 
 // Delete a group and all its members
-func DeleteGroupRecursive(groupId string, tokenBase64 string) (*string, error) {
+func DeleteGroupRecursive(groupId string, tokenBase64 string) error {
 	users, err := ListUsers(groupId, nil, tokenBase64)
 
 	if err != nil {
 		for _, user := range users {
-			_, err := DeleteUser(user, tokenBase64)
+			err := DeleteUser(user, tokenBase64)
 			if err != nil {
 				fmt.Println("Error deleting user: ", err)
-				return nil, err
+				return err
 			}
 		}
 
 		return DeleteGroup(groupId, tokenBase64)
 	}
 
-	return nil, err
+	return err
 }
 
 // Deletes a group if it is without members
-func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
+func DeleteGroup(groupId string, tokenBase64 string) error {
 	url := baseUrl + "/group?groupId=" + groupId
 
 	// Create a context with a timeout
@@ -170,7 +170,7 @@ func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 	if err != nil {
 		fmt.Println("DELETE error creating request: ", err)
-		return nil, err
+		return err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -181,21 +181,20 @@ func DeleteGroup(groupId string, tokenBase64 string) (*string, error) {
 	if err != nil {
 		statusErrStr := strconv.Itoa(resp.StatusCode)
 		fmt.Println("DELETE to cloudian /group got status code ["+statusErrStr+"]", err)
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close() // nolint:errcheck
 
-	// Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
-	return &groupId, nil
+	return nil
 }
 
-func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
+func CreateGroup(group Group, tokenBase64 string) error {
 	url := baseUrl + "/group"
 
 	jsonData, err := marshalGroup(group)
 	if err != nil {
 		fmt.Println("Error marshaling JSON:", err)
-		return nil, err
+		return err
 	}
 
 	// Create a context with a timeout
@@ -204,7 +203,7 @@ func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println("POST error creating request: ", err)
-		return nil, err
+		return err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -215,21 +214,20 @@ func CreateGroup(group Group, tokenBase64 string) (*Group, error) {
 	if err != nil {
 		statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
 		fmt.Println("POST to cloudian /group got status code ["+statusErrStr+"]", err)
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close() // nolint:errcheck
 
-	// Cloudian does not return a payload for this POST, but we can echo it to the callsite if all went well
-	return &group, nil
+	return err
 }
 
-func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
+func UpdateGroup(group Group, tokenBase64 string) error {
 	url := baseUrl + "/group"
 
 	jsonData, err := marshalGroup(group)
 	if err != nil {
 		fmt.Println("Error marshaling JSON:", err)
-		return nil, err
+		return err
 	}
 
 	// Create a context with a timeout
@@ -238,7 +236,7 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println("POST error creating request: ", err)
-		return nil, err
+		return err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -253,8 +251,7 @@ func UpdateGroup(group Group, tokenBase64 string) (*Group, error) {
 
 	defer resp.Body.Close() // nolint:errcheck
 
-	// Cloudian does not return a payload for this PUT, but we can echo it to the callsite if all went well
-	return &group, nil
+	return nil
 }
 
 func GetGroup(groupId string, tokenBase64 string) (*Group, error) {
