@@ -20,8 +20,8 @@ package apis
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 
-	cloudianv1alpha1 "github.com/statnett/provider-cloudian/apis/v1alpha1"
 	userv1alpha1 "github.com/statnett/provider-cloudian/apis/user/v1alpha1"
+	cloudianv1alpha1 "github.com/statnett/provider-cloudian/apis/v1alpha1"
 )
 
 func init() {

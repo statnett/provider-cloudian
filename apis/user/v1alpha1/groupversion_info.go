@@ -27,8 +27,8 @@ import (
 
 // Package type metadata.
 const (
-	MetadataGroup   = "user.cloudian.crossplane.io"
-	Version         = "v1alpha1"
+	MetadataGroup = "user.cloudian.crossplane.io"
+	Version       = "v1alpha1"
 )
 
 var (
