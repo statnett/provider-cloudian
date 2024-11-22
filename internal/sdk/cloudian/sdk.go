@@ -13,24 +13,24 @@ import (
 
 type Group struct {
 	Active             string   `json:"active"`
-	GroupId            string   `json:"groupId"`
+	GroupID            string   `json:"groupId"`
 	GroupName          string   `json:"groupName"`
-	LdapEnabled        bool     `json:"ldapEnabled"`
-	LdapGroup          string   `json:"ldapGroup"`
-	LdapMatchAttribute string   `json:"ldapMatchAttribute"`
-	LdapSearch         string   `json:"ldapSearch"`
-	LdapSearchUserBase string   `json:"ldapSearchUserBase"`
-	LdapServerURL      string   `json:"ldapServerURL"`
-	LdapUserDNTemplate string   `json:"ldapUserDNTemplate"`
+	LDAPEnabled        bool     `json:"ldapEnabled"`
+	LDAPGroup          string   `json:"ldapGroup"`
+	LDAPMatchAttribute string   `json:"ldapMatchAttribute"`
+	LDAPSearch         string   `json:"ldapSearch"`
+	LDAPSearchUserBase string   `json:"ldapSearchUserBase"`
+	LDAPServerURL      string   `json:"ldapServerURL"`
+	LDAPUserDNTemplate string   `json:"ldapUserDNTemplate"`
 	S3endpointshttp    []string `json:"s3endpointshttp"`
 	S3endpointshttps   []string `json:"s3endpointshttps"`
 	S3websiteendpoints []string `json:"s3websiteendpoints"`
 }
 
 type User struct {
-	UserId          string `json:"userId"`
-	GroupId         string `json:"groupId"`
-	CanonicalUserId string `json:"canonicalUserId"`
+	UserID          string `json:"userId"`
+	GroupID         string `json:"groupId"`
+	CanonicalUserID string `json:"canonicalUserId"`
 }
 
 func marshalGroup(group Group) ([]byte, error) {
@@ -105,7 +105,7 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 			// There is some ambiguity in the GET /user/list endpoint documentation, but it seems
 			// that UserId is the correct key for this parameter (and not CanonicalUserId)
 			// Fetch more results
-			moreUsers, err := ListUsers(groupId, &users[limit].UserId, tokenBase64)
+			moreUsers, err := ListUsers(groupId, &users[limit].UserID, tokenBase64)
 
 			if err == nil {
 				retVal = append(retVal, moreUsers...)
@@ -122,7 +122,7 @@ func ListUsers(groupId string, offsetUserId *string, tokenBase64 string) ([]User
 
 // Delete a single user
 func DeleteUser(user User, tokenBase64 string) (*User, error) {
-	url := baseUrl + "/user?userId=" + user.UserId + "&groupId=" + user.GroupId + "&canonicalUserId=" + user.CanonicalUserId
+	url := baseUrl + "/user?userId=" + user.UserID + "&groupId=" + user.GroupID + "&canonicalUserId=" + user.CanonicalUserID
 
 	// Create a context with a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

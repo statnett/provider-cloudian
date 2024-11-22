@@ -26,8 +26,8 @@ func TestRealisticGroupSerialization(t *testing.T) {
 		t.Errorf("Error deserializing from JSON: %v", err)
 	}
 
-	if group.GroupId != "QA" {
-		t.Errorf("Expected QA, got %v", group.GroupId)
+	if group.GroupID != "QA" {
+		t.Errorf("Expected QA, got %v", group.GroupID)
 	}
 }
 
@@ -75,12 +75,12 @@ func TestUnmarshalUsers(t *testing.T) {
 		t.Errorf("Error deserializing users from JSON: %v", err)
 	}
 
-	if users[0].UserId != "Glory" {
-		t.Errorf("Expected Glory as the userId of first user, got %v", users[0].UserId)
+	if users[0].UserID != "Glory" {
+		t.Errorf("Expected Glory as the userId of first user, got %v", users[0].UserID)
 	}
 
-	if users[1].UserId != "John" {
-		t.Errorf("Expected John as the userId of second user, got %v", users[1].UserId)
+	if users[1].UserID != "John" {
+		t.Errorf("Expected John as the userId of second user, got %v", users[1].UserID)
 	}
 
 }
