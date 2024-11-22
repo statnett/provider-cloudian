@@ -184,8 +184,7 @@ func (client Client) DeleteGroup(groupId string) error {
 	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
-		statusErrStr := strconv.Itoa(resp.StatusCode)
-		return fmt.Errorf("DELETE to cloudian /group got status code [%s]: %w", statusErrStr, err)
+		return fmt.Errorf("DELETE to cloudian /group got: %w", err)
 	}
 	defer resp.Body.Close() // nolint:errcheck
 
@@ -209,8 +208,7 @@ func (client Client) CreateGroup(group Group) error {
 	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
-		statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
-		return fmt.Errorf("POST to cloudian /group got status code [%s]: %w", statusErrStr, err)
+		return fmt.Errorf("POST to cloudian /group", err)
 	}
 	defer resp.Body.Close() // nolint:errcheck
 
@@ -236,8 +234,7 @@ func (client Client) UpdateGroup(group Group) error {
 	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
-		statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
-		return fmt.Errorf("PUT to cloudian /group got status code [%s]: %w", statusErrStr, err)
+		return fmt.Errorf("PUT to cloudian /group: %w", err)
 	}
 
 	defer resp.Body.Close() // nolint:errcheck
@@ -260,7 +257,9 @@ func (client Client) GetGroup(groupId string) (*Group, error) {
 		return nil, fmt.Errorf("GET error: %w", err)
 	}
 
-	defer resp.Body.Close() // nolint:errcheck
+	if resp != nil {
+		defer resp.Body.Close() // nolint:errcheck
+	}
 
 	if resp.StatusCode == 200 {
 		body, err := io.ReadAll(resp.Body)
@@ -277,5 +276,5 @@ func (client Client) GetGroup(groupId string) (*Group, error) {
 	}
 
 	// Cloudian-API returns 204 if the group does not exist
-	return nil, nil
+	return nil, err
 }
