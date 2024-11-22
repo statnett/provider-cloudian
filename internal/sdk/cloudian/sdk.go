@@ -25,9 +25,17 @@ func NewClient(baseUrl string, tokenBase64 string) *Client {
 	}
 }
 
-func (client Client) headerModifier(req *http.Request) {
+var ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+
+func (client Client) newRequest(url string, method string, body *[]byte) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(*body))
+	if err != nil {
+		return req, fmt.Errorf("error creating request: %w", err)
+	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+client.token)
+
+	return req, nil
 }
 
 type Group struct {
@@ -127,15 +135,11 @@ func (client Client) ListUsers(groupId string, offsetUserId *string) ([]User, er
 func (client Client) DeleteUser(user User) error {
 	url := client.baseURL + "/user?userId=" + user.UserID + "&groupId=" + user.GroupID + "&canonicalUserId=" + user.CanonicalUserID
 
-	// Create a context with a timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
+	req, err := client.newRequest(url, http.MethodDelete, nil)
 	if err != nil {
-		return fmt.Errorf("DELETE error creating request: %w", err)
+		return err
 	}
-
-	client.headerModifier(req)
+	defer cancel()
 
 	resp, err := client.httpClient.Do(req)
 
@@ -170,15 +174,11 @@ func (client Client) DeleteGroupRecursive(groupId string) error {
 func (client Client) DeleteGroup(groupId string) error {
 	url := client.baseURL + "/group?groupId=" + groupId
 
-	// Create a context with a timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
+	req, err := client.newRequest(url, http.MethodDelete, nil)
 	if err != nil {
-		return fmt.Errorf("DELETE error creating request: %w", err)
+		return err
 	}
-
-	client.headerModifier(req)
+	defer cancel()
 
 	resp, err := client.httpClient.Do(req)
 
@@ -199,15 +199,11 @@ func (client Client) CreateGroup(group Group) error {
 		return fmt.Errorf("Error marshaling JSON: %w", err)
 	}
 
-	// Create a context with a timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonData))
+	req, err := client.newRequest(url, http.MethodPost, &jsonData)
 	if err != nil {
-		return fmt.Errorf("POST error creating request: %w", err)
+		return err
 	}
-
-	client.headerModifier(req)
+	defer cancel()
 
 	resp, err := client.httpClient.Do(req)
 
@@ -229,14 +225,12 @@ func (client Client) UpdateGroup(group Group) error {
 	}
 
 	// Create a context with a timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, bytes.NewBuffer(jsonData))
+	req, err := client.newRequest(url, http.MethodPut, &jsonData)
 	if err != nil {
-		return fmt.Errorf("PUT error creating request: %w", err)
+		return err
 	}
 
-	client.headerModifier(req)
+	defer cancel()
 
 	resp, err := client.httpClient.Do(req)
 
@@ -253,15 +247,11 @@ func (client Client) UpdateGroup(group Group) error {
 func (client Client) GetGroup(groupId string) (*Group, error) {
 	url := client.baseURL + "/group?groupId=" + groupId
 
-	// Create a context with a timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := client.newRequest(url, http.MethodGet, nil)
 	if err != nil {
-		return nil, fmt.Errorf("GET error creating request: %w", err)
+		return nil, err
 	}
-
-	client.headerModifier(req)
+	defer cancel()
 
 	resp, err := client.httpClient.Do(req)
 
