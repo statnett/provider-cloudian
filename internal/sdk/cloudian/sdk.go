@@ -81,8 +81,7 @@ func (client Client) ListUsers(groupId string, offsetUserId *string) ([]User, er
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Println("GET error creating list request: ", err)
-		return nil, err
+		return nil, fmt.Errorf("GET error creating list request: %w", err)
 	}
 
 	resp, err := client.httpClient.Do(req)
@@ -91,14 +90,12 @@ func (client Client) ListUsers(groupId string, offsetUserId *string) ([]User, er
 		body, err := io.ReadAll(resp.Body)
 		defer resp.Body.Close() // nolint:errcheck
 		if err != nil {
-			fmt.Println("GET reading list users response body failed: ", err)
-			return nil, err
+			return nil, fmt.Errorf("GET reading list users response body failed: %w", err)
 		}
 
 		users, err := unmarshalUsersJson(body)
 		if err != nil {
-			fmt.Println("GET unmarshal users response body failed: ", err)
-			return nil, err
+			return nil, fmt.Errorf("GET unmarshal users response body failed: %w", err)
 		}
 
 		retVal = append(retVal, users...)
@@ -117,8 +114,7 @@ func (client Client) ListUsers(groupId string, offsetUserId *string) ([]User, er
 
 		return retVal, nil
 	} else {
-		fmt.Println("GET list users failed: ", err)
-		return nil, err
+		return nil, fmt.Errorf("GET list users failed: %w", err)
 	}
 
 }
@@ -132,8 +128,7 @@ func (client Client) DeleteUser(user User) error {
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 	if err != nil {
-		fmt.Println("DELETE error creating request: ", err)
-		return err
+		return fmt.Errorf("DELETE error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -158,8 +153,7 @@ func (client Client) DeleteGroupRecursive(groupId string) error {
 		for _, user := range users {
 			err := client.DeleteUser(user)
 			if err != nil {
-				fmt.Println("Error deleting user: ", err)
-				return err
+				return fmt.Errorf("Error deleting user: %w", err)
 			}
 		}
 
@@ -178,8 +172,7 @@ func (client Client) DeleteGroup(groupId string) error {
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 	if err != nil {
-		fmt.Println("DELETE error creating request: ", err)
-		return err
+		return fmt.Errorf("DELETE error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -189,8 +182,7 @@ func (client Client) DeleteGroup(groupId string) error {
 
 	if err != nil {
 		statusErrStr := strconv.Itoa(resp.StatusCode)
-		fmt.Println("DELETE to cloudian /group got status code ["+statusErrStr+"]", err)
-		return err
+		return fmt.Errorf("DELETE to cloudian /group got status code [%s]: %w", statusErrStr, err)
 	}
 	defer resp.Body.Close() // nolint:errcheck
 
@@ -202,8 +194,7 @@ func (client Client) CreateGroup(group Group) error {
 
 	jsonData, err := marshalGroup(group)
 	if err != nil {
-		fmt.Println("Error marshaling JSON:", err)
-		return err
+		return fmt.Errorf("Error marshaling JSON: %w", err)
 	}
 
 	// Create a context with a timeout
@@ -211,8 +202,7 @@ func (client Client) CreateGroup(group Group) error {
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		fmt.Println("POST error creating request: ", err)
-		return err
+		return fmt.Errorf("POST error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -222,8 +212,7 @@ func (client Client) CreateGroup(group Group) error {
 
 	if err != nil {
 		statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
-		fmt.Println("POST to cloudian /group got status code ["+statusErrStr+"]", err)
-		return err
+		return fmt.Errorf("POST to cloudian /group got status code [%s]: %w", statusErrStr, err)
 	}
 	defer resp.Body.Close() // nolint:errcheck
 
@@ -235,8 +224,7 @@ func (client Client) UpdateGroup(group Group) error {
 
 	jsonData, err := marshalGroup(group)
 	if err != nil {
-		fmt.Println("Error marshaling JSON:", err)
-		return err
+		return fmt.Errorf("Error marshaling JSON: %w", err)
 	}
 
 	// Create a context with a timeout
@@ -244,8 +232,7 @@ func (client Client) UpdateGroup(group Group) error {
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		fmt.Println("POST error creating request: ", err)
-		return err
+		return fmt.Errorf("PUT error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -255,7 +242,7 @@ func (client Client) UpdateGroup(group Group) error {
 
 	if err != nil {
 		statusErrStr := strconv.FormatInt(int64(resp.StatusCode), 10)
-		fmt.Println("PUT to cloudian /group got status code ["+statusErrStr+"]", err)
+		return fmt.Errorf("PUT to cloudian /group got status code [%s]: %w", statusErrStr, err)
 	}
 
 	defer resp.Body.Close() // nolint:errcheck
@@ -271,8 +258,7 @@ func (client Client) GetGroup(groupId string) (*Group, error) {
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Println("GET error creating request: ", err)
-		return nil, err
+		return nil, fmt.Errorf("GET error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -281,8 +267,7 @@ func (client Client) GetGroup(groupId string) (*Group, error) {
 	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
-		fmt.Println("GET errored towards Cloudian /group: ", err)
-		return nil, err
+		return nil, fmt.Errorf("GET error: %w", err)
 	}
 
 	defer resp.Body.Close() // nolint:errcheck
@@ -290,14 +275,12 @@ func (client Client) GetGroup(groupId string) (*Group, error) {
 	if resp.StatusCode == 200 {
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Println("GET reading response body failed: ", err)
-			return nil, err
+			return nil, fmt.Errorf("GET reading response body failed: %w", err)
 		}
 
 		group, err := unmarshalGroupJson(body)
 		if err != nil {
-			fmt.Println("GET unmarshal response body failed: ", err)
-			return nil, err
+			return nil, fmt.Errorf("GET unmarshal response body failed: %w", err)
 		}
 
 		return &group, nil
