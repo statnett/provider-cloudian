@@ -1,8 +1,22 @@
 package cloudian
 
 import (
+	"math/rand"
+	"reflect"
+	"strings"
 	"testing"
+	"testing/quick"
 )
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-. "
+
+func randomString(length int) string {
+	var sb strings.Builder
+	for i := 0; i < length; i++ {
+		sb.WriteByte(charset[rand.Intn(len(charset))])
+	}
+	return sb.String()
+}
 
 func TestRealisticGroupSerialization(t *testing.T) {
 	jsonString := `{
@@ -83,4 +97,42 @@ func TestUnmarshalUsers(t *testing.T) {
 		t.Errorf("Expected John as the userId of second user, got %v", users[1].UserID)
 	}
 
+}
+
+func (group Group) Generate(rand *rand.Rand, size int) reflect.Value {
+	return reflect.ValueOf(Group{
+		Active:             "true",
+		GroupID:            randomString(16),
+		GroupName:          randomString(32),
+		LDAPEnabled:        false,
+		LDAPGroup:          randomString(8),
+		LDAPMatchAttribute: "",
+		LDAPSearch:         "",
+		LDAPSearchUserBase: "",
+		LDAPServerURL:      "",
+		LDAPUserDNTemplate: "",
+		S3endpointshttp:    []string{"ALL"},
+		S3endpointshttps:   []string{"ALL"},
+		S3websiteendpoints: []string{"ALL"},
+	})
+}
+
+func TestGroupSerialization(t *testing.T) {
+	f := func(group Group) bool {
+		data, err := marshalGroup(group)
+		if err != nil {
+			return false
+		}
+
+		deserialized, err := unmarshalGroupJson(data)
+		if err != nil {
+			return false
+		}
+
+		return reflect.DeepEqual(group, deserialized)
+	}
+
+	if err := quick.Check(f, nil); err != nil {
+		t.Error(err)
+	}
 }
