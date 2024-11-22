@@ -132,7 +132,7 @@ func DeleteUser(user User, tokenBase64 string) (*User, error) {
 
 	resp, err := client.Do(req)
 
-	if resp != nil && err != nil {
+	if resp != nil && err == nil {
 		// Cloudian does not return a payload for this DELETE, but we can echo it to the callsite if all went well
 		defer resp.Body.Close()
 
