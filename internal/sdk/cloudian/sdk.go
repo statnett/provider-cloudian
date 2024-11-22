@@ -154,9 +154,11 @@ func (client Client) DeleteUser(user User) error {
 // Delete a group and all its members
 func (client Client) DeleteGroupRecursive(groupId string) error {
 	users, err := client.ListUsers(groupId, nil)
-
 	if err != nil {
-		for _, user := range users {
+		return err
+	}
+
+	for _, user := range users {
 			err := client.DeleteUser(user)
 			if err != nil {
 				return fmt.Errorf("Error deleting user: %w", err)
