@@ -76,7 +76,8 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 		return nil, fmt.Errorf("GET reading list users response body failed: %w", err)
 	}
 
-	users, err := unmarshalUsersJson(body)
+	var users []User
+	err = json.Unmarshal(body, &users)
 	if err != nil {
 		return nil, fmt.Errorf("GET unmarshal users response body failed: %w", err)
 	}
@@ -160,7 +161,7 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 func (client Client) CreateGroup(ctx context.Context, group Group) error {
 	url := client.baseURL + "/group"
 
-	jsonData, err := marshalGroup(group)
+	jsonData, err := json.Marshal(group)
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
@@ -184,7 +185,7 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	url := client.baseURL + "/group"
 
-	jsonData, err := marshalGroup(group)
+	jsonData, err := json.Marshal(group)
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
@@ -228,7 +229,8 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 			return nil, fmt.Errorf("GET reading response body failed: %w", err)
 		}
 
-		group, err := unmarshalGroupJson(body)
+		var group Group
+		err = json.Unmarshal(body, &group)
 		if err != nil {
 			return nil, fmt.Errorf("GET unmarshal response body failed: %w", err)
 		}
@@ -252,20 +254,4 @@ func (client Client) newRequest(ctx context.Context, url string, method string, 
 	req.Header.Set("Authorization", "Basic "+client.token)
 
 	return req, nil
-}
-
-func marshalGroup(group Group) ([]byte, error) {
-	return json.Marshal(group)
-}
-
-func unmarshalGroupJson(data []byte) (Group, error) {
-	var group Group
-	err := json.Unmarshal(data, &group)
-	return group, err
-}
-
-func unmarshalUsersJson(data []byte) ([]User, error) {
-	var users []User
-	err := json.Unmarshal(data, &users)
-	return users, err
 }

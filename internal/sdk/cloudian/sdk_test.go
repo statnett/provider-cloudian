@@ -1,6 +1,7 @@
 package cloudian
 
 import (
+	"encoding/json"
 	"math/rand"
 	"reflect"
 	"strings"
@@ -25,7 +26,8 @@ func TestRealisticGroupSerialization(t *testing.T) {
 			"s3websiteendpoints": ["ALL"]
 		}`
 
-	group, err := unmarshalGroupJson([]byte(jsonString))
+	var group Group
+	err := json.Unmarshal([]byte(jsonString), &group)
 	if err != nil {
 		t.Errorf("Error deserializing from JSON: %v", err)
 	}
@@ -74,7 +76,8 @@ func TestUnmarshalUsers(t *testing.T) {
 			"zip": ""
 			}]`
 
-	users, err := unmarshalUsersJson([]byte(jsonString))
+	var users []User
+	err := json.Unmarshal([]byte(jsonString), &users)
 	if err != nil {
 		t.Errorf("Error deserializing users from JSON: %v", err)
 	}
@@ -109,12 +112,13 @@ func (group Group) Generate(rand *rand.Rand, size int) reflect.Value {
 
 func TestGroupSerialization(t *testing.T) {
 	f := func(group Group) bool {
-		data, err := marshalGroup(group)
+		data, err := json.Marshal(group)
 		if err != nil {
 			return false
 		}
 
-		deserialized, err := unmarshalGroupJson(data)
+		var deserialized Group
+		err = json.Unmarshal(data, &deserialized)
 		if err != nil {
 			return false
 		}
