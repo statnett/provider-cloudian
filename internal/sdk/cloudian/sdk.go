@@ -89,9 +89,10 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 		// Fetch more results
 		moreUsers, err := client.ListUsers(ctx, groupId, &users[limit].UserID)
 
-		if err == nil {
-			retVal = append(retVal, moreUsers...)
+		if err != nil {
+			return nil, fmt.Errorf("GET list users failed: %w", err)
 		}
+		retVal = append(retVal, moreUsers...)
 	}
 
 	return retVal, nil
@@ -221,23 +222,27 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 
 	if resp != nil {
 		defer resp.Body.Close() // nolint:errcheck
+		switch resp.StatusCode {
+		case 200:
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, fmt.Errorf("GET reading response body failed: %w", err)
+			}
+		
+			group, err := unmarshalGroupJson(body)
+			if err != nil {
+				return nil, fmt.Errorf("GET unmarshal response body failed: %w", err)
+			}
+		
+			return &group, nil
+		case 204:
+			// Cloudian-API returns 204 if the group does not exist
+			return nil, nil
+		default: 
+			return nil, fmt.Errorf("GET unexpected status code: %d", resp.StatusCode)
+		}
 	}
 
-	if resp.StatusCode == 200 {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return nil, fmt.Errorf("GET reading response body failed: %w", err)
-		}
-
-		group, err := unmarshalGroupJson(body)
-		if err != nil {
-			return nil, fmt.Errorf("GET unmarshal response body failed: %w", err)
-		}
-
-		return &group, nil
-	}
-
-	// Cloudian-API returns 204 if the group does not exist
 	return nil, err
 }
 
