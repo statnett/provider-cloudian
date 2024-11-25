@@ -79,34 +79,33 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 
 	if err != nil {
 		return nil, fmt.Errorf("GET list users failed: %w", err)
-	} else {
-		body, err := io.ReadAll(resp.Body)
-		defer resp.Body.Close() // nolint:errcheck
-		if err != nil {
-			return nil, fmt.Errorf("GET reading list users response body failed: %w", err)
-		}
-
-		users, err := unmarshalUsersJson(body)
-		if err != nil {
-			return nil, fmt.Errorf("GET unmarshal users response body failed: %w", err)
-		}
-
-		retVal = append(retVal, users...)
-
-		// list users is a paginated API endpoint, so we need to check the limit and use an offset to fetch more
-		if len(users) > limit {
-			// There is some ambiguity in the GET /user/list endpoint documentation, but it seems
-			// that UserId is the correct key for this parameter (and not CanonicalUserId)
-			// Fetch more results
-			moreUsers, err := client.ListUsers(ctx, groupId, &users[limit].UserID)
-
-			if err == nil {
-				retVal = append(retVal, moreUsers...)
-			}
-		}
-
-		return retVal, nil
 	}
+	body, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close() // nolint:errcheck
+	if err != nil {
+		return nil, fmt.Errorf("GET reading list users response body failed: %w", err)
+	}
+
+	users, err := unmarshalUsersJson(body)
+	if err != nil {
+		return nil, fmt.Errorf("GET unmarshal users response body failed: %w", err)
+	}
+
+	retVal = append(retVal, users...)
+
+	// list users is a paginated API endpoint, so we need to check the limit and use an offset to fetch more
+	if len(users) > limit {
+		// There is some ambiguity in the GET /user/list endpoint documentation, but it seems
+		// that UserId is the correct key for this parameter (and not CanonicalUserId)
+		// Fetch more results
+		moreUsers, err := client.ListUsers(ctx, groupId, &users[limit].UserID)
+
+		if err == nil {
+			retVal = append(retVal, moreUsers...)
+		}
+	}
+
+	return retVal, nil
 
 }
 
