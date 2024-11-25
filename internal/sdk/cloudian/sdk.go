@@ -69,8 +69,9 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 	if err != nil {
 		return nil, fmt.Errorf("GET list users failed: %w", err)
 	}
-	body, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close() // nolint:errcheck
+
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("GET reading list users response body failed: %w", err)
 	}
@@ -105,32 +106,30 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 
 	req, err := client.newRequest(ctx, url, http.MethodDelete, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("DELETE error creating request: %w", err)
 	}
 
 	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("DELETE to cloudian /user got: %w", err)
 	}
-	if resp != nil {
-		defer resp.Body.Close() // nolint:errcheck
-	}
+	defer resp.Body.Close() // nolint:errcheck
 
-	return err
+	return nil
 }
 
 // Delete a group and all its members
 func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) error {
 	users, err := client.ListUsers(ctx, groupId, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("error listing users: %w", err)
 	}
 
 	for _, user := range users {
 		err := client.DeleteUser(ctx, user)
 		if err != nil {
-			return fmt.Errorf("Error deleting user: %w", err)
+			return fmt.Errorf("error deleting user: %w", err)
 		}
 
 	}
@@ -144,7 +143,7 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 
 	req, err := client.newRequest(ctx, url, http.MethodDelete, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating request: %w", err)
 	}
 
 	resp, err := client.httpClient.Do(req)
@@ -162,12 +161,12 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 
 	jsonData, err := marshalGroup(group)
 	if err != nil {
-		return fmt.Errorf("Error marshaling JSON: %w", err)
+		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
 	req, err := client.newRequest(ctx, url, http.MethodPost, &jsonData)
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating request: %w", err)
 	}
 
 	resp, err := client.httpClient.Do(req)
@@ -177,7 +176,7 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 	}
 	defer resp.Body.Close() // nolint:errcheck
 
-	return err
+	return nil
 }
 
 func (client Client) UpdateGroup(ctx context.Context, group Group) error {
@@ -186,13 +185,13 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 
 	jsonData, err := marshalGroup(group)
 	if err != nil {
-		return fmt.Errorf("Error marshaling JSON: %w", err)
+		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
 	// Create a context with a timeout
 	req, err := client.newRequest(ctx, url, http.MethodPut, &jsonData)
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating request: %w", err)
 	}
 
 	resp, err := client.httpClient.Do(req)
@@ -200,7 +199,6 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	if err != nil {
 		return fmt.Errorf("PUT to cloudian /group: %w", err)
 	}
-
 	defer resp.Body.Close() // nolint:errcheck
 
 	return nil
@@ -219,31 +217,28 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 	if err != nil {
 		return nil, fmt.Errorf("GET error: %w", err)
 	}
+	defer resp.Body.Close() // nolint:errcheck
 
-	if resp != nil {
-		defer resp.Body.Close() // nolint:errcheck
-		switch resp.StatusCode {
-		case 200:
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return nil, fmt.Errorf("GET reading response body failed: %w", err)
-			}
-
-			group, err := unmarshalGroupJson(body)
-			if err != nil {
-				return nil, fmt.Errorf("GET unmarshal response body failed: %w", err)
-			}
-
-			return &group, nil
-		case 204:
-			// Cloudian-API returns 204 if the group does not exist
-			return nil, nil
-		default:
-			return nil, fmt.Errorf("GET unexpected status code: %d", resp.StatusCode)
+	switch resp.StatusCode {
+	case 200:
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("GET reading response body failed: %w", err)
 		}
+
+		group, err := unmarshalGroupJson(body)
+		if err != nil {
+			return nil, fmt.Errorf("GET unmarshal response body failed: %w", err)
+		}
+
+		return &group, nil
+	case 204:
+		// Cloudian-API returns 204 if the group does not exist
+		return nil, nil
+	default:
+		return nil, fmt.Errorf("GET unexpected status. Failure: %w", err)
 	}
 
-	return nil, err
 }
 
 func (client Client) newRequest(ctx context.Context, url string, method string, body *[]byte) (*http.Request, error) {
