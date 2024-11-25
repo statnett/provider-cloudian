@@ -27,9 +27,9 @@ type Group struct {
 	LDAPSearchUserBase string   `json:"ldapSearchUserBase"`
 	LDAPServerURL      string   `json:"ldapServerURL"`
 	LDAPUserDNTemplate string   `json:"ldapUserDNTemplate"`
-	S3endpointsHTTP    []string `json:"s3endpointshttp"`
-	S3endpointsHTTPS   []string `json:"s3endpointshttps"`
-	S3websiteendpoints []string `json:"s3websiteendpoints"`
+	S3EndpointsHTTP    []string `json:"s3endpointshttp"`
+	S3EndpointsHTTPS   []string `json:"s3endpointshttps"`
+	S3WebSiteEndpoints []string `json:"s3websiteendpoints"`
 }
 
 type User struct {

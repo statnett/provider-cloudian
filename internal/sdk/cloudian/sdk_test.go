@@ -101,9 +101,9 @@ func (group Group) Generate(rand *rand.Rand, size int) reflect.Value {
 		LDAPSearchUserBase: "",
 		LDAPServerURL:      "",
 		LDAPUserDNTemplate: "",
-		S3endpointsHTTP:    []string{"ALL"},
-		S3endpointsHTTPS:   []string{"ALL"},
-		S3websiteendpoints: []string{"ALL"},
+		S3EndpointsHTTP:    []string{"ALL"},
+		S3EndpointsHTTPS:   []string{"ALL"},
+		S3WebSiteEndpoints: []string{"ALL"},
 	})
 }
 
