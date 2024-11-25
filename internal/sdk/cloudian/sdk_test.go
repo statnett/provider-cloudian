@@ -8,16 +8,6 @@ import (
 	"testing/quick"
 )
 
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-. "
-
-func randomString(length int) string {
-	var sb strings.Builder
-	for i := 0; i < length; i++ {
-		sb.WriteByte(charset[rand.Intn(len(charset))])
-	}
-	return sb.String()
-}
-
 func TestRealisticGroupSerialization(t *testing.T) {
 	jsonString := `{
 			"active": "true",
@@ -82,7 +72,7 @@ func TestUnmarshalUsers(t *testing.T) {
 			"userType": "User",
 			"website": "",
 			"zip": ""
-		}]`
+			}]`
 
 	users, err := unmarshalUsersJson([]byte(jsonString))
 	if err != nil {
@@ -135,4 +125,15 @@ func TestGroupSerialization(t *testing.T) {
 	if err := quick.Check(f, nil); err != nil {
 		t.Error(err)
 	}
+}
+
+const charset = "abcdefghijklmnopqrstuvwxyzæøåABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ-. "
+
+func randomString(length int) string {
+	var sb strings.Builder
+	runes := []rune(charset)
+	for i := 0; i < length; i++ {
+		sb.WriteRune(runes[rand.Intn(len(runes))])
+	}
+	return sb.String()
 }
