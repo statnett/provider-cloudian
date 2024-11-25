@@ -182,7 +182,6 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 
 // Updates a group if it does not exists.
 func (client Client) UpdateGroup(ctx context.Context, group Group) error {
-
 	url := client.baseURL + "/group"
 
 	jsonData, err := marshalGroup(group)
