@@ -52,7 +52,7 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 
 	limit := 100
 
-	var offsetQueryParam = ""
+	offsetQueryParam := ""
 	if offsetUserId != nil {
 		offsetQueryParam = "&offset=" + *offsetUserId
 	}
