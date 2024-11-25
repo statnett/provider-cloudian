@@ -228,17 +228,17 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 			if err != nil {
 				return nil, fmt.Errorf("GET reading response body failed: %w", err)
 			}
-		
+
 			group, err := unmarshalGroupJson(body)
 			if err != nil {
 				return nil, fmt.Errorf("GET unmarshal response body failed: %w", err)
 			}
-		
+
 			return &group, nil
 		case 204:
 			// Cloudian-API returns 204 if the group does not exist
 			return nil, nil
-		default: 
+		default:
 			return nil, fmt.Errorf("GET unexpected status code: %d", resp.StatusCode)
 		}
 	}
