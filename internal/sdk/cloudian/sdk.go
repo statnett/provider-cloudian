@@ -46,7 +46,7 @@ func NewClient(baseUrl string, tokenBase64 string) *Client {
 	}
 }
 
-// List all users of a group
+// List all users of a group.
 func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId *string) ([]User, error) {
 	var retVal []User
 
@@ -100,7 +100,7 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 
 }
 
-// Delete a single user
+// Delete a single user. Errors if the user does not exist.
 func (client Client) DeleteUser(ctx context.Context, user User) error {
 	url := client.baseURL + "/user?userId=" + user.UserID + "&groupId=" + user.GroupID + "&canonicalUserId=" + user.CanonicalUserID
 
@@ -119,7 +119,7 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 	return nil
 }
 
-// Delete a group and all its members
+// Delete a group and all its members.
 func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) error {
 	users, err := client.ListUsers(ctx, groupId, nil)
 	if err != nil {
@@ -137,7 +137,7 @@ func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) e
 	return client.DeleteGroup(ctx, groupId)
 }
 
-// Deletes a group if it is without members
+// Deletes a group if it is without members.
 func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 	url := client.baseURL + "/group?groupId=" + groupId
 
@@ -156,6 +156,7 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 	return nil
 }
 
+// Creates a group.
 func (client Client) CreateGroup(ctx context.Context, group Group) error {
 	url := client.baseURL + "/group"
 
@@ -179,6 +180,7 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 	return nil
 }
 
+// Updates a group if it does not exists.
 func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 
 	url := client.baseURL + "/group"
@@ -204,6 +206,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	return nil
 }
 
+// Get a group. Returns nil if the group does not exist.
 func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, error) {
 	url := client.baseURL + "/group?groupId=" + groupId
 
