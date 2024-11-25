@@ -32,6 +32,14 @@ type Group struct {
 	S3WebSiteEndpoints []string `json:"s3websiteendpoints"`
 }
 
+type GroupNotFoundError struct {
+	groupId string
+}
+
+func (e GroupNotFoundError) Error() string {
+	return fmt.Sprintf("group %s not found", e.groupId)
+}
+
 type User struct {
 	UserID          string `json:"userId"`
 	GroupID         string `json:"groupId"`
@@ -206,7 +214,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	return nil
 }
 
-// Get a group. Returns nil if the group does not exist.
+// Get a group. Returns a `GroupNotFoundError` with the groupId if the group does not exist.
 func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, error) {
 	url := client.baseURL + "/group?groupId=" + groupId
 
@@ -238,7 +246,7 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 		return &group, nil
 	case 204:
 		// Cloudian-API returns 204 if the group does not exist
-		return nil, nil
+		return nil, GroupNotFoundError{groupId: groupId}
 	default:
 		return nil, fmt.Errorf("GET unexpected status. Failure: %w", err)
 	}
