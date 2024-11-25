@@ -65,10 +65,10 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 	}
 
 	resp, err := client.httpClient.Do(req)
-
 	if err != nil {
 		return nil, fmt.Errorf("GET list users failed: %w", err)
 	}
+
 	defer resp.Body.Close() // nolint:errcheck
 
 	body, err := io.ReadAll(resp.Body)
@@ -110,10 +110,10 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 	}
 
 	resp, err := client.httpClient.Do(req)
-
 	if err != nil {
 		return fmt.Errorf("DELETE to cloudian /user got: %w", err)
 	}
+
 	defer resp.Body.Close() // nolint:errcheck
 
 	return nil
@@ -147,10 +147,10 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 	}
 
 	resp, err := client.httpClient.Do(req)
-
 	if err != nil {
 		return fmt.Errorf("DELETE to cloudian /group got: %w", err)
 	}
+
 	defer resp.Body.Close() // nolint:errcheck
 
 	return nil
@@ -171,10 +171,10 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 	}
 
 	resp, err := client.httpClient.Do(req)
-
 	if err != nil {
 		return fmt.Errorf("POST to cloudian /group: %w", err)
 	}
+
 	defer resp.Body.Close() // nolint:errcheck
 
 	return nil
@@ -197,10 +197,10 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	}
 
 	resp, err := client.httpClient.Do(req)
-
 	if err != nil {
 		return fmt.Errorf("PUT to cloudian /group: %w", err)
 	}
+
 	defer resp.Body.Close() // nolint:errcheck
 
 	return nil
@@ -216,10 +216,10 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 	}
 
 	resp, err := client.httpClient.Do(req)
-
 	if err != nil {
 		return nil, fmt.Errorf("GET error: %w", err)
 	}
+
 	defer resp.Body.Close() // nolint:errcheck
 
 	switch resp.StatusCode {
