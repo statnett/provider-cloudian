@@ -12,7 +12,7 @@ import (
 
 type Client struct {
 	baseURL    string
-	httpClient *http.Client
+	HTTPClient *http.Client
 	token      string
 }
 
@@ -27,8 +27,8 @@ type Group struct {
 	LDAPSearchUserBase string   `json:"ldapSearchUserBase"`
 	LDAPServerURL      string   `json:"ldapServerURL"`
 	LDAPUserDNTemplate string   `json:"ldapUserDNTemplate"`
-	S3endpointshttp    []string `json:"s3endpointshttp"`
-	S3endpointshttps   []string `json:"s3endpointshttps"`
+	S3endpointsHTTP    []string `json:"s3endpointshttp"`
+	S3endpointsHTTPS   []string `json:"s3endpointshttps"`
 	S3websiteendpoints []string `json:"s3websiteendpoints"`
 }
 
@@ -41,7 +41,7 @@ type User struct {
 func NewClient(baseUrl string, tokenBase64 string) *Client {
 	return &Client{
 		baseURL:    baseUrl,
-		httpClient: &http.Client{},
+		HTTPClient: &http.Client{},
 		token:      tokenBase64,
 	}
 }
@@ -64,7 +64,7 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 		return nil, fmt.Errorf("GET error creating list request: %w", err)
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 
 	if err != nil {
 		return nil, fmt.Errorf("GET list users failed: %w", err)
@@ -109,7 +109,7 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 		return fmt.Errorf("DELETE error creating request: %w", err)
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 
 	if err != nil {
 		return fmt.Errorf("DELETE to cloudian /user got: %w", err)
@@ -146,7 +146,7 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 
 	if err != nil {
 		return fmt.Errorf("DELETE to cloudian /group got: %w", err)
@@ -170,7 +170,7 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 
 	if err != nil {
 		return fmt.Errorf("POST to cloudian /group: %w", err)
@@ -196,7 +196,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 
 	if err != nil {
 		return fmt.Errorf("PUT to cloudian /group: %w", err)
@@ -215,7 +215,7 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 		return nil, err
 	}
 
-	resp, err := client.httpClient.Do(req)
+	resp, err := client.HTTPClient.Do(req)
 
 	if err != nil {
 		return nil, fmt.Errorf("GET error: %w", err)
