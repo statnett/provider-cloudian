@@ -16,25 +16,6 @@ type Client struct {
 	token      string
 }
 
-func NewClient(baseUrl string, tokenBase64 string) *Client {
-	return &Client{
-		baseURL:    baseUrl,
-		httpClient: &http.Client{},
-		token:      tokenBase64,
-	}
-}
-
-func (client Client) newRequest(ctx context.Context, url string, method string, body *[]byte) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(*body))
-	if err != nil {
-		return req, fmt.Errorf("error creating request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+client.token)
-
-	return req, nil
-}
-
 type Group struct {
 	Active             string   `json:"active"`
 	GroupID            string   `json:"groupId"`
@@ -55,6 +36,14 @@ type User struct {
 	UserID          string `json:"userId"`
 	GroupID         string `json:"groupId"`
 	CanonicalUserID string `json:"canonicalUserId"`
+}
+
+func NewClient(baseUrl string, tokenBase64 string) *Client {
+	return &Client{
+		baseURL:    baseUrl,
+		httpClient: &http.Client{},
+		token:      tokenBase64,
+	}
 }
 
 // List all users of a group
@@ -250,6 +239,17 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 
 	// Cloudian-API returns 204 if the group does not exist
 	return nil, err
+}
+
+func (client Client) newRequest(ctx context.Context, url string, method string, body *[]byte) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(*body))
+	if err != nil {
+		return req, fmt.Errorf("error creating request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Basic "+client.token)
+
+	return req, nil
 }
 
 func marshalGroup(group Group) ([]byte, error) {
