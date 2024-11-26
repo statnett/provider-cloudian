@@ -113,42 +113,18 @@ func (group Group) Generate(rand *rand.Rand, size int) reflect.Value {
 }
 
 func TestGenericError(t *testing.T) {
-	e := errors.New("Random failure")
+	err := errors.New("Random failure")
 
-	switch CheckResponseReason(e) {
-	case NotFound:
-		t.Error("Expected NotFound")
-	case Unknown: // Expected
+	if errors.Is(err, ErrNotFound) {
+		t.Error("Expected not to be ErrNotFound")
 	}
 }
 
-func TestWrappedGrouGenericError(t *testing.T) {
-	e := fmt.Errorf("wrap it: %w", errors.New("Random failure"))
+func TestWrappedErrNotFound(t *testing.T) {
+	err := fmt.Errorf("wrap it: %w", ErrNotFound)
 
-	switch CheckResponseReason(e) {
-	case NotFound:
-		t.Error("Expected NotFound")
-	case Unknown: // Expected
-	}
-}
-
-func TestGroupNotFoundError(t *testing.T) {
-	e := groupNotFoundError{}
-
-	switch CheckResponseReason(e) {
-	case NotFound: // Expected
-	case Unknown:
-		t.Error("Expected NotFound")
-	}
-}
-
-func TestWrappedGroupNotFoundError(t *testing.T) {
-	e := fmt.Errorf("wrap it: %w", groupNotFoundError{})
-
-	switch CheckResponseReason(e) {
-	case NotFound: // Expected
-	case Unknown:
-		t.Error("Expected NotFound")
+	if !errors.Is(err, ErrNotFound) {
+		t.Error("Expected to be ErrNotFound")
 	}
 }
 

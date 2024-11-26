@@ -39,12 +39,7 @@ type User struct {
 	CanonicalUserID string `json:"canonicalUserId"`
 }
 
-type ResponseReason int
-
-const (
-	NotFound ResponseReason = iota
-	Unknown
-)
+var ErrNotFound = errors.New("not found")
 
 func NewClient(baseUrl string, tokenBase64 string) *Client {
 	return &Client{
@@ -215,7 +210,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 }
 
 // Get a group. Returns an error even in the case of a group not found.
-// This error can be checked for an enum value `ResponseReason` using `CheckResponseReason`
+// This error can then be checked against ErrNotFound: errors.Is(err, ErrNotFound)
 func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, error) {
 	url := client.baseURL + "/group?groupId=" + groupId
 
@@ -247,20 +242,11 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 		return &group, nil
 	case 204:
 		// Cloudian-API returns 204 if the group does not exist
-		return nil, groupNotFoundError{}
+		return nil, ErrNotFound
 	default:
 		return nil, fmt.Errorf("GET unexpected status. Failure: %w", err)
 	}
 
-}
-
-func CheckResponseReason(err error) ResponseReason {
-	var targetErr groupNotFoundError
-
-	if errors.As(err, &targetErr) {
-		return NotFound
-	}
-	return Unknown
 }
 
 func (client Client) newRequest(ctx context.Context, url string, method string, body *[]byte) (*http.Request, error) {
@@ -272,10 +258,4 @@ func (client Client) newRequest(ctx context.Context, url string, method string, 
 	req.Header.Set("Authorization", "Basic "+client.token)
 
 	return req, nil
-}
-
-type groupNotFoundError struct{}
-
-func (e groupNotFoundError) Error() string {
-	return "group not found"
 }
