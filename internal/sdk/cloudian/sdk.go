@@ -45,7 +45,7 @@ func NewClient(baseUrl string, tlsInsecureSkipVerify bool, tokenBase64 string) *
 	return &Client{
 		baseURL: baseUrl,
 		httpClient: &http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsInsecureSkipVerify},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsInsecureSkipVerify}, // nolint:gosec
 		}},
 		token: tokenBase64,
 	}
@@ -116,11 +116,10 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 	}
 
 	resp, err := client.httpClient.Do(req)
-
 	if err != nil {
 		return fmt.Errorf("DELETE to cloudian /user got: %w", err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() // nolint:errcheck
 
 	switch resp.StatusCode {
 	case 200:
