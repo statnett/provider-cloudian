@@ -27,7 +27,44 @@ import (
 
 // GroupParameters are the configurable fields of a Group.
 type GroupParameters struct {
-	ConfigurableField string `json:"configurableField"`
+	// Active determines whether the group is enabled ("true") or disabled ("false") in the system.
+	//+optional
+	//+kubebuilder:validation:Pattern=`^(true|false)$`
+	Active *string `json:"active"`
+	// GroupID is the group ID (known as Name in the GUI).
+	//+kubebuilder:validation:MinLength=1
+	//+kubebuilder:validation:MaxLength=64
+	//+kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]*$`
+	GroupID string `json:"groupId"`
+	// GroupName is the group name (known as Description in the GUI).
+	//+optional
+	//+kubebuilder:validation:MaxLength=64
+	GroupName *string `json:"groupName"`
+	//+optional
+	// LDAPEnabled determines whether LDAP authentication is enabled for members of this group.
+	LDAPEnabled *bool `json:"ldapEnabled"`
+	//+optional
+	// LDAPGroup us the group's name from the LDAP system.
+	LDAPGroup *string `json:"ldapGroup"`
+	//+optional
+	LDAPMatchAttribute *string `json:"ldapMatchAttribute"`
+	//+optional
+	LDAPSearch *string `json:"ldapSearch"`
+	// LDAPSearchUserBase specifies the LDAP search base from which the CMC should start when retrieving the user's LDAP record in order to apply filtering.
+	//+optional
+	LDAPSearchUserBase *string `json:"ldapSearchUserBase"`
+	//+optional
+	// LDAPServerURL specifies the URL that the CMC should use to access the LDAP Server when authenticating users in this group.
+	LDAPServerURL *string `json:"ldapServerURL"`
+	// LDAPUserDNTemplate specifies how users within this group will be authenticated against the LDAP system when they log into the CMC.
+	//+optional
+	LDAPUserDNTemplate *string `json:"ldapUserDNTemplate"`
+	//+optional
+	S3EndpointsHTTPS []string `json:"s3endpointshttp"`
+	//+optional
+	S3EndpointsHTTP []string `json:"s3endpointshttps"`
+	//+optional
+	S3WebsiteEndpoints []string `json:"s3websiteendpoints"`
 }
 
 // GroupObservation are the observable fields of a Group.
