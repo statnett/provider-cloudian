@@ -2,6 +2,8 @@ package cloudian
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"math/rand"
 	"reflect"
 	"strings"
@@ -108,6 +110,46 @@ func (group Group) Generate(rand *rand.Rand, size int) reflect.Value {
 		S3EndpointsHTTPS:   []string{"ALL"},
 		S3WebSiteEndpoints: []string{"ALL"},
 	})
+}
+
+func TestGenericError(t *testing.T) {
+	e := errors.New("Random failure")
+
+	switch CheckResponseReason(e) {
+	case NotFound:
+		t.Error("Expected NotFound")
+	case Unknown: // Expected
+	}
+}
+
+func TestWrappedGrouGenericError(t *testing.T) {
+	e := fmt.Errorf("wrap it: %w", errors.New("Random failure"))
+
+	switch CheckResponseReason(e) {
+	case NotFound:
+		t.Error("Expected NotFound")
+	case Unknown: // Expected
+	}
+}
+
+func TestGroupNotFoundError(t *testing.T) {
+	e := groupNotFoundError{}
+
+	switch CheckResponseReason(e) {
+	case NotFound: // Expected
+	case Unknown:
+		t.Error("Expected NotFound")
+	}
+}
+
+func TestWrappedGroupNotFoundError(t *testing.T) {
+	e := fmt.Errorf("wrap it: %w", groupNotFoundError{})
+
+	switch CheckResponseReason(e) {
+	case NotFound: // Expected
+	case Unknown:
+		t.Error("Expected NotFound")
+	}
 }
 
 func TestGroupSerialization(t *testing.T) {
