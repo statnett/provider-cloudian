@@ -6,11 +6,5 @@
       "matchUpdateTypes": ["minor", "patch", "digest"],
       "automerge": true,
     },
-    {
-      "matchPackageNames": [
-        "ghcr.io/aquasecurity/trivy",
-      ],
-      "semanticCommitType": "fix",
-    },
   ],
 }
