@@ -173,7 +173,7 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	req, err := client.newRequest(ctx, url, http.MethodPost, jsonData)
+	req, err := client.newRequest(ctx, url, http.MethodPut, jsonData)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -196,7 +196,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	}
 
 	// Create a context with a timeout
-	req, err := client.newRequest(ctx, url, http.MethodPut, jsonData)
+	req, err := client.newRequest(ctx, url, http.MethodPost, jsonData)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -243,7 +243,7 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 		// Cloudian-API returns 204 if the group does not exist
 		return nil, ErrNotFound
 	default:
-		return nil, fmt.Errorf("GET unexpected status. Failure: %w", err)
+		return nil, fmt.Errorf("GET unexpected status. StatusCode: [%d] Failure: %w", resp.StatusCode, err)
 	}
 }
 
@@ -256,7 +256,6 @@ func (client Client) newRequest(ctx context.Context, url string, method string, 
 	if err != nil {
 		return req, fmt.Errorf("error creating request: %w", err)
 	}
-	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+client.token)
 
