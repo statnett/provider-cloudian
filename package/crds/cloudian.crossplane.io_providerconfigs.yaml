@@ -47,8 +47,9 @@ spec:
           spec:
             description: A ProviderConfigSpec defines the desired state of a ProviderConfig.
             properties:
-              credentials:
-                description: Credentials required to authenticate to this provider.
+              authHeader:
+                description: AuthHeader is the value of the Authorization header in
+                  requests to Cloudian API.
                 properties:
                   env:
                     description: |-
@@ -103,8 +104,11 @@ spec:
                 required:
                 - source
                 type: object
+              endpoint:
+                type: string
             required:
-            - credentials
+            - authHeader
+            - endpoint
             type: object
           status:
             description: A ProviderConfigStatus reflects the observed state of a ProviderConfig.

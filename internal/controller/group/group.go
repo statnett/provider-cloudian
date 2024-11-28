@@ -18,16 +18,19 @@ package group
 
 import (
 	"context"
-	"fmt"
+	"encoding/base64"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/connection"
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
 	"github.com/crossplane/crossplane-runtime/pkg/event"
+	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
@@ -35,6 +38,7 @@ import (
 	"github.com/statnett/provider-cloudian/apis/user/v1alpha1"
 	apisv1alpha1 "github.com/statnett/provider-cloudian/apis/v1alpha1"
 	"github.com/statnett/provider-cloudian/internal/features"
+	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
 const (
@@ -43,14 +47,18 @@ const (
 	errGetPC        = "cannot get ProviderConfig"
 	errGetCreds     = "cannot get credentials"
 
-	errNewClient = "cannot create new Service"
+	errNewClient   = "cannot create new Service"
+	errGetGroup    = "cannot get Group"
+	errUpdateGroup = "cannot update Group"
+	errDeleteGroup = "cannot delete Group"
+	errCreateGroup = "cannot create Group"
 )
 
-// A NoOpService does nothing.
-type NoOpService struct{}
-
 var (
-	newNoOpService = func(_ []byte) (interface{}, error) { return &NoOpService{}, nil }
+	newCloudianService = func(providerConfig apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error) {
+		// FIXME: Don't require InsecureSkipVerify
+		return cloudian.NewClient(providerConfig.Spec.Endpoint, true, base64.StdEncoding.EncodeToString(authHeader)), nil
+	}
 )
 
 // Setup adds a controller that reconciles Group managed resources.
@@ -67,7 +75,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		managed.WithExternalConnecter(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1.ProviderConfigUsage{}),
-			newServiceFn: newNoOpService}),
+			newServiceFn: newCloudianService}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
 		managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))),
@@ -86,7 +94,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 type connector struct {
 	kube         client.Client
 	usage        resource.Tracker
-	newServiceFn func(creds []byte) (interface{}, error)
+	newServiceFn func(providerConfig apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error)
 }
 
 // Connect typically produces an ExternalClient by:
@@ -109,26 +117,24 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.Wrap(err, errGetPC)
 	}
 
-	cd := pc.Spec.Credentials
-	data, err := resource.CommonCredentialExtractor(ctx, cd.Source, c.kube, cd.CommonCredentialSelectors)
+	cd := pc.Spec.AuthHeader
+	authHeader, err := resource.CommonCredentialExtractor(ctx, cd.Source, c.kube, cd.CommonCredentialSelectors)
 	if err != nil {
 		return nil, errors.Wrap(err, errGetCreds)
 	}
 
-	svc, err := c.newServiceFn(data)
+	svc, err := c.newServiceFn(*pc, authHeader)
 	if err != nil {
 		return nil, errors.Wrap(err, errNewClient)
 	}
 
-	return &external{service: svc}, nil
+	return &external{cloudianService: svc}, nil
 }
 
 // An ExternalClient observes, then either creates, updates, or deletes an
 // external resource to ensure it reflects the managed resource's desired state.
 type external struct {
-	// A 'client' used to connect to the external resource API. In practice this
-	// would be something like an AWS SDK client.
-	service interface{}
+	cloudianService *cloudian.Client
 }
 
 func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
@@ -137,8 +143,30 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.New(errNotGroup)
 	}
 
-	// These fmt statements should be removed in the real implementation.
-	fmt.Printf("Observing: %+v", cr)
+	log := ctrl.LoggerFrom(ctx)
+	log.Info("Observing group", "group", cr.Spec.ForProvider.GroupID)
+
+	group, err := c.cloudianService.GetGroup(ctx, cr.Spec.ForProvider.GroupID)
+
+	if err != nil {
+		// group does not exist
+		if errors.Is(err, cloudian.ErrNotFound) {
+			log.Info("Group not found", "group", cr.Spec.ForProvider.GroupID)
+			return managed.ExternalObservation{ResourceExists: false}, nil
+		}
+		log.Info("Failed to get group", "group", cr.Spec.ForProvider.GroupID)
+		// group exists, but we failed to get it
+		return managed.ExternalObservation{}, errors.Wrap(err, errGetGroup)
+	}
+
+	// group exists and we got it
+	cr.SetConditions(xpv1.Available())
+
+	desired := cloudian.Group{
+		GroupID: meta.GetExternalName(cr),
+	}
+
+	// TODO should we set any field in the cr Status? cr.Status.AtProvider.GroupID or something?
 
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
@@ -149,12 +177,28 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
-		ResourceUpToDate: true,
+		ResourceUpToDate: cmp.Equal(group, desired),
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
 		ConnectionDetails: managed.ConnectionDetails{},
 	}, nil
+}
+
+var defaultGroup cloudian.Group = cloudian.Group{
+	Active:             "true",
+	GroupID:            "default",
+	GroupName:          "default",
+	LDAPEnabled:        false,
+	LDAPGroup:          "",
+	LDAPMatchAttribute: "",
+	LDAPSearch:         "",
+	LDAPSearchUserBase: "",
+	LDAPServerURL:      "",
+	LDAPUserDNTemplate: "",
+	S3EndpointsHTTP:    []string{"ALL"},
+	S3EndpointsHTTPS:   []string{"ALL"},
+	S3WebSiteEndpoints: []string{"ALL"},
 }
 
 func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
@@ -163,7 +207,18 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, errors.New(errNotGroup)
 	}
 
-	fmt.Printf("Creating: %+v", cr)
+	defaultGroup.GroupID = cr.Spec.ForProvider.GroupID
+
+	log := ctrl.LoggerFrom(ctx)
+	log.Info("Creating group", "group", defaultGroup)
+
+	// TODO set more than group id
+	cr.SetConditions(xpv1.Creating())
+	err := c.cloudianService.CreateGroup(ctx, defaultGroup)
+	if err != nil {
+		log.Info("Could not create group", "group", defaultGroup)
+		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
+	}
 
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
@@ -178,7 +233,13 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalUpdate{}, errors.New(errNotGroup)
 	}
 
-	fmt.Printf("Updating: %+v", cr)
+	defaultGroup.GroupID = cr.Spec.ForProvider.GroupID
+
+	// TODO set more than group id
+	err := c.cloudianService.UpdateGroup(ctx, defaultGroup)
+	if err != nil {
+		return managed.ExternalUpdate{}, errors.Wrap(err, errUpdateGroup)
+	}
 
 	return managed.ExternalUpdate{
 		// Optionally return any details that may be required to connect to the
@@ -193,12 +254,18 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalDelete{}, errors.New(errNotGroup)
 	}
 
-	fmt.Printf("Deleting: %+v", cr)
+	// TODO set more than group id
+	defaultGroup.GroupID = cr.Spec.ForProvider.GroupID
+
+	cr.SetConditions(xpv1.Deleting())
+	err := c.cloudianService.DeleteGroup(ctx, cr.Spec.ForProvider.GroupID)
+	if err != nil {
+		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteGroup)
+	}
 
 	return managed.ExternalDelete{}, nil
 }
 
 func (c *external) Disconnect(ctx context.Context) error {
-	// TODO implement me
-	panic("implement me")
+	return nil
 }
