@@ -143,18 +143,13 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.New(errNotGroup)
 	}
 
-	log := ctrl.LoggerFrom(ctx)
-	log.Info("Observing group", "group", cr.Spec.ForProvider.GroupID)
-
 	group, err := c.cloudianService.GetGroup(ctx, cr.Spec.ForProvider.GroupID)
 
 	if err != nil {
 		// group does not exist
 		if errors.Is(err, cloudian.ErrNotFound) {
-			log.Info("Group not found", "group", cr.Spec.ForProvider.GroupID)
 			return managed.ExternalObservation{ResourceExists: false}, nil
 		}
-		log.Info("Failed to get group", "group", cr.Spec.ForProvider.GroupID)
 		// group exists, but we failed to get it
 		return managed.ExternalObservation{}, errors.Wrap(err, errGetGroup)
 	}
@@ -224,13 +219,9 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	group := groupWithDefaultedFields(cr)
 
-	log := ctrl.LoggerFrom(ctx)
-	log.Info("Creating group", "group", group)
-
 	cr.SetConditions(xpv1.Creating())
 	err := c.cloudianService.CreateGroup(ctx, group)
 	if err != nil {
-		log.Info("Could not create group", "group", group)
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
 	}
 
