@@ -196,7 +196,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	}
 
 	// Create a context with a timeout
-	req, err := client.newRequest(ctx, url, http.MethodPut, jsonData)
+	req, err := client.newRequest(ctx, url, http.MethodPost, jsonData)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
