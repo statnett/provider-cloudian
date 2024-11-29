@@ -38,9 +38,6 @@ import (
 // https://github.com/crossplane/crossplane/blob/master/CONTRIBUTING.md#contributing-code
 
 func TestObserve(t *testing.T) {
-	type fields struct {
-		service interface{}
-	}
 
 	type args struct {
 		ctx context.Context
@@ -54,7 +51,7 @@ func TestObserve(t *testing.T) {
 
 	cases := map[string]struct {
 		reason string
-		fields fields
+		fields interface{}
 		args   args
 		want   want
 	}{

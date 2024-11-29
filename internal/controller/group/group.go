@@ -185,20 +185,35 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	}, nil
 }
 
-var defaultGroup cloudian.Group = cloudian.Group{
-	Active:             "true",
-	GroupID:            "default",
-	GroupName:          "default",
-	LDAPEnabled:        false,
-	LDAPGroup:          "",
-	LDAPMatchAttribute: "",
-	LDAPSearch:         "",
-	LDAPSearchUserBase: "",
-	LDAPServerURL:      "",
-	LDAPUserDNTemplate: "",
-	S3EndpointsHTTP:    []string{"ALL"},
-	S3EndpointsHTTPS:   []string{"ALL"},
-	S3WebSiteEndpoints: []string{"ALL"},
+func orDefault[T any](value *T, fallback T) T {
+	if value == nil {
+		return fallback
+	}
+
+	// Check if the value is a slice and if it's empty
+	if slice, ok := any(*value).([]T); ok && len(slice) == 0 {
+		return fallback
+	}
+
+	return *value
+}
+
+func groupWithDefaultedFields(cr *v1alpha1.Group) cloudian.Group {
+	return cloudian.Group{
+		Active:             orDefault(cr.Spec.ForProvider.Active, "true"),
+		GroupID:            cr.Spec.ForProvider.GroupID,
+		GroupName:          orDefault(cr.Spec.ForProvider.GroupName, ""),
+		LDAPEnabled:        orDefault(cr.Spec.ForProvider.LDAPEnabled, false),
+		LDAPGroup:          orDefault(cr.Spec.ForProvider.LDAPGroup, ""),
+		LDAPMatchAttribute: orDefault(cr.Spec.ForProvider.LDAPMatchAttribute, ""),
+		LDAPSearch:         orDefault(cr.Spec.ForProvider.LDAPSearch, ""),
+		LDAPSearchUserBase: orDefault(cr.Spec.ForProvider.LDAPSearchUserBase, ""),
+		LDAPServerURL:      orDefault(cr.Spec.ForProvider.LDAPServerURL, ""),
+		LDAPUserDNTemplate: orDefault(cr.Spec.ForProvider.LDAPUserDNTemplate, ""),
+		S3EndpointsHTTP:    orDefault(&cr.Spec.ForProvider.S3EndpointsHTTP, []string{"ALL"}),
+		S3EndpointsHTTPS:   orDefault(&cr.Spec.ForProvider.S3EndpointsHTTPS, []string{"ALL"}),
+		S3WebSiteEndpoints: orDefault(&cr.Spec.ForProvider.S3WebsiteEndpoints, []string{"ALL"}),
+	}
 }
 
 func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
@@ -207,16 +222,15 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, errors.New(errNotGroup)
 	}
 
-	defaultGroup.GroupID = cr.Spec.ForProvider.GroupID
+	group := groupWithDefaultedFields(cr)
 
 	log := ctrl.LoggerFrom(ctx)
-	log.Info("Creating group", "group", defaultGroup)
+	log.Info("Creating group", "group", group)
 
-	// TODO set more than group id
 	cr.SetConditions(xpv1.Creating())
-	err := c.cloudianService.CreateGroup(ctx, defaultGroup)
+	err := c.cloudianService.CreateGroup(ctx, group)
 	if err != nil {
-		log.Info("Could not create group", "group", defaultGroup)
+		log.Info("Could not create group", "group", group)
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
 	}
 
@@ -233,10 +247,9 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalUpdate{}, errors.New(errNotGroup)
 	}
 
-	defaultGroup.GroupID = cr.Spec.ForProvider.GroupID
+	group := groupWithDefaultedFields(cr)
 
-	// TODO set more than group id
-	err := c.cloudianService.UpdateGroup(ctx, defaultGroup)
+	err := c.cloudianService.UpdateGroup(ctx, group)
 	if err != nil {
 		return managed.ExternalUpdate{}, errors.Wrap(err, errUpdateGroup)
 	}
@@ -253,9 +266,6 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 	if !ok {
 		return managed.ExternalDelete{}, errors.New(errNotGroup)
 	}
-
-	// TODO set more than group id
-	defaultGroup.GroupID = cr.Spec.ForProvider.GroupID
 
 	cr.SetConditions(xpv1.Deleting())
 	err := c.cloudianService.DeleteGroup(ctx, cr.Spec.ForProvider.GroupID)
