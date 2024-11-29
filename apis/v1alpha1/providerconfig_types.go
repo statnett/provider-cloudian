@@ -27,8 +27,10 @@ import (
 
 // A ProviderConfigSpec defines the desired state of a ProviderConfig.
 type ProviderConfigSpec struct {
-	// Credentials required to authenticate to this provider.
-	Credentials ProviderCredentials `json:"credentials"`
+	// Endpoint is an url with protocol, hostname and port (no slash at the end) of the Cloudian API.
+	Endpoint string `json:"endpoint"`
+	// AuthHeader is the value of the Authorization header in requests to Cloudian API.
+	AuthHeader ProviderCredentials `json:"authHeader"`
 }
 
 // ProviderCredentials required to authenticate.
