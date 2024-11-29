@@ -105,6 +105,8 @@ spec:
                 - source
                 type: object
               endpoint:
+                description: Endpoint is an url with protocol, hostname and port (no
+                  slash at the end) of the Cloudian API.
                 type: string
             required:
             - authHeader
