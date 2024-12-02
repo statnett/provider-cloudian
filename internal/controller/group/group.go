@@ -53,8 +53,10 @@ type NoOpService struct{}
 
 var (
 	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error) {
-		// FIXME: Don't require InsecureSkipVerify
-		return cloudian.NewClient(providerConfig.Spec.Endpoint, true, base64.StdEncoding.EncodeToString(authHeader)), nil
+		return cloudian.NewClient(
+			cloudian.WithBaseURL(providerConfig.Spec.Endpoint),
+			cloudian.WithInsecureTLSVerify(false),
+			cloudian.WithToken(base64.StdEncoding.EncodeToString(authHeader))), nil
 	}
 )
 

@@ -41,14 +41,40 @@ type User struct {
 
 var ErrNotFound = errors.New("not found")
 
-func NewClient(baseUrl string, tlsInsecureSkipVerify bool, tokenBase64 string) *Client {
-	return &Client{
-		baseURL: baseUrl,
-		httpClient: &http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsInsecureSkipVerify}, // nolint:gosec
-		}},
-		token: tokenBase64,
+// WithBaseURL sets the base URL for the Client
+func WithBaseURL(url string) func(*Client) {
+	return func(c *Client) {
+		c.baseURL = url
 	}
+}
+
+// WithHTTPClient sets a custom HTTP client
+func WithInsecureTLSVerify(insecure bool) func(*Client) {
+	return func(c *Client) {
+		c.httpClient = &http.Client{Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}, // nolint:gosec
+		},
+		}
+	}
+}
+
+// WithToken sets a token for http basic auth
+func WithToken(token string) func(*Client) {
+	return func(c *Client) {
+		c.token = token
+	}
+}
+
+func NewClient(opts ...func(*Client)) *Client {
+	c := &Client{
+		baseURL:    "https://cloudian.example.com/api/v2",
+		httpClient: http.DefaultClient,
+		token:      "",
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 // List all users of a group.
