@@ -261,7 +261,6 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalDelete{}, errors.New(errNotGroup)
 	}
 
-	cr.SetConditions(xpv1.Deleting())
 	err := c.cloudianService.DeleteGroup(ctx, cr.Spec.ForProvider.GroupID)
 	if err != nil {
 		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteGroup)
