@@ -29,6 +29,7 @@ import (
 type GroupParameters struct {
 	// Active determines whether the group is enabled ("true") or disabled ("false") in the system.
 	//+optional
+	//+kubebuilder:default="true"
 	//+kubebuilder:validation:Pattern=`^(true|false)$`
 	Active *string `json:"active,omitempty"`
 	// GroupID is the group ID (known as Name in the GUI).
@@ -40,8 +41,9 @@ type GroupParameters struct {
 	//+optional
 	//+kubebuilder:validation:MaxLength=64
 	GroupName *string `json:"groupName,omitempty"`
-	//+optional
 	// LDAPEnabled determines whether LDAP authentication is enabled for members of this group.
+	//+optional
+	//+kubebuilder:default=false
 	LDAPEnabled *bool `json:"ldapEnabled,omitempty"`
 	//+optional
 	// LDAPGroup us the group's name from the LDAP system.
@@ -60,10 +62,13 @@ type GroupParameters struct {
 	//+optional
 	LDAPUserDNTemplate *string `json:"ldapUserDNTemplate,omitempty"`
 	//+optional
+	//+kubebuilder:default={ALL}
 	S3EndpointsHTTPS []string `json:"s3endpointshttp,omitempty"`
 	//+optional
+	//+kubebuilder:default={ALL}
 	S3EndpointsHTTP []string `json:"s3endpointshttps,omitempty"`
 	//+optional
+	//+kubebuilder:default={ALL}
 	S3WebsiteEndpoints []string `json:"s3websiteendpoints,omitempty"`
 }
 
