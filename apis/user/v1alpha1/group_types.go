@@ -31,7 +31,7 @@ type GroupParameters struct {
 	//+optional
 	//+kubebuilder:default="true"
 	//+kubebuilder:validation:Pattern=`^(true|false)$`
-	Active *string `json:"active,omitempty"`
+	Active *string `json:"active"`
 	// GroupID is the group ID (known as Name in the GUI).
 	//+kubebuilder:validation:MinLength=1
 	//+kubebuilder:validation:MaxLength=64
@@ -40,11 +40,11 @@ type GroupParameters struct {
 	// GroupName is the group name (known as Description in the GUI).
 	//+optional
 	//+kubebuilder:validation:MaxLength=64
-	GroupName *string `json:"groupName,omitempty"`
+	GroupName *string `json:"groupName"`
 	// LDAPEnabled determines whether LDAP authentication is enabled for members of this group.
 	//+optional
 	//+kubebuilder:default=false
-	LDAPEnabled *bool `json:"ldapEnabled,omitempty"`
+	LDAPEnabled *bool `json:"ldapEnabled"`
 	//+optional
 	// LDAPGroup us the group's name from the LDAP system.
 	LDAPGroup *string `json:"ldapGroup,omitempty"`
@@ -63,13 +63,13 @@ type GroupParameters struct {
 	LDAPUserDNTemplate *string `json:"ldapUserDNTemplate,omitempty"`
 	//+optional
 	//+kubebuilder:default={ALL}
-	S3EndpointsHTTPS []string `json:"s3endpointshttp,omitempty"`
+	S3EndpointsHTTPS []string `json:"s3endpointshttp"`
 	//+optional
 	//+kubebuilder:default={ALL}
-	S3EndpointsHTTP []string `json:"s3endpointshttps,omitempty"`
+	S3EndpointsHTTP []string `json:"s3endpointshttps"`
 	//+optional
 	//+kubebuilder:default={ALL}
-	S3WebsiteEndpoints []string `json:"s3websiteendpoints,omitempty"`
+	S3WebsiteEndpoints []string `json:"s3websiteendpoints"`
 }
 
 // GroupObservation are the observable fields of a Group.

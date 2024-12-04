@@ -86,6 +86,7 @@ spec:
                     pattern: ^[A-Za-z0-9_-]*$
                     type: string
                   groupName:
+                    default: ""
                     description: GroupName is the group name (known as Description
                       in the GUI).
                     maxLength: 64
