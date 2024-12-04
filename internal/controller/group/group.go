@@ -54,9 +54,10 @@ type NoOpService struct{}
 var (
 	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error) {
 		return cloudian.NewClient(
-			cloudian.WithBaseURL(providerConfig.Spec.Endpoint),
+			providerConfig.Spec.Endpoint,
+			base64.StdEncoding.EncodeToString(authHeader),
 			cloudian.WithInsecureTLSVerify(true),
-			cloudian.WithToken(base64.StdEncoding.EncodeToString(authHeader))), nil
+		), nil
 	}
 )
 
