@@ -55,7 +55,7 @@ var (
 	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error) {
 		return cloudian.NewClient(
 			cloudian.WithBaseURL(providerConfig.Spec.Endpoint),
-			cloudian.WithInsecureTLSVerify(false),
+			cloudian.WithInsecureTLSVerify(true),
 			cloudian.WithToken(base64.StdEncoding.EncodeToString(authHeader))), nil
 	}
 )
