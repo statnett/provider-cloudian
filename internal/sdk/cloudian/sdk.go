@@ -41,7 +41,7 @@ type User struct {
 
 var ErrNotFound = errors.New("not found")
 
-// WithHTTPClient sets a custom HTTP client
+// WithInsecureTLSVerify skips the TLS validation of the server certificate.
 func WithInsecureTLSVerify(insecure bool) func(*Client) {
 	return func(c *Client) {
 		c.httpClient = &http.Client{Transport: &http.Transport{
