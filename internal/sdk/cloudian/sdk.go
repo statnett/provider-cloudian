@@ -15,7 +15,7 @@ import (
 type Client struct {
 	baseURL    string
 	httpClient *http.Client
-	token      string
+	authHeader string
 }
 
 type Group struct {
@@ -50,11 +50,11 @@ func WithInsecureTLSVerify(insecure bool) func(*Client) {
 	}
 }
 
-func NewClient(baseURL string, tokenBase64Encoded string, opts ...func(*Client)) *Client {
+func NewClient(baseURL string, authHeader string, opts ...func(*Client)) *Client {
 	c := &Client{
 		baseURL:    baseURL,
 		httpClient: http.DefaultClient,
-		token:      tokenBase64Encoded,
+		authHeader: authHeader,
 	}
 	for _, opt := range opts {
 		opt(c)
@@ -269,7 +269,7 @@ func (client Client) newRequest(ctx context.Context, url string, method string, 
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+client.token)
+	req.Header.Set("Authorization", client.authHeader)
 
 	return req, nil
 }

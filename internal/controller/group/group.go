@@ -18,7 +18,6 @@ package group
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 
 	"github.com/pkg/errors"
@@ -52,10 +51,11 @@ const (
 type NoOpService struct{}
 
 var (
-	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error) {
+	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error) {
+		// FIXME: Don't require InsecureSkipVerify
 		return cloudian.NewClient(
 			providerConfig.Spec.Endpoint,
-			base64.StdEncoding.EncodeToString(authHeader),
+			authHeader,
 			cloudian.WithInsecureTLSVerify(true),
 		), nil
 	}
@@ -94,7 +94,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 type connector struct {
 	kube         client.Client
 	usage        resource.Tracker
-	newServiceFn func(providerConfig *apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error)
+	newServiceFn func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error)
 }
 
 // Connect typically produces an ExternalClient by:
@@ -123,7 +123,7 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.Wrap(err, errGetCreds)
 	}
 
-	svc, err := c.newServiceFn(pc, authHeader)
+	svc, err := c.newServiceFn(pc, string(authHeader))
 	if err != nil {
 		return nil, errors.Wrap(err, errNewClient)
 	}
