@@ -46,16 +46,15 @@ func WithInsecureTLSVerify(insecure bool) func(*Client) {
 	return func(c *Client) {
 		c.httpClient = &http.Client{Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}, // nolint:gosec
-		},
-		}
+		}}
 	}
 }
 
 func NewClient(baseURL string, tokenBase64Encoded string, opts ...func(*Client)) *Client {
 	c := &Client{
-		baseURL:    "https://cloudian.example.com/api/v2",
+		baseURL:    baseURL,
 		httpClient: http.DefaultClient,
-		token:      "",
+		token:      tokenBase64Encoded,
 	}
 	for _, opt := range opts {
 		opt(c)
