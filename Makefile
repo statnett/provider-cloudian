@@ -30,6 +30,9 @@ GO111MODULE = on
 # ====================================================================================
 # Setup Images
 
+DOCKER_REGISTRY = ghcr.io/statnett
+XPKG_REG_ORGS = $(DOCKER_REGISTRY)
+XPKG_REG_ORGS_NO_PROMOTE = $(DOCKER_REGISTRY)
 IMAGES = provider-cloudian
 -include build/makelib/imagelight.mk
 
