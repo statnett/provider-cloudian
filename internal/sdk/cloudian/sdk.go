@@ -15,7 +15,7 @@ import (
 type Client struct {
 	baseURL    string
 	httpClient *http.Client
-	token      string
+	authHeader []byte
 }
 
 type Group struct {
@@ -41,13 +41,13 @@ type User struct {
 
 var ErrNotFound = errors.New("not found")
 
-func NewClient(baseUrl string, tlsInsecureSkipVerify bool, tokenBase64 string) *Client {
+func NewClient(baseUrl string, tlsInsecureSkipVerify bool, authHeader []byte) *Client {
 	return &Client{
 		baseURL: baseUrl,
 		httpClient: &http.Client{Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsInsecureSkipVerify}, // nolint:gosec
 		}},
-		token: tokenBase64,
+		authHeader: authHeader,
 	}
 }
 
@@ -258,7 +258,7 @@ func (client Client) newRequest(ctx context.Context, url string, method string, 
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+client.token)
+	req.Header.Set("Authorization", string(client.authHeader))
 
 	return req, nil
 }

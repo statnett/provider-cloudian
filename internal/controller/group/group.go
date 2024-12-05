@@ -18,7 +18,6 @@ package group
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 
 	"github.com/pkg/errors"
@@ -54,7 +53,7 @@ type NoOpService struct{}
 var (
 	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error) {
 		// FIXME: Don't require InsecureSkipVerify
-		return cloudian.NewClient(providerConfig.Spec.Endpoint, true, base64.StdEncoding.EncodeToString(authHeader)), nil
+		return cloudian.NewClient(providerConfig.Spec.Endpoint, true, authHeader), nil
 	}
 )
 
