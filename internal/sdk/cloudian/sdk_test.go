@@ -17,12 +17,6 @@ func TestRealisticGroupSerialization(t *testing.T) {
 			"groupId": "QA",
 			"groupName": "Quality Assurance Group",
 			"ldapEnabled": false,
-			"ldapGroup": "",
-			"ldapMatchAttribute": "",
-			"ldapSearch": "",
-			"ldapSearchUserBase": "",
-			"ldapServerURL": "",
-			"ldapUserDNTemplate": "",
 			"s3endpointshttp": ["ALL"],
 			"s3endpointshttps": ["ALL"],
 			"s3websiteendpoints": ["ALL"]
@@ -95,20 +89,22 @@ func TestUnmarshalUsers(t *testing.T) {
 }
 
 func (group Group) Generate(rand *rand.Rand, size int) reflect.Value {
+	active := "true"
+	ldapEnabled := true
 	return reflect.ValueOf(Group{
-		Active:             "true",
-		GroupID:            randomString(16),
+		Active:             &active,
+		GroupID:            *randomString(16),
 		GroupName:          randomString(32),
-		LDAPEnabled:        false,
+		LDAPEnabled:        &ldapEnabled,
 		LDAPGroup:          randomString(8),
-		LDAPMatchAttribute: "",
-		LDAPSearch:         "",
-		LDAPSearchUserBase: "",
-		LDAPServerURL:      "",
-		LDAPUserDNTemplate: "",
-		S3EndpointsHTTP:    []string{"ALL"},
-		S3EndpointsHTTPS:   []string{"ALL"},
-		S3WebSiteEndpoints: []string{"ALL"},
+		LDAPMatchAttribute: randomString(8),
+		LDAPSearch:         randomString(8),
+		LDAPSearchUserBase: randomString(8),
+		LDAPServerURL:      randomString(8),
+		LDAPUserDNTemplate: randomString(8),
+		S3EndpointsHTTP:    []string{*randomString(8), *randomString(8)},
+		S3EndpointsHTTPS:   []string{*randomString(8), *randomString(8)},
+		S3WebSiteEndpoints: []string{*randomString(8), *randomString(8)},
 	})
 }
 
@@ -136,8 +132,7 @@ func TestGroupSerialization(t *testing.T) {
 		}
 
 		var deserialized Group
-		err = json.Unmarshal(data, &deserialized)
-		if err != nil {
+		if err = json.Unmarshal(data, &deserialized); err != nil {
 			return false
 		}
 
@@ -149,13 +144,14 @@ func TestGroupSerialization(t *testing.T) {
 	}
 }
 
-const charset = "abcdefghijklmnopqrstuvwxyzæøåABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ-. "
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
-func randomString(length int) string {
+func randomString(length int) *string {
 	var sb strings.Builder
 	runes := []rune(charset)
 	for i := 0; i < length; i++ {
 		sb.WriteRune(runes[rand.Intn(len(runes))])
 	}
-	return sb.String()
+	str := sb.String()
+	return &str
 }
