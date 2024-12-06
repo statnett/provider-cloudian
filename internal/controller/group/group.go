@@ -212,7 +212,6 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	group := newGroupFromCR(cr)
 
-	cr.SetConditions(xpv1.Creating())
 	err := c.cloudianService.CreateGroup(ctx, group)
 	if err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
