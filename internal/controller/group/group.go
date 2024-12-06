@@ -18,7 +18,6 @@ package group
 
 import (
 	"context"
-	"encoding/base64"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
@@ -58,9 +57,13 @@ const (
 type NoOpService struct{}
 
 var (
-	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error) {
+	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error) {
 		// FIXME: Don't require InsecureSkipVerify
-		return cloudian.NewClient(providerConfig.Spec.Endpoint, true, base64.StdEncoding.EncodeToString(authHeader)), nil
+		return cloudian.NewClient(
+			providerConfig.Spec.Endpoint,
+			authHeader,
+			cloudian.WithInsecureTLSVerify(true),
+		), nil
 	}
 )
 
@@ -97,7 +100,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 type connector struct {
 	kube         client.Client
 	usage        resource.Tracker
-	newServiceFn func(providerConfig *apisv1alpha1.ProviderConfig, authHeader []byte) (*cloudian.Client, error)
+	newServiceFn func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error)
 }
 
 // Connect typically produces an ExternalClient by:
@@ -126,7 +129,7 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.Wrap(err, errGetCreds)
 	}
 
-	svc, err := c.newServiceFn(pc, authHeader)
+	svc, err := c.newServiceFn(pc, string(authHeader))
 	if err != nil {
 		return nil, errors.Wrap(err, errNewClient)
 	}
@@ -183,34 +186,21 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	}, nil
 }
 
-func orDefault[T any](value *T, fallback T) T {
-	if value == nil {
-		return fallback
-	}
-
-	// Check if the value is a slice and if it's empty
-	if slice, ok := any(*value).([]T); ok && len(slice) == 0 {
-		return fallback
-	}
-
-	return *value
-}
-
-func groupWithDefaultedFields(cr *v1alpha1.Group) cloudian.Group {
+func newGroupFromCR(cr *v1alpha1.Group) cloudian.Group {
 	return cloudian.Group{
-		Active:             orDefault(cr.Spec.ForProvider.Active, "true"),
+		Active:             cr.Spec.ForProvider.Active,
 		GroupID:            cr.Spec.ForProvider.GroupID,
-		GroupName:          orDefault(cr.Spec.ForProvider.GroupName, ""),
-		LDAPEnabled:        orDefault(cr.Spec.ForProvider.LDAPEnabled, false),
-		LDAPGroup:          orDefault(cr.Spec.ForProvider.LDAPGroup, ""),
-		LDAPMatchAttribute: orDefault(cr.Spec.ForProvider.LDAPMatchAttribute, ""),
-		LDAPSearch:         orDefault(cr.Spec.ForProvider.LDAPSearch, ""),
-		LDAPSearchUserBase: orDefault(cr.Spec.ForProvider.LDAPSearchUserBase, ""),
-		LDAPServerURL:      orDefault(cr.Spec.ForProvider.LDAPServerURL, ""),
-		LDAPUserDNTemplate: orDefault(cr.Spec.ForProvider.LDAPUserDNTemplate, ""),
-		S3EndpointsHTTP:    orDefault(&cr.Spec.ForProvider.S3EndpointsHTTP, []string{"ALL"}),
-		S3EndpointsHTTPS:   orDefault(&cr.Spec.ForProvider.S3EndpointsHTTPS, []string{"ALL"}),
-		S3WebSiteEndpoints: orDefault(&cr.Spec.ForProvider.S3WebsiteEndpoints, []string{"ALL"}),
+		GroupName:          cr.Spec.ForProvider.GroupName,
+		LDAPEnabled:        cr.Spec.ForProvider.LDAPEnabled,
+		LDAPGroup:          cr.Spec.ForProvider.LDAPGroup,
+		LDAPMatchAttribute: cr.Spec.ForProvider.LDAPMatchAttribute,
+		LDAPSearch:         cr.Spec.ForProvider.LDAPSearch,
+		LDAPSearchUserBase: cr.Spec.ForProvider.LDAPSearchUserBase,
+		LDAPServerURL:      cr.Spec.ForProvider.LDAPServerURL,
+		LDAPUserDNTemplate: cr.Spec.ForProvider.LDAPUserDNTemplate,
+		S3EndpointsHTTP:    cr.Spec.ForProvider.S3EndpointsHTTP,
+		S3EndpointsHTTPS:   cr.Spec.ForProvider.S3EndpointsHTTPS,
+		S3WebSiteEndpoints: cr.Spec.ForProvider.S3WebsiteEndpoints,
 	}
 }
 
@@ -220,7 +210,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, errors.New(errNotGroup)
 	}
 
-	group := groupWithDefaultedFields(cr)
+	group := newGroupFromCR(cr)
 
 	cr.SetConditions(xpv1.Creating())
 	err := c.cloudianService.CreateGroup(ctx, group)
@@ -241,7 +231,7 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalUpdate{}, errors.New(errNotGroup)
 	}
 
-	group := groupWithDefaultedFields(cr)
+	group := newGroupFromCR(cr)
 
 	err := c.cloudianService.UpdateGroup(ctx, group)
 	if err != nil {

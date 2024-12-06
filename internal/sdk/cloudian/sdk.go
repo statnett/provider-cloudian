@@ -15,7 +15,7 @@ import (
 type Client struct {
 	baseURL    string
 	httpClient *http.Client
-	token      string
+	authHeader string
 }
 
 type Group struct {
@@ -41,14 +41,25 @@ type User struct {
 
 var ErrNotFound = errors.New("not found")
 
-func NewClient(baseUrl string, tlsInsecureSkipVerify bool, tokenBase64 string) *Client {
-	return &Client{
-		baseURL: baseUrl,
-		httpClient: &http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsInsecureSkipVerify}, // nolint:gosec
-		}},
-		token: tokenBase64,
+// WithInsecureTLSVerify skips the TLS validation of the server certificate when `insecure` is true.
+func WithInsecureTLSVerify(insecure bool) func(*Client) {
+	return func(c *Client) {
+		c.httpClient = &http.Client{Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}, // nolint:gosec
+		}}
 	}
+}
+
+func NewClient(baseURL string, authHeader string, opts ...func(*Client)) *Client {
+	c := &Client{
+		baseURL:    baseURL,
+		httpClient: http.DefaultClient,
+		authHeader: authHeader,
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 // List all users of a group.
@@ -258,7 +269,7 @@ func (client Client) newRequest(ctx context.Context, url string, method string, 
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+client.token)
+	req.Header.Set("Authorization", client.authHeader)
 
 	return req, nil
 }
