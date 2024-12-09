@@ -158,7 +158,6 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		if errors.Is(err, cloudian.ErrNotFound) {
 			return managed.ExternalObservation{ResourceExists: false}, nil
 		}
-		// group exists, but we failed to get it
 		return managed.ExternalObservation{}, errors.Wrap(err, errGetGroup)
 	}
 
