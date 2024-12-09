@@ -29,7 +29,6 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/connection"
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
 	"github.com/crossplane/crossplane-runtime/pkg/event"
-	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
@@ -151,7 +150,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.New(errNotGroup)
 	}
 
-	group, err := c.cloudianService.GetGroup(ctx, cr.Spec.ForProvider.GroupID)
+	observedGroup, err := c.cloudianService.GetGroup(ctx, cr.Spec.ForProvider.GroupID)
 
 	if err != nil {
 		// group does not exist
@@ -164,10 +163,6 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	// group exists and we got it
 	cr.SetConditions(xpv1.Available())
 
-	desired := cloudian.Group{
-		GroupID: meta.GetExternalName(cr),
-	}
-
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
 		// the managed resource reconciler know that it needs to call Create to
@@ -177,7 +172,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
-		ResourceUpToDate: cmp.Equal(group, desired),
+		ResourceUpToDate: cmp.Equal(observedGroup, newGroupFromCR(cr)),
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
