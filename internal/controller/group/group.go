@@ -251,6 +251,5 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 }
 
 func (c *external) Disconnect(ctx context.Context) error {
-	// TODO implement me
-	panic("implement me")
+	return nil
 }
