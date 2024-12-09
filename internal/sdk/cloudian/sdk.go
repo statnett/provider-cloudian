@@ -41,14 +41,25 @@ type User struct {
 
 var ErrNotFound = errors.New("not found")
 
-func NewClient(baseUrl string, tlsInsecureSkipVerify bool, authHeader string) *Client {
-	return &Client{
-		baseURL: baseUrl,
-		httpClient: &http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsInsecureSkipVerify}, // nolint:gosec
-		}},
+// WithInsecureTLSVerify skips the TLS validation of the server certificate when `insecure` is true.
+func WithInsecureTLSVerify(insecure bool) func(*Client) {
+	return func(c *Client) {
+		c.httpClient = &http.Client{Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}, // nolint:gosec
+		}}
+	}
+}
+
+func NewClient(baseURL string, authHeader string, opts ...func(*Client)) *Client {
+	c := &Client{
+		baseURL:    baseURL,
+		httpClient: http.DefaultClient,
 		authHeader: authHeader,
 	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 // List all users of a group.
