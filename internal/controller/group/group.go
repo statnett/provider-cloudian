@@ -209,9 +209,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, errors.New(errNotGroup)
 	}
 
-	group := newGroupFromCR(cr)
-
-	if err := c.cloudianService.CreateGroup(ctx, group); err != nil {
+	if err := c.cloudianService.CreateGroup(ctx, newGroupFromCR(cr)); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
 	}
 
@@ -228,10 +226,7 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalUpdate{}, errors.New(errNotGroup)
 	}
 
-	group := newGroupFromCR(cr)
-
-	err := c.cloudianService.UpdateGroup(ctx, group)
-	if err != nil {
+	if err := c.cloudianService.UpdateGroup(ctx, newGroupFromCR(cr)); err != nil {
 		return managed.ExternalUpdate{}, errors.Wrap(err, errUpdateGroup)
 	}
 
@@ -248,8 +243,7 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalDelete{}, errors.New(errNotGroup)
 	}
 
-	err := c.cloudianService.DeleteGroup(ctx, cr.Spec.ForProvider.GroupID)
-	if err != nil {
+	if err := c.cloudianService.DeleteGroup(ctx, cr.Spec.ForProvider.GroupID); err != nil {
 		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteGroup)
 	}
 
