@@ -237,7 +237,7 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 
 	defer resp.Body.Close() // nolint:errcheck
 
-	switch resp.StatusCode {
+	switch code := resp.StatusCode; code {
 	case 200:
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
@@ -254,7 +254,7 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 		// Cloudian-API returns 204 if the group does not exist
 		return nil, ErrNotFound
 	default:
-		return nil, fmt.Errorf("GET unexpected status. Failure: %w", err)
+		return nil, fmt.Errorf("GET unexpected status. StatusCode: %d", code)
 	}
 }
 
