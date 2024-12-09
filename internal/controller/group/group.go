@@ -211,8 +211,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	group := newGroupFromCR(cr)
 
-	err := c.cloudianService.CreateGroup(ctx, group)
-	if err != nil {
+	if err := c.cloudianService.CreateGroup(ctx, group); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
 	}
 
