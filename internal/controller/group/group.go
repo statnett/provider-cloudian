@@ -222,6 +222,8 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, errors.New(errNotGroup)
 	}
 
+	cr.SetConditions(xpv1.Creating())
+
 	if err := c.cloudianService.CreateGroup(ctx, newGroupFromCR(cr)); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
 	}
@@ -255,6 +257,8 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 	if !ok {
 		return managed.ExternalDelete{}, errors.New(errNotGroup)
 	}
+
+	cr.SetConditions(xpv1.Deleting())
 
 	if err := c.cloudianService.DeleteGroup(ctx, cr.Spec.ForProvider.GroupID); err != nil {
 		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteGroup)
