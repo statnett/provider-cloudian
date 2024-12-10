@@ -176,17 +176,13 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 }
 
 func isUpToDate(desired v1alpha1.GroupParameters, observed cloudian.Group) bool {
-	// For all fields that are defined in desired, check if they are equal to the observed
-	if desired.Active != nil && *desired.Active != *observed.Active {
-		return false
-	}
+	// Only compare groupId and groupName for now - use defaults for the rest
 	if desired.GroupID != observed.GroupID {
 		return false
 	}
-	if desired.GroupName != nil && *desired.GroupName != *observed.GroupName {
-		return false
-	}
-	if desired.LDAPEnabled != nil && *desired.LDAPEnabled != *observed.LDAPEnabled {
+	if desired.GroupName != nil &&
+		observed.GroupName != nil &&
+		*desired.GroupName != *observed.GroupName {
 		return false
 	}
 	return true
