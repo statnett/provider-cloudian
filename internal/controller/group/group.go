@@ -51,9 +51,6 @@ const (
 	errCreateGroup = "cannot create Group"
 )
 
-// A NoOpService does nothing.
-type NoOpService struct{}
-
 var (
 	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error) {
 		// FIXME: Don't require InsecureSkipVerify
@@ -150,16 +147,13 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	}
 
 	observedGroup, err := c.cloudianService.GetGroup(ctx, cr.Spec.ForProvider.GroupID)
-
 	if err != nil {
-		// group does not exist
 		if errors.Is(err, cloudian.ErrNotFound) {
 			return managed.ExternalObservation{ResourceExists: false}, nil
 		}
 		return managed.ExternalObservation{}, errors.Wrap(err, errGetGroup)
 	}
 
-	// group exists and we got it
 	cr.SetConditions(xpv1.Available())
 
 	upToDate := isUpToDate(cr.Spec.ForProvider, *observedGroup)
