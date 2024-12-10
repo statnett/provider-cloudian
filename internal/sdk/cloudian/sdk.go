@@ -19,19 +19,19 @@ type Client struct {
 }
 
 type Group struct {
-	Active             *string  `json:"active,omitempty"`
+	Active             *string  `json:"active"`
 	GroupID            string   `json:"groupId"`
-	GroupName          *string  `json:"groupName,omitempty"`
-	LDAPEnabled        *bool    `json:"ldapEnabled,omitempty"`
-	LDAPGroup          *string  `json:"ldapGroup,omitempty"`
-	LDAPMatchAttribute *string  `json:"ldapMatchAttribute,omitempty"`
-	LDAPSearch         *string  `json:"ldapSearch,omitempty"`
-	LDAPSearchUserBase *string  `json:"ldapSearchUserBase,omitempty"`
-	LDAPServerURL      *string  `json:"ldapServerURL,omitempty"`
-	LDAPUserDNTemplate *string  `json:"ldapUserDNTemplate,omitempty"`
-	S3EndpointsHTTP    []string `json:"s3endpointshttp,omitempty"`
-	S3EndpointsHTTPS   []string `json:"s3endpointshttps,omitempty"`
-	S3WebSiteEndpoints []string `json:"s3websiteendpoints,omitempty"`
+	GroupName          *string  `json:"groupName"`
+	LDAPEnabled        *bool    `json:"ldapEnabled"`
+	LDAPGroup          *string  `json:"ldapGroup"`
+	LDAPMatchAttribute *string  `json:"ldapMatchAttribute"`
+	LDAPSearch         *string  `json:"ldapSearch"`
+	LDAPSearchUserBase *string  `json:"ldapSearchUserBase"`
+	LDAPServerURL      *string  `json:"ldapServerURL"`
+	LDAPUserDNTemplate *string  `json:"ldapUserDNTemplate"`
+	S3EndpointsHTTP    []string `json:"s3endpointshttp"`
+	S3EndpointsHTTPS   []string `json:"s3endpointshttps"`
+	S3WebsiteEndpoints []string `json:"s3websiteendpoints"`
 }
 
 type User struct {

@@ -19,7 +19,6 @@ package group
 import (
 	"context"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -163,6 +162,8 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	// group exists and we got it
 	cr.SetConditions(xpv1.Available())
 
+	upToDate := isUpToDate(cr.Spec.ForProvider, *observedGroup)
+
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
 		// the managed resource reconciler know that it needs to call Create to
@@ -172,12 +173,29 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
-		ResourceUpToDate: cmp.Equal(observedGroup, newGroupFromCR(cr)),
+		ResourceUpToDate: upToDate,
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
 		ConnectionDetails: managed.ConnectionDetails{},
 	}, nil
+}
+
+func isUpToDate(desired v1alpha1.GroupParameters, observed cloudian.Group) bool {
+	// For all fields that are defined in desired, check if they are equal to the observed
+	if desired.Active != nil && *desired.Active != *observed.Active {
+		return false
+	}
+	if desired.GroupID != observed.GroupID {
+		return false
+	}
+	if desired.GroupName != nil && *desired.GroupName != *observed.GroupName {
+		return false
+	}
+	if desired.LDAPEnabled != nil && *desired.LDAPEnabled != *observed.LDAPEnabled {
+		return false
+	}
+	return true
 }
 
 func newGroupFromCR(cr *v1alpha1.Group) cloudian.Group {
@@ -194,7 +212,7 @@ func newGroupFromCR(cr *v1alpha1.Group) cloudian.Group {
 		LDAPUserDNTemplate: cr.Spec.ForProvider.LDAPUserDNTemplate,
 		S3EndpointsHTTP:    cr.Spec.ForProvider.S3EndpointsHTTP,
 		S3EndpointsHTTPS:   cr.Spec.ForProvider.S3EndpointsHTTPS,
-		S3WebSiteEndpoints: cr.Spec.ForProvider.S3WebsiteEndpoints,
+		S3WebsiteEndpoints: cr.Spec.ForProvider.S3WebsiteEndpoints,
 	}
 }
 

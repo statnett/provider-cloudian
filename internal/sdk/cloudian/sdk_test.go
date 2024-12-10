@@ -104,7 +104,7 @@ func (group Group) Generate(rand *rand.Rand, size int) reflect.Value {
 		LDAPUserDNTemplate: randomString(8),
 		S3EndpointsHTTP:    []string{*randomString(8), *randomString(8)},
 		S3EndpointsHTTPS:   []string{*randomString(8), *randomString(8)},
-		S3WebSiteEndpoints: []string{*randomString(8), *randomString(8)},
+		S3WebsiteEndpoints: []string{*randomString(8), *randomString(8)},
 	})
 }
 
