@@ -21,10 +21,13 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"k8s.io/utils/ptr"
 
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
+
+	"github.com/statnett/provider-cloudian/apis/user/v1alpha1"
 )
 
 // Unlike many Kubernetes projects Crossplane does not use third party testing
@@ -68,6 +71,163 @@ func TestObserve(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.o, got); diff != "" {
 				t.Errorf("\n%s\ne.Observe(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestGroupIsConsideredUpToDate(t *testing.T) {
+	tests := []struct {
+		name              string
+		desired, observed v1alpha1.GroupParameters
+		wantEquality      bool
+	}{
+		{
+			name: "GroupID and GroupName is set",
+			desired: v1alpha1.GroupParameters{
+				GroupID:   "QA",
+				GroupName: ptr.To("Hello"),
+			},
+			observed: v1alpha1.GroupParameters{
+				Active:             ptr.To("true"),
+				GroupID:            "QA",
+				GroupName:          ptr.To("Hello"),
+				LDAPEnabled:        ptr.To(false),
+				LDAPGroup:          nil,
+				LDAPMatchAttribute: nil,
+				LDAPSearch:         nil,
+				LDAPSearchUserBase: nil,
+				LDAPServerURL:      nil,
+				LDAPUserDNTemplate: nil,
+				S3EndpointsHTTP:    []string{"ALL"},
+				S3EndpointsHTTPS:   []string{"ALL"},
+				S3WebsiteEndpoints: []string{"ALL"},
+			},
+			wantEquality: true,
+		},
+		{
+			name: "GroupID is set GroupName is not set",
+			desired: v1alpha1.GroupParameters{
+				GroupID: "QA",
+			},
+			observed: v1alpha1.GroupParameters{
+				Active:             ptr.To("true"),
+				GroupID:            "QA",
+				GroupName:          ptr.To(""),
+				LDAPEnabled:        ptr.To(false),
+				LDAPGroup:          nil,
+				LDAPMatchAttribute: nil,
+				LDAPSearch:         nil,
+				LDAPSearchUserBase: nil,
+				LDAPServerURL:      nil,
+				LDAPUserDNTemplate: nil,
+				S3EndpointsHTTP:    []string{"ALL"},
+				S3EndpointsHTTPS:   []string{"ALL"},
+				S3WebsiteEndpoints: []string{"ALL"},
+			},
+			wantEquality: true,
+		},
+		{
+			name: "Desired GroupID is unlike observed GroupID",
+			desired: v1alpha1.GroupParameters{
+				GroupID: "desired",
+			},
+			observed: v1alpha1.GroupParameters{
+				Active:             ptr.To("true"),
+				GroupID:            "observed",
+				GroupName:          ptr.To(""),
+				LDAPEnabled:        ptr.To(false),
+				LDAPGroup:          nil,
+				LDAPMatchAttribute: nil,
+				LDAPSearch:         nil,
+				LDAPSearchUserBase: nil,
+				LDAPServerURL:      nil,
+				LDAPUserDNTemplate: nil,
+				S3EndpointsHTTP:    []string{"ALL"},
+				S3EndpointsHTTPS:   []string{"ALL"},
+				S3WebsiteEndpoints: []string{"ALL"},
+			},
+			wantEquality: false,
+		},
+		{
+			name: "Desired GroupName is unlike observed GroupName",
+			desired: v1alpha1.GroupParameters{
+				GroupID:   "desired",
+				GroupName: ptr.To("desired description"),
+			},
+			observed: v1alpha1.GroupParameters{
+				Active:             ptr.To("true"),
+				GroupID:            "desired",
+				GroupName:          ptr.To(""),
+				LDAPEnabled:        ptr.To(false),
+				LDAPGroup:          nil,
+				LDAPMatchAttribute: nil,
+				LDAPSearch:         nil,
+				LDAPSearchUserBase: nil,
+				LDAPServerURL:      nil,
+				LDAPUserDNTemplate: nil,
+				S3EndpointsHTTP:    []string{"ALL"},
+				S3EndpointsHTTPS:   []string{"ALL"},
+				S3WebsiteEndpoints: []string{"ALL"},
+			},
+			wantEquality: false,
+		},
+		{
+			name: "We have not set a GroupName in the desired state, and the observed GroupName is empty string",
+			desired: v1alpha1.GroupParameters{
+				GroupID:   "desired",
+				GroupName: nil,
+			},
+			observed: v1alpha1.GroupParameters{
+				Active:             ptr.To("true"),
+				GroupID:            "desired",
+				GroupName:          ptr.To(""),
+				LDAPEnabled:        ptr.To(false),
+				LDAPGroup:          nil,
+				LDAPMatchAttribute: nil,
+				LDAPSearch:         nil,
+				LDAPSearchUserBase: nil,
+				LDAPServerURL:      nil,
+				LDAPUserDNTemplate: nil,
+				S3EndpointsHTTP:    []string{"ALL"},
+				S3EndpointsHTTPS:   []string{"ALL"},
+				S3WebsiteEndpoints: []string{"ALL"},
+			},
+			wantEquality: true,
+		},
+		{
+			name: "We can desire a LDAPServerURL and get a diff if observed does not have one",
+			desired: v1alpha1.GroupParameters{
+				GroupID:       "desired",
+				GroupName:     nil,
+				LDAPServerURL: ptr.To("ldap://example.com"),
+			},
+			observed: v1alpha1.GroupParameters{
+				Active:             ptr.To("true"),
+				GroupID:            "desired",
+				GroupName:          ptr.To(""),
+				LDAPEnabled:        ptr.To(false),
+				LDAPGroup:          nil,
+				LDAPMatchAttribute: nil,
+				LDAPSearch:         nil,
+				LDAPSearchUserBase: nil,
+				LDAPServerURL:      nil,
+				LDAPUserDNTemplate: nil,
+				S3EndpointsHTTP:    []string{"ALL"},
+				S3EndpointsHTTPS:   []string{"ALL"},
+				S3WebsiteEndpoints: []string{"ALL"},
+			},
+			wantEquality: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			isUpToDate, diff, err := isUpToDate(tt.desired, tt.observed)
+			if err != nil {
+				t.Errorf("isUpToDate() error = %v", err)
+			}
+			if isUpToDate != tt.wantEquality {
+				t.Errorf("isUpToDate() = %v, want %v, but the diff was %s", isUpToDate, tt.wantEquality, diff)
 			}
 		})
 	}

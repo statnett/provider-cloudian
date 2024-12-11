@@ -19,8 +19,11 @@ package group
 import (
 	"context"
 
+	"dario.cat/mergo"
+	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -156,7 +159,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 
 	cr.SetConditions(xpv1.Available())
 
-	upToDate := isUpToDate(cr.Spec.ForProvider, *observedGroup)
+	upToDate, _, err := isUpToDate(cr.Spec.ForProvider, toAPIGroup(*observedGroup))
 
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
@@ -172,20 +175,50 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
 		ConnectionDetails: managed.ConnectionDetails{},
-	}, nil
+	}, err
 }
 
-func isUpToDate(desired v1alpha1.GroupParameters, observed cloudian.Group) bool {
-	// Only compare groupId and groupName for now - use defaults for the rest
-	if desired.GroupID != observed.GroupID {
-		return false
+func toAPIGroup(g cloudian.Group) v1alpha1.GroupParameters {
+	return v1alpha1.GroupParameters{
+		Active:             g.Active,
+		GroupID:            g.GroupID,
+		GroupName:          g.GroupName,
+		LDAPEnabled:        g.LDAPEnabled,
+		LDAPGroup:          g.LDAPGroup,
+		LDAPMatchAttribute: g.LDAPMatchAttribute,
+		LDAPSearch:         g.LDAPSearch,
+		LDAPSearchUserBase: g.LDAPSearchUserBase,
+		LDAPServerURL:      g.LDAPServerURL,
+		LDAPUserDNTemplate: g.LDAPUserDNTemplate,
+		S3EndpointsHTTP:    g.S3EndpointsHTTP,
+		S3EndpointsHTTPS:   g.S3EndpointsHTTPS,
+		S3WebsiteEndpoints: g.S3WebsiteEndpoints,
 	}
-	if desired.GroupName != nil &&
-		observed.GroupName != nil &&
-		*desired.GroupName != *observed.GroupName {
-		return false
+}
+
+func isUpToDate(desired v1alpha1.GroupParameters, observed v1alpha1.GroupParameters) (bool, string, error) {
+	// These values are the Cloudian API defaults
+	// We can find them by POSTing a minimal gropuData {"groupId" = "testgroup"}
+	// and then reading this group back through a GET
+	cloudianAPIDefaults := v1alpha1.GroupParameters{
+		Active:             ptr.To("true"),
+		GroupName:          ptr.To(""),
+		LDAPGroup:          nil,
+		LDAPEnabled:        ptr.To(false),
+		LDAPServerURL:      nil,
+		LDAPMatchAttribute: nil,
+		LDAPSearch:         nil,
+		LDAPSearchUserBase: nil,
+		LDAPUserDNTemplate: nil,
+		S3EndpointsHTTP:    []string{"ALL"},
+		S3EndpointsHTTPS:   []string{"ALL"},
+		S3WebsiteEndpoints: []string{"ALL"},
 	}
-	return true
+	err := mergo.Merge(&desired, cloudianAPIDefaults)
+	if err != nil {
+		return false, "", err
+	}
+	return cmp.Equal(desired, observed), cmp.Diff(desired, observed), err
 }
 
 func newGroupFromCR(cr *v1alpha1.Group) cloudian.Group {
