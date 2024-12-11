@@ -219,6 +219,32 @@ func TestGroupIsConsideredUpToDate(t *testing.T) {
 			},
 			wantEquality: false,
 		},
+		{
+			name: "We can desire some s3urls and this will lead to a diff against observed [\"ALL\"]",
+			desired: v1alpha1.GroupParameters{
+				GroupID:       "desired",
+				GroupName:     nil,
+				S3EndpointsHTTP: []string{"oslo,bergen"},
+				S3EndpointsHTTPS: []string{"oslo,bergen"},
+				S3WebsiteEndpoints: []string{"oslo,bergen"},
+			},
+			observed: v1alpha1.GroupParameters{
+				Active:             ptr.To("true"),
+				GroupID:            "desired",
+				GroupName:          ptr.To(""),
+				LDAPEnabled:        ptr.To(false),
+				LDAPGroup:          nil,
+				LDAPMatchAttribute: nil,
+				LDAPSearch:         nil,
+				LDAPSearchUserBase: nil,
+				LDAPServerURL:      nil,
+				LDAPUserDNTemplate: nil,
+				S3EndpointsHTTP:    []string{"ALL"},
+				S3EndpointsHTTPS:   []string{"ALL"},
+				S3WebsiteEndpoints: []string{"ALL"},
+			},
+			wantEquality: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
