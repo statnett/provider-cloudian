@@ -224,9 +224,9 @@ func TestGroupIsConsideredUpToDate(t *testing.T) {
 			desired: v1alpha1.GroupParameters{
 				GroupID:            "desired",
 				GroupName:          nil,
-				S3EndpointsHTTP:    []string{"oslo,bergen"},
-				S3EndpointsHTTPS:   []string{"oslo,bergen"},
-				S3WebsiteEndpoints: []string{"oslo,bergen"},
+				S3EndpointsHTTP:    []string{"oslo", "bergen"},
+				S3EndpointsHTTPS:   []string{"oslo", "bergen"},
+				S3WebsiteEndpoints: []string{"oslo", "bergen"},
 			},
 			observed: v1alpha1.GroupParameters{
 				Active:             ptr.To("true"),
