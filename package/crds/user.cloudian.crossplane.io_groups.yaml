@@ -117,24 +117,6 @@ spec:
                       group will be authenticated against the LDAP system when they
                       log into the CMC.
                     type: string
-                  s3endpointshttp:
-                    default:
-                    - ALL
-                    items:
-                      type: string
-                    type: array
-                  s3endpointshttps:
-                    default:
-                    - ALL
-                    items:
-                      type: string
-                    type: array
-                  s3websiteendpoints:
-                    default:
-                    - ALL
-                    items:
-                      type: string
-                    type: array
                 required:
                 - groupId
                 type: object

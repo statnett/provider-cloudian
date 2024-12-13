@@ -61,15 +61,6 @@ type GroupParameters struct {
 	// LDAPUserDNTemplate specifies how users within this group will be authenticated against the LDAP system when they log into the CMC.
 	//+optional
 	LDAPUserDNTemplate *string `json:"ldapUserDNTemplate,omitempty"`
-	//+optional
-	//+kubebuilder:default={ALL}
-	S3EndpointsHTTPS []string `json:"s3endpointshttp,omitempty"`
-	//+optional
-	//+kubebuilder:default={ALL}
-	S3EndpointsHTTP []string `json:"s3endpointshttps,omitempty"`
-	//+optional
-	//+kubebuilder:default={ALL}
-	S3WebsiteEndpoints []string `json:"s3websiteendpoints,omitempty"`
 }
 
 // GroupObservation are the observable fields of a Group.
