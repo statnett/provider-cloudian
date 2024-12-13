@@ -29,9 +29,8 @@ import (
 type GroupParameters struct {
 	// Active determines whether the group is enabled ("true") or disabled ("false") in the system.
 	//+optional
-	//+kubebuilder:default="true"
-	//+kubebuilder:validation:Pattern=`^(true|false)$`
-	Active *string `json:"active,omitempty"`
+	//+kubebuilder:default=true
+	Active bool `json:"active"`
 	// GroupID is the group ID (known as Name in the GUI).
 	//+kubebuilder:validation:MinLength=1
 	//+kubebuilder:validation:MaxLength=64
@@ -39,8 +38,9 @@ type GroupParameters struct {
 	GroupID string `json:"groupId"`
 	// GroupName is the group name (known as Description in the GUI).
 	//+optional
+	//+kubebuilder:validation:MinLength=1
 	//+kubebuilder:validation:MaxLength=64
-	GroupName *string `json:"groupName,omitempty"`
+	GroupName string `json:"groupName,omitempty"`
 	// LDAPEnabled determines whether LDAP authentication is enabled for members of this group.
 	//+optional
 	//+kubebuilder:default=false
