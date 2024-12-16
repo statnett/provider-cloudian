@@ -48,22 +48,42 @@ type groupInternal struct {
 	S3WebSiteEndpoints []string `json:"s3websiteendpoints"`
 }
 
-func toInternal(g Group) groupInternal {
+// A new group with cloudian defaults set
+func NewGroup(groupId string) Group {
+	return fromInternal(cloudianDefaults(groupId))
+}
+
+// The Cloudian API operates with a set of default values for the fields in a PUT request
+func cloudianDefaults(groupId string) groupInternal {
 	return groupInternal{
-		Active:             strconv.FormatBool(g.Active),
-		GroupID:            g.GroupID,
-		GroupName:          g.GroupName,
-		LDAPEnabled:        g.LDAPEnabled,
-		LDAPGroup:          g.LDAPGroup,
-		LDAPMatchAttribute: g.LDAPMatchAttribute,
-		LDAPSearch:         g.LDAPSearch,
-		LDAPSearchUserBase: g.LDAPSearchUserBase,
-		LDAPServerURL:      g.LDAPServerURL,
-		LDAPUserDNTemplate: g.LDAPUserDNTemplate,
+		Active:             "true",
+		GroupID:            groupId,
+		GroupName:          "",
+		LDAPEnabled:        false,
+		LDAPGroup:          "",
+		LDAPMatchAttribute: "",
+		LDAPSearch:         "",
+		LDAPSearchUserBase: "",
+		LDAPServerURL:      "",
+		LDAPUserDNTemplate: "",
 		S3EndpointsHTTP:    []string{"ALL"},
 		S3EndpointsHTTPS:   []string{"ALL"},
 		S3WebSiteEndpoints: []string{"ALL"},
 	}
+}
+
+func toInternal(g Group) groupInternal {
+	group := cloudianDefaults(g.GroupID)
+	group.Active = strconv.FormatBool(g.Active)
+	group.GroupName = g.GroupName
+	group.LDAPEnabled = g.LDAPEnabled
+	group.LDAPGroup = g.LDAPGroup
+	group.LDAPMatchAttribute = g.LDAPMatchAttribute
+	group.LDAPSearch = g.LDAPSearch
+	group.LDAPSearchUserBase = g.LDAPSearchUserBase
+	group.LDAPServerURL = g.LDAPServerURL
+	group.LDAPUserDNTemplate = g.LDAPUserDNTemplate
+	return group
 }
 
 func fromInternal(g groupInternal) Group {
