@@ -28,8 +28,8 @@ func TestRealisticGroupSerialization(t *testing.T) {
 		t.Errorf("Error deserializing from JSON: %v", err)
 	}
 
-	if group.GroupIDInternal != "QA" {
-		t.Errorf("Expected QA, got %v", group.GroupIDInternal)
+	if group.GroupID != "QA" {
+		t.Errorf("Expected QA, got %v", group.GroupID)
 	}
 }
 
@@ -90,19 +90,19 @@ func TestUnmarshalUsers(t *testing.T) {
 
 func (group groupInternal) Generate(rand *rand.Rand, size int) reflect.Value {
 	return reflect.ValueOf(groupInternal{
-		ActiveInternal:             "true",
-		GroupIDInternal:            randomString(16),
-		GroupNameInternal:          randomString(32),
-		LDAPEnabledInternal:        true,
-		LDAPGroupInternal:          randomString(8),
-		LDAPMatchAttributeInternal: randomString(8),
-		LDAPSearchInternal:         randomString(8),
-		LDAPSearchUserBaseInternal: randomString(8),
-		LDAPServerURLInternal:      randomString(8),
-		LDAPUserDNTemplateInternal: randomString(8),
-		S3EndpointsHTTPInternal:    []string{randomString(8), randomString(8)},
-		S3EndpointsHTTPSInternal:   []string{randomString(8), randomString(8)},
-		S3WebSiteEndpointsInternal: []string{randomString(8), randomString(8)},
+		Active:             "true",
+		GroupID:            randomString(16),
+		GroupName:          randomString(32),
+		LDAPEnabled:        true,
+		LDAPGroup:          randomString(8),
+		LDAPMatchAttribute: randomString(8),
+		LDAPSearch:         randomString(8),
+		LDAPSearchUserBase: randomString(8),
+		LDAPServerURL:      randomString(8),
+		LDAPUserDNTemplate: randomString(8),
+		S3EndpointsHTTP:    []string{randomString(8), randomString(8)},
+		S3EndpointsHTTPS:   []string{randomString(8), randomString(8)},
+		S3WebSiteEndpoints: []string{randomString(8), randomString(8)},
 	})
 }
 

@@ -33,51 +33,51 @@ type Group struct {
 
 // fields must be exported (uppercase) to allow json marshalling
 type groupInternal struct {
-	ActiveInternal             string   `json:"active"`
-	GroupIDInternal            string   `json:"groupId"`
-	GroupNameInternal          string   `json:"groupName"`
-	LDAPEnabledInternal        bool     `json:"ldapEnabled"`
-	LDAPGroupInternal          string   `json:"ldapGroup"`
-	LDAPMatchAttributeInternal string   `json:"ldapMatchAttribute"`
-	LDAPSearchInternal         string   `json:"ldapSearch"`
-	LDAPSearchUserBaseInternal string   `json:"ldapSearchUserBase"`
-	LDAPServerURLInternal      string   `json:"ldapServerURL"`
-	LDAPUserDNTemplateInternal string   `json:"ldapUserDNTemplate"`
-	S3EndpointsHTTPInternal    []string `json:"s3endpointshttp"`
-	S3EndpointsHTTPSInternal   []string `json:"s3endpointshttps"`
-	S3WebSiteEndpointsInternal []string `json:"s3websiteendpoints"`
+	Active             string   `json:"active"`
+	GroupID            string   `json:"groupId"`
+	GroupName          string   `json:"groupName"`
+	LDAPEnabled        bool     `json:"ldapEnabled"`
+	LDAPGroup          string   `json:"ldapGroup"`
+	LDAPMatchAttribute string   `json:"ldapMatchAttribute"`
+	LDAPSearch         string   `json:"ldapSearch"`
+	LDAPSearchUserBase string   `json:"ldapSearchUserBase"`
+	LDAPServerURL      string   `json:"ldapServerURL"`
+	LDAPUserDNTemplate string   `json:"ldapUserDNTemplate"`
+	S3EndpointsHTTP    []string `json:"s3endpointshttp"`
+	S3EndpointsHTTPS   []string `json:"s3endpointshttps"`
+	S3WebSiteEndpoints []string `json:"s3websiteendpoints"`
 }
 
 func toInternal(g Group) groupInternal {
 	return groupInternal{
-		ActiveInternal:             strconv.FormatBool(g.Active),
-		GroupIDInternal:            g.GroupID,
-		GroupNameInternal:          g.GroupName,
-		LDAPEnabledInternal:        g.LDAPEnabled,
-		LDAPGroupInternal:          g.LDAPGroup,
-		LDAPMatchAttributeInternal: g.LDAPMatchAttribute,
-		LDAPSearchInternal:         g.LDAPSearch,
-		LDAPSearchUserBaseInternal: g.LDAPSearchUserBase,
-		LDAPServerURLInternal:      g.LDAPServerURL,
-		LDAPUserDNTemplateInternal: g.LDAPUserDNTemplate,
-		S3EndpointsHTTPInternal:    []string{"ALL"},
-		S3EndpointsHTTPSInternal:   []string{"ALL"},
-		S3WebSiteEndpointsInternal: []string{"ALL"},
+		Active:             strconv.FormatBool(g.Active),
+		GroupID:            g.GroupID,
+		GroupName:          g.GroupName,
+		LDAPEnabled:        g.LDAPEnabled,
+		LDAPGroup:          g.LDAPGroup,
+		LDAPMatchAttribute: g.LDAPMatchAttribute,
+		LDAPSearch:         g.LDAPSearch,
+		LDAPSearchUserBase: g.LDAPSearchUserBase,
+		LDAPServerURL:      g.LDAPServerURL,
+		LDAPUserDNTemplate: g.LDAPUserDNTemplate,
+		S3EndpointsHTTP:    []string{"ALL"},
+		S3EndpointsHTTPS:   []string{"ALL"},
+		S3WebSiteEndpoints: []string{"ALL"},
 	}
 }
 
 func fromInternal(g groupInternal) Group {
 	return Group{
-		Active:             g.ActiveInternal == "true",
-		GroupID:            g.GroupIDInternal,
-		GroupName:          g.GroupNameInternal,
-		LDAPEnabled:        g.LDAPEnabledInternal,
-		LDAPGroup:          g.LDAPGroupInternal,
-		LDAPMatchAttribute: g.LDAPMatchAttributeInternal,
-		LDAPSearch:         g.LDAPSearchInternal,
-		LDAPSearchUserBase: g.LDAPSearchUserBaseInternal,
-		LDAPServerURL:      g.LDAPServerURLInternal,
-		LDAPUserDNTemplate: g.LDAPUserDNTemplateInternal,
+		Active:             g.Active == "true",
+		GroupID:            g.GroupID,
+		GroupName:          g.GroupName,
+		LDAPEnabled:        g.LDAPEnabled,
+		LDAPGroup:          g.LDAPGroup,
+		LDAPMatchAttribute: g.LDAPMatchAttribute,
+		LDAPSearch:         g.LDAPSearch,
+		LDAPSearchUserBase: g.LDAPSearchUserBase,
+		LDAPServerURL:      g.LDAPServerURL,
+		LDAPUserDNTemplate: g.LDAPUserDNTemplate,
 	}
 }
 
