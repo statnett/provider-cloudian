@@ -27,7 +27,7 @@ import (
 
 // GroupParameters are the configurable fields of a Group.
 type GroupParameters struct {
-	// Active determines whether the group is enabled ("true") or disabled ("false") in the system.
+	// Active determines whether the group is enabled (true) or disabled (false) in the system.
 	//+optional
 	//+kubebuilder:default=true
 	Active bool `json:"active"`

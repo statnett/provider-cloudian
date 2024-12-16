@@ -75,8 +75,8 @@ spec:
                 properties:
                   active:
                     default: true
-                    description: Active determines whether the group is enabled ("true")
-                      or disabled ("false") in the system.
+                    description: Active determines whether the group is enabled (true)
+                      or disabled (false) in the system.
                     type: boolean
                   groupId:
                     description: GroupID is the group ID (known as Name in the GUI).
