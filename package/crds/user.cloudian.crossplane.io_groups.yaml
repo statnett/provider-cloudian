@@ -74,11 +74,10 @@ spec:
                 description: GroupParameters are the configurable fields of a Group.
                 properties:
                   active:
-                    default: "true"
-                    description: Active determines whether the group is enabled ("true")
-                      or disabled ("false") in the system.
-                    pattern: ^(true|false)$
-                    type: string
+                    default: true
+                    description: Active determines whether the group is enabled (true)
+                      or disabled (false) in the system.
+                    type: boolean
                   groupId:
                     description: GroupID is the group ID (known as Name in the GUI).
                     maxLength: 64
@@ -89,6 +88,7 @@ spec:
                     description: GroupName is the group name (known as Description
                       in the GUI).
                     maxLength: 64
+                    minLength: 1
                     type: string
                   ldapEnabled:
                     default: false
@@ -117,24 +117,6 @@ spec:
                       group will be authenticated against the LDAP system when they
                       log into the CMC.
                     type: string
-                  s3endpointshttp:
-                    default:
-                    - ALL
-                    items:
-                      type: string
-                    type: array
-                  s3endpointshttps:
-                    default:
-                    - ALL
-                    items:
-                      type: string
-                    type: array
-                  s3websiteendpoints:
-                    default:
-                    - ALL
-                    items:
-                      type: string
-                    type: array
                 required:
                 - groupId
                 type: object

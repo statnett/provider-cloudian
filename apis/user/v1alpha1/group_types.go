@@ -27,11 +27,10 @@ import (
 
 // GroupParameters are the configurable fields of a Group.
 type GroupParameters struct {
-	// Active determines whether the group is enabled ("true") or disabled ("false") in the system.
+	// Active determines whether the group is enabled (true) or disabled (false) in the system.
 	//+optional
-	//+kubebuilder:default="true"
-	//+kubebuilder:validation:Pattern=`^(true|false)$`
-	Active *string `json:"active,omitempty"`
+	//+kubebuilder:default=true
+	Active bool `json:"active"`
 	// GroupID is the group ID (known as Name in the GUI).
 	//+kubebuilder:validation:MinLength=1
 	//+kubebuilder:validation:MaxLength=64
@@ -39,8 +38,9 @@ type GroupParameters struct {
 	GroupID string `json:"groupId"`
 	// GroupName is the group name (known as Description in the GUI).
 	//+optional
+	//+kubebuilder:validation:MinLength=1
 	//+kubebuilder:validation:MaxLength=64
-	GroupName *string `json:"groupName,omitempty"`
+	GroupName string `json:"groupName,omitempty"`
 	// LDAPEnabled determines whether LDAP authentication is enabled for members of this group.
 	//+optional
 	//+kubebuilder:default=false
@@ -61,15 +61,6 @@ type GroupParameters struct {
 	// LDAPUserDNTemplate specifies how users within this group will be authenticated against the LDAP system when they log into the CMC.
 	//+optional
 	LDAPUserDNTemplate *string `json:"ldapUserDNTemplate,omitempty"`
-	//+optional
-	//+kubebuilder:default={ALL}
-	S3EndpointsHTTPS []string `json:"s3endpointshttp,omitempty"`
-	//+optional
-	//+kubebuilder:default={ALL}
-	S3EndpointsHTTP []string `json:"s3endpointshttps,omitempty"`
-	//+optional
-	//+kubebuilder:default={ALL}
-	S3WebsiteEndpoints []string `json:"s3websiteendpoints,omitempty"`
 }
 
 // GroupObservation are the observable fields of a Group.
