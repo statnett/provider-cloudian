@@ -19,7 +19,6 @@ package group
 import (
 	"context"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/ptr"
@@ -161,7 +160,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 
 	cr.SetConditions(xpv1.Available())
 
-	upToDate, _ := isUpToDate(cr.Spec.ForProvider, *observedGroup)
+	upToDate := isUpToDate(cr.Spec.ForProvider, *observedGroup)
 
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
@@ -235,9 +234,8 @@ func (c *external) Disconnect(ctx context.Context) error {
 	return nil
 }
 
-func isUpToDate(desired v1alpha1.GroupParameters, observed cloudian.Group) (bool, string) {
-	diff := cmp.Diff(newGroupFromParams(&desired), observed)
-	return diff == "", diff
+func isUpToDate(desired v1alpha1.GroupParameters, observed cloudian.Group) bool {
+	return newGroupFromParams(&desired) == observed
 }
 
 func newGroupFromParams(gp *v1alpha1.GroupParameters) cloudian.Group {
