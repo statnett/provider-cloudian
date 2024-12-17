@@ -187,7 +187,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	cr.SetConditions(xpv1.Creating())
 
-	if err := c.cloudianService.CreateGroup(ctx, newGroupFromParams(&cr.Spec.ForProvider)); err != nil {
+	if err := c.cloudianService.CreateGroup(ctx, newGroupFromParams(cr.Spec.ForProvider)); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
 	}
 
@@ -204,7 +204,7 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalUpdate{}, errors.New(errNotGroup)
 	}
 
-	if err := c.cloudianService.UpdateGroup(ctx, newGroupFromParams(&cr.Spec.ForProvider)); err != nil {
+	if err := c.cloudianService.UpdateGroup(ctx, newGroupFromParams(cr.Spec.ForProvider)); err != nil {
 		return managed.ExternalUpdate{}, errors.Wrap(err, errUpdateGroup)
 	}
 
@@ -235,10 +235,10 @@ func (c *external) Disconnect(ctx context.Context) error {
 }
 
 func isUpToDate(desired v1alpha1.GroupParameters, observed cloudian.Group) bool {
-	return newGroupFromParams(&desired) == observed
+	return newGroupFromParams(desired) == observed
 }
 
-func newGroupFromParams(gp *v1alpha1.GroupParameters) cloudian.Group {
+func newGroupFromParams(gp v1alpha1.GroupParameters) cloudian.Group {
 	defaultsGroup := cloudian.NewGroup(gp.GroupID)
 	return cloudian.Group{
 		Active:             gp.Active,
