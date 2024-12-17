@@ -31,7 +31,8 @@ type Group struct {
 	LDAPUserDNTemplate string `json:"ldapUserDNTemplate"`
 }
 
-// fields must be exported (uppercase) to allow json marshalling
+// groupInternal is the SDK's internal representation of a cloudion group.
+// Fields must be exported (uppercase) to allow json marshalling.
 type groupInternal struct {
 	Active             string   `json:"active"`
 	GroupID            string   `json:"groupId"`
@@ -48,10 +49,10 @@ type groupInternal struct {
 	S3WebSiteEndpoints []string `json:"s3websiteendpoints"`
 }
 
-// A new group with cloudian defaults set
-func NewGroup(groupId string) Group {
+// NewGroup creates an empty cloudian group with the given ID.
+func NewGroup(groupID string) Group {
 	return Group{
-		GroupID: groupId,
+		GroupID: groupID,
 	}
 }
 

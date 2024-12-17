@@ -185,7 +185,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	cr.SetConditions(xpv1.Creating())
 
-	if err := c.cloudianService.CreateGroup(ctx, newGroupFromParams(cr.Spec.ForProvider)); err != nil {
+	if err := c.cloudianService.CreateGroup(ctx, newCloudianGroup(cr.Spec.ForProvider)); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
 	}
 
@@ -202,7 +202,7 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalUpdate{}, errors.New(errNotGroup)
 	}
 
-	if err := c.cloudianService.UpdateGroup(ctx, newGroupFromParams(cr.Spec.ForProvider)); err != nil {
+	if err := c.cloudianService.UpdateGroup(ctx, newCloudianGroup(cr.Spec.ForProvider)); err != nil {
 		return managed.ExternalUpdate{}, errors.Wrap(err, errUpdateGroup)
 	}
 
@@ -233,21 +233,20 @@ func (c *external) Disconnect(ctx context.Context) error {
 }
 
 func isUpToDate(desired v1alpha1.GroupParameters, observed cloudian.Group) bool {
-	return newGroupFromParams(desired) == observed
+	return newCloudianGroup(desired) == observed
 }
 
-func newGroupFromParams(gp v1alpha1.GroupParameters) cloudian.Group {
-	defaultsGroup := cloudian.NewGroup(gp.GroupID)
+func newCloudianGroup(gp v1alpha1.GroupParameters) cloudian.Group {
 	return cloudian.Group{
 		Active:             gp.Active,
 		GroupID:            gp.GroupID,
 		GroupName:          gp.GroupName,
-		LDAPEnabled:        ptr.Deref(gp.LDAPEnabled, defaultsGroup.LDAPEnabled),
-		LDAPGroup:          ptr.Deref(gp.LDAPGroup, defaultsGroup.LDAPGroup),
-		LDAPMatchAttribute: ptr.Deref(gp.LDAPMatchAttribute, defaultsGroup.LDAPMatchAttribute),
-		LDAPSearch:         ptr.Deref(gp.LDAPSearch, defaultsGroup.LDAPSearch),
-		LDAPSearchUserBase: ptr.Deref(gp.LDAPSearchUserBase, defaultsGroup.LDAPSearchUserBase),
-		LDAPServerURL:      ptr.Deref(gp.LDAPServerURL, defaultsGroup.LDAPServerURL),
-		LDAPUserDNTemplate: ptr.Deref(gp.LDAPUserDNTemplate, defaultsGroup.LDAPUserDNTemplate),
+		LDAPEnabled:        ptr.Deref(gp.LDAPEnabled),
+		LDAPGroup:          ptr.Deref(gp.LDAPGroup),
+		LDAPMatchAttribute: ptr.Deref(gp.LDAPMatchAttribute),
+		LDAPSearch:         ptr.Deref(gp.LDAPSearch),
+		LDAPSearchUserBase: ptr.Deref(gp.LDAPSearchUserBase),
+		LDAPServerURL:      ptr.Deref(gp.LDAPServerURL),
+		LDAPUserDNTemplate: ptr.Deref(gp.LDAPUserDNTemplate),
 	}
 }
