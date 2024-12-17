@@ -160,8 +160,6 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 
 	cr.SetConditions(xpv1.Available())
 
-	upToDate := isUpToDate(cr.Spec.ForProvider, *observedGroup)
-
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
 		// the managed resource reconciler know that it needs to call Create to
@@ -171,7 +169,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
-		ResourceUpToDate: upToDate,
+		ResourceUpToDate: isUpToDate(cr.Spec.ForProvider, *observedGroup),
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
