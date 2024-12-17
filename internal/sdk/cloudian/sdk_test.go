@@ -142,6 +142,22 @@ func TestGroupSerialization(t *testing.T) {
 	}
 }
 
+func TestGroupToInternalRoundtrip(t *testing.T) {
+	f := func(group groupInternal) bool {
+		// Override fuzzed s3-endpoint entries with known values
+		group.S3EndpointsHTTP = []string{"ALL"}
+		group.S3EndpointsHTTPS = []string{"ALL"}
+		group.S3WebSiteEndpoints = []string{"ALL"}
+
+		roundtrip := toInternal(fromInternal(group))
+		return reflect.DeepEqual(group, roundtrip)
+	}
+
+	if err := quick.Check(f, nil); err != nil {
+		t.Error(err)
+	}
+}
+
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 func randomString(length int) string {
