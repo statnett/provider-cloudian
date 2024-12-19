@@ -196,6 +196,26 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 
 }
 
+// Create a single user of type `User` into a groupId
+func (client Client) CreateUser(ctx context.Context, user User) error {
+	url := client.baseURL + "/user"
+
+	// We can create an internal type for this json data later, if needed
+	jsonData := []byte(`{"userId":"` + user.UserID + `","groupId":"` + user.GroupID + `","userType":"User"}`)
+
+	req, err := client.newRequest(ctx, url, http.MethodPut, jsonData)
+	if err != nil {
+		return fmt.Errorf("error creating request: %w", err)
+	}
+
+	resp, err := client.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("PUT to cloudian /user: %w", err)
+	}
+
+	return resp.Body.Close()
+}
+
 // Delete a group and all its members.
 func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) error {
 	users, err := client.ListUsers(ctx, groupId, nil)
