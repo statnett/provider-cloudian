@@ -214,7 +214,6 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 func (client Client) CreateUser(ctx context.Context, user User) error {
 	url := client.baseURL + "/user"
 
-	// We can create an internal type for this json data later, if needed
 	jsonData, err := json.Marshal(toInternalUser(user))
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %w", err)
