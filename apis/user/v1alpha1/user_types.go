@@ -27,6 +27,8 @@ import (
 
 // UserParameters are the configurable fields of a User.
 type UserParameters struct {
+	GroupID string `json:"groupId"`
+	UserID  string `json:"userId"`
 }
 
 // UserObservation are the observable fields of a User.
