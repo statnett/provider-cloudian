@@ -44,7 +44,11 @@ const (
 	errGetPC        = "cannot get ProviderConfig"
 	errGetCreds     = "cannot get credentials"
 
-	errNewClient = "cannot create new Service"
+	errNewClient  = "cannot create new Service"
+	errCreateUser = "cannot create User"
+	errDeleteUser = "cannot delete User"
+	errListUsers  = "cannot list Users"
+	errGetUser    = "cannot get User"
 )
 
 // A NoOpService does nothing.
@@ -147,7 +151,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 
 	users, err := c.cloudianService.ListUsers(ctx, cr.Spec.ForProvider.GroupID, nil)
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(err, "cannot list users")
+		return managed.ExternalObservation{}, errors.Wrap(err, errListUsers)
 	}
 
 	return managed.ExternalObservation{
@@ -187,7 +191,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		UserID:  cr.Spec.ForProvider.UserID,
 	}
 	if err := c.cloudianService.CreateUser(ctx, user); err != nil {
-		return managed.ExternalCreation{}, errors.Wrap(err, "cannot create user")
+		return managed.ExternalCreation{}, errors.Wrap(err, errCreateUser)
 	}
 
 	return managed.ExternalCreation{
@@ -223,7 +227,7 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 		UserID:  cr.Spec.ForProvider.UserID,
 	}
 	if err := c.cloudianService.DeleteUser(ctx, user); err != nil {
-		return managed.ExternalDelete{}, errors.Wrap(err, "cannot delete user")
+		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteUser)
 	}
 
 	return managed.ExternalDelete{}, nil
