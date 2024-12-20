@@ -212,14 +212,12 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 
 // Create a single user of type `User` into a groupId
 func (client Client) CreateUser(ctx context.Context, user User) error {
-	url := client.baseURL + "/user"
-
 	jsonData, err := json.Marshal(toInternalUser(user))
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	req, err := client.newRequest(ctx, url, http.MethodPut, jsonData)
+	req, err := client.newRequest(ctx, client.baseURL+"/user", http.MethodPut, jsonData)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
