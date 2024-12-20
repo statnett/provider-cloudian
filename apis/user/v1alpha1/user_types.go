@@ -27,12 +27,10 @@ import (
 
 // UserParameters are the configurable fields of a User.
 type UserParameters struct {
-	ConfigurableField string `json:"configurableField"`
 }
 
 // UserObservation are the observable fields of a User.
 type UserObservation struct {
-	ObservableField string `json:"observableField,omitempty"`
 }
 
 // A UserSpec defines the desired state of a User.
