@@ -222,8 +222,7 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 		GroupID: cr.Spec.ForProvider.GroupID,
 		UserID:  cr.Spec.ForProvider.UserID,
 	}
-	err := c.cloudianService.DeleteUser(ctx, user)
-	if err != nil {
+	if err := c.cloudianService.DeleteUser(ctx, user); err != nil {
 		return managed.ExternalDelete{}, errors.Wrap(err, "cannot delete user")
 	}
 
