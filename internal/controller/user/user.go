@@ -203,7 +203,7 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalUpdate{}, errors.New(errNotUser)
 	}
 
-	fmt.Printf("Pretending to Update (not yet implemented): %+v", cr)
+	fmt.Printf("Pretending to Update (no managed fields to update): %+v", cr)
 
 	return managed.ExternalUpdate{
 		// Optionally return any details that may be required to connect to the
