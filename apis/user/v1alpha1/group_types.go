@@ -65,7 +65,6 @@ type GroupParameters struct {
 
 // GroupObservation are the observable fields of a Group.
 type GroupObservation struct {
-	ObservableField string `json:"observableField,omitempty"`
 }
 
 // A GroupSpec defines the desired state of a Group.
