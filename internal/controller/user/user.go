@@ -154,16 +154,18 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.Wrap(err, errListUsers)
 	}
 
+	upToDate := isUpToDate(cr.Spec.ForProvider, users)
+
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
 		// the managed resource reconciler know that it needs to call Create to
 		// (re)create the resource, or that it has successfully been deleted.
-		ResourceExists: true,
+		ResourceExists: upToDate,
 
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
-		ResourceUpToDate: isUpToDate(cr.Spec.ForProvider, users),
+		ResourceUpToDate: upToDate,
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
