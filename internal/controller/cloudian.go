@@ -22,6 +22,7 @@ import (
 
 	"github.com/statnett/provider-cloudian/internal/controller/config"
 	"github.com/statnett/provider-cloudian/internal/controller/group"
+	"github.com/statnett/provider-cloudian/internal/controller/user"
 )
 
 // Setup creates all Cloudian controllers with the supplied logger and adds them to
@@ -30,6 +31,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		config.Setup,
 		group.Setup,
+		user.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err
