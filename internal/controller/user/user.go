@@ -183,8 +183,8 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 	}
 
 	user := cloudian.User{
-		UserID:  cr.Spec.ForProvider.UserID,
 		GroupID: cr.Spec.ForProvider.GroupID,
+		UserID:  cr.Spec.ForProvider.UserID,
 	}
 	if err := c.cloudianService.CreateUser(ctx, user); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, "cannot create user")
@@ -219,8 +219,8 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 	}
 
 	user := cloudian.User{
-		UserID:  cr.Spec.ForProvider.UserID,
 		GroupID: cr.Spec.ForProvider.GroupID,
+		UserID:  cr.Spec.ForProvider.UserID,
 	}
 	err := c.cloudianService.DeleteUser(ctx, user)
 	if err != nil {
