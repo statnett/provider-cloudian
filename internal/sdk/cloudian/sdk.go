@@ -94,6 +94,20 @@ type User struct {
 	GroupID string `json:"groupId"`
 }
 
+type userInternal struct {
+	UserID   string `json:"userId"`
+	GroupID  string `json:"groupId"`
+	UserType string `json:"userType"`
+}
+
+func toInternalUser(u User) userInternal {
+	return userInternal{
+		UserID:   u.UserID,
+		GroupID:  u.GroupID,
+		UserType: "User",
+	}
+}
+
 var ErrNotFound = errors.New("not found")
 
 // WithInsecureTLSVerify skips the TLS validation of the server certificate when `insecure` is true.
@@ -201,7 +215,10 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 	url := client.baseURL + "/user"
 
 	// We can create an internal type for this json data later, if needed
-	jsonData := []byte(`{"userId":"` + user.UserID + `","groupId":"` + user.GroupID + `","userType":"User"}`)
+	jsonData, err := json.Marshal(toInternalUser(user))
+	if err != nil {
+		return fmt.Errorf("error marshaling JSON: %w", err)
+	}
 
 	req, err := client.newRequest(ctx, url, http.MethodPut, jsonData)
 	if err != nil {
