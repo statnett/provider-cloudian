@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Help us diagnose and fix bugs in Crossplane
+about: Help us diagnose and fix bugs in Crossplane Provider Cloudian
 labels: bug
 ---
 <!--
@@ -26,8 +26,8 @@ appreciated!
 -->
 
 ### What environment did it happen in?
-Crossplane version: 
-
+Crossplane version:
+Crossplane Provider Cloudian version:
 <!--
 Include at least the version or commit of Crossplane you were running. Consider
 also including your:
