@@ -14,7 +14,7 @@ func TestSecretUnmarshal(t *testing.T) {
 		t.Errorf("Error deserializing from JSON: %v", err)
 	}
 
-	if secrets[0].AccessKey.Reveal() != "124" {
+	if string(secrets[0].AccessKey) != "124" {
 		t.Errorf("Expected string equality to 124, got %v", secrets[0].AccessKey)
 	}
 
