@@ -18,7 +18,7 @@ func TestSecretUnmarshal(t *testing.T) {
 		t.Errorf("Expected string equality to 124, got %v", secrets[0].AccessKey)
 	}
 
-	if fmt.Sprintf("%s", secrets[0].AccessKey) != "********" {
+	if string(secrets[0].AccessKey) != "********" {
 		t.Errorf("Expected obfuscated string, got %v", secrets[0].SecretKey)
 	}
 }
