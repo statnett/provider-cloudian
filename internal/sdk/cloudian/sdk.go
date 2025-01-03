@@ -108,6 +108,12 @@ func toInternalUser(u User) userInternal {
 	}
 }
 
+// The cloudian API doc names this data `SecurityInfo` so we retain that name.
+type SecurityInfo struct {
+	AccessKey Secret `json:"accessKey"`
+	SecretKey Secret `json:"secretKey"`
+}
+
 var ErrNotFound = errors.New("not found")
 
 // WithInsecureTLSVerify skips the TLS validation of the server certificate when `insecure` is true.
@@ -228,6 +234,43 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 	}
 
 	return resp.Body.Close()
+}
+
+// Fetch user credentials.
+func (client Client) GetUserCredentials(ctx context.Context, user User) ([]SecurityInfo, error) {
+	url := client.baseURL + "/user/credentials/list?userId=" + user.UserID + "&groupId=" + user.GroupID
+
+	req, err := client.newRequest(ctx, url, http.MethodGet, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating credentials request: %w", err)
+	}
+
+	resp, err := client.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error performing credentials request: %w", err)
+	}
+
+	defer resp.Body.Close() // nolint:errcheck
+
+	switch resp.StatusCode {
+	case 200:
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("error reading credentials response: %w", err)
+		}
+
+		var securityInfo []SecurityInfo
+		if err := json.Unmarshal(body, &securityInfo); err != nil {
+			return nil, fmt.Errorf("error parsing credentials response: %w", err)
+		}
+
+		return securityInfo, nil
+	case 204:
+		// Cloudian-API returns 204 if no security credentials found
+		return nil, ErrNotFound
+	default:
+		return nil, fmt.Errorf("error: list credentials unexpected status code: %d", resp.StatusCode)
+	}
 }
 
 // Delete a group and all its members.
