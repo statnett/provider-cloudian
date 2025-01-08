@@ -236,7 +236,7 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 	return resp.Body.Close()
 }
 
-// Fetch user credentials.
+// GetUserCredentials fetches all the credentials of a user.
 func (client Client) GetUserCredentials(ctx context.Context, user User) ([]SecurityInfo, error) {
 	url := client.baseURL + "/user/credentials/list?userId=" + user.UserID + "&groupId=" + user.GroupID
 
