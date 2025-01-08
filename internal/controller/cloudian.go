@@ -20,6 +20,7 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
 	ctrl "sigs.k8s.io/controller-runtime"
 
+	"github.com/statnett/provider-cloudian/internal/controller/accesskey"
 	"github.com/statnett/provider-cloudian/internal/controller/config"
 	"github.com/statnett/provider-cloudian/internal/controller/group"
 	"github.com/statnett/provider-cloudian/internal/controller/user"
@@ -29,6 +30,7 @@ import (
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		accesskey.Setup,
 		config.Setup,
 		group.Setup,
 		user.Setup,
