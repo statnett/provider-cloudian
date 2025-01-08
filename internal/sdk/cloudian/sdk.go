@@ -237,6 +237,34 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 	return resp.Body.Close()
 }
 
+// CreateUserCredentials creates a new set of credentials for a user.
+func (client Client) CreateUserCredentials(ctx context.Context, user User) (*SecurityInfo, error) {
+	resp, err := client.doRequest(ctx, http.MethodPut, "/user/credentials",
+		map[string]string{"groupId": user.GroupID, "userId": user.UserID}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close() // nolint:errcheck
+
+	switch resp.StatusCode {
+	case 200:
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("error reading create credentials response: %w", err)
+		}
+
+		var securityInfo SecurityInfo
+		if err := json.Unmarshal(body, &securityInfo); err != nil {
+			return nil, fmt.Errorf("error parsing create credentials response: %w", err)
+		}
+
+		return &securityInfo, nil
+	default:
+		return nil, fmt.Errorf("error: create credentials unexpected status code: %d", resp.StatusCode)
+	}
+}
+
 // GetUserCredentials fetches all the credentials of a user.
 func (client Client) GetUserCredentials(ctx context.Context, user User) ([]SecurityInfo, error) {
 	req, err := client.newRequest(ctx, http.MethodGet, "/user/credentials/list",
