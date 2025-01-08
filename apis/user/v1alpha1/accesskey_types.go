@@ -76,7 +76,7 @@ type AccessKeyList struct {
 // AccessKey type metadata.
 var (
 	AccessKeyKind             = reflect.TypeOf(AccessKey{}).Name()
-	AccessKeyGroupKind        = schema.GroupKind{Group: Group, Kind: AccessKeyKind}.String()
+	AccessKeyGroupKind        = schema.GroupKind{Group: MetadataGroup, Kind: AccessKeyKind}.String()
 	AccessKeyKindAPIVersion   = AccessKeyKind + "." + SchemeGroupVersion.String()
 	AccessKeyGroupVersionKind = SchemeGroupVersion.WithKind(AccessKeyKind)
 )
