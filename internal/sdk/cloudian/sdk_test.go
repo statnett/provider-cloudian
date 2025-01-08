@@ -1,15 +1,56 @@
 package cloudian
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"strings"
 	"testing"
 	"testing/quick"
+
+	"github.com/google/go-cmp/cmp"
 )
+
+func TestGetGroup(t *testing.T) {
+	expected := Group{
+		GroupID: "QA",
+	}
+
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"groupId": "QA"}`))
+	}))
+	defer mockServer.Close()
+
+	mockClient := &http.Client{}
+
+	_, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, mockServer.URL, nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+
+	cloudianClient := Client{
+		baseURL:    mockServer.URL,
+		httpClient: mockClient,
+		authHeader: "",
+	}
+
+	group, err := cloudianClient.GetGroup(context.TODO(), "QA")
+
+	if err != nil {
+		t.Errorf("Error getting group: %v", err)
+	}
+
+	if diff := cmp.Diff(*group, expected); diff != "" {
+		t.Errorf("GetGroup() mismatch (-want +got):\n%s", diff)
+	}
+
+}
 
 func TestRealisticGroupSerialization(t *testing.T) {
 	jsonString := `{
