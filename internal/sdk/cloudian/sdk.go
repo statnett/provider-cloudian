@@ -154,7 +154,7 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 
 	resp, err := client.newRequest(ctx, http.MethodGet, "/user/list", params, nil)
 	if err != nil {
-		return nil, fmt.Errorf("GET list users failed: %w", err)
+		return nil, err
 	}
 
 	defer resp.Body.Close() // nolint:errcheck
@@ -194,7 +194,7 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 	resp, err := client.newRequest(ctx, http.MethodDelete, "/user",
 		map[string]string{"groupId": user.GroupID, "userId": user.UserID}, nil)
 	if err != nil {
-		return fmt.Errorf("DELETE to cloudian /user got: %w", err)
+		return err
 	}
 	defer resp.Body.Close() // nolint:errcheck
 
@@ -216,7 +216,7 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 
 	resp, err := client.newRequest(ctx, http.MethodPut, "/user", nil, jsonData)
 	if err != nil {
-		return fmt.Errorf("PUT to cloudian /user: %w", err)
+		return err
 	}
 
 	return resp.Body.Close()
@@ -227,7 +227,7 @@ func (client Client) GetUserCredentials(ctx context.Context, user User) ([]Secur
 	resp, err := client.newRequest(ctx, http.MethodGet, "/user/credentials/list",
 		map[string]string{"groupId": user.GroupID, "userId": user.UserID}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error performing credentials request: %w", err)
+		return nil, err
 	}
 
 	defer resp.Body.Close() // nolint:errcheck
@@ -256,7 +256,6 @@ func (client Client) GetUserCredentials(ctx context.Context, user User) ([]Secur
 // Delete a group and all its members.
 func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) error {
 	users, err := client.ListUsers(ctx, groupId, nil)
-
 	if err != nil {
 		return fmt.Errorf("error listing users: %w", err)
 	}
@@ -275,7 +274,7 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 	resp, err := client.newRequest(ctx, http.MethodDelete, "/group",
 		map[string]string{"groupId": groupId}, nil)
 	if err != nil {
-		return fmt.Errorf("DELETE to cloudian /group got: %w", err)
+		return err
 	}
 
 	return resp.Body.Close()
@@ -290,7 +289,7 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 
 	resp, err := client.newRequest(ctx, http.MethodPut, "/group", nil, jsonData)
 	if err != nil {
-		return fmt.Errorf("POST to cloudian /group: %w", err)
+		return err
 	}
 
 	return resp.Body.Close()
@@ -306,7 +305,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	// Create a context with a timeout
 	resp, err := client.newRequest(ctx, http.MethodPost, "/group", nil, jsonData)
 	if err != nil {
-		return fmt.Errorf("PUT to cloudian /group: %w", err)
+		return err
 	}
 
 	return resp.Body.Close()
@@ -318,7 +317,7 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 	resp, err := client.newRequest(ctx, http.MethodGet, "/group",
 		map[string]string{"groupId": groupId}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("GET error: %w", err)
+		return nil, err
 	}
 
 	defer resp.Body.Close() // nolint:errcheck
