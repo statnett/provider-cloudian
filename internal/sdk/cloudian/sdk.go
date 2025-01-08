@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	urlpkg "net/url"
 	"strconv"
 )
 
@@ -386,23 +387,28 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 }
 
 func (client Client) newRequest(ctx context.Context, method string, url string, query map[string]string, body []byte) (*http.Request, error) {
+	u, err := urlpkg.Parse(client.baseURL + url)
+	if err != nil {
+		return nil, err
+	}
+
+	q := urlpkg.Values{}
+	for k, v := range query {
+		q.Set(k, v)
+	}
+	u.RawQuery = q.Encode()
+
 	var buffer io.Reader = nil
 	if body != nil {
 		buffer = bytes.NewBuffer(body)
 	}
-	req, err := http.NewRequestWithContext(ctx, method, client.baseURL+url, buffer)
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), buffer)
 	if err != nil {
 		return req, fmt.Errorf("error creating request: %w", err)
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", client.authHeader)
-
-	q := req.URL.Query()
-	for k, v := range query {
-		q.Set(k, v)
-	}
-	req.URL.RawQuery = q.Encode()
 
 	return req, nil
 }
