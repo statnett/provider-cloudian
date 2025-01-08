@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.2](https://github.com/statnett/provider-cloudian/compare/v0.0.1...v0.0.2) (2025-01-08)
+
+
+### Features
+
+* fetch user credentials in sdk ([#78](https://github.com/statnett/provider-cloudian/issues/78)) ([ad0ef0a](https://github.com/statnett/provider-cloudian/commit/ad0ef0aae9e0e018d49c9d228fed8a70e68f754e))
+
 ## [0.0.1](https://github.com/statnett/provider-cloudian/compare/v0.0.0...v0.0.1) (2025-01-02)
 
 
