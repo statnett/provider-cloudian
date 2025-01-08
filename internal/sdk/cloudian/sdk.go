@@ -143,17 +143,20 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 
 	limit := 100
 
-	offsetQueryParam := ""
-	if offsetUserId != nil {
-		offsetQueryParam = "&offset=" + *offsetUserId
-	}
-
-	url := client.baseURL + "/user/list?groupId=" + groupId + "&userType=all&userStatus=all&limit=" + strconv.Itoa(limit) + offsetQueryParam
-
-	req, err := client.newRequest(ctx, url, http.MethodGet, nil)
+	req, err := client.newRequest(ctx, "/user/list", http.MethodGet, nil)
 	if err != nil {
 		return nil, fmt.Errorf("GET error creating list request: %w", err)
 	}
+
+	q := req.URL.Query()
+	q.Set("groupId", groupId)
+	q.Set("userType", "all")
+	q.Set("userStatus", "all")
+	q.Set("limit", strconv.Itoa(limit))
+	if offsetUserId != nil {
+		q.Set("offset", *offsetUserId)
+	}
+	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
@@ -194,12 +197,15 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 
 // Delete a single user. Errors if the user does not exist.
 func (client Client) DeleteUser(ctx context.Context, user User) error {
-	url := client.baseURL + "/user?userId=" + user.UserID + "&groupId=" + user.GroupID
-
-	req, err := client.newRequest(ctx, url, http.MethodDelete, nil)
+	req, err := client.newRequest(ctx, "/user", http.MethodDelete, nil)
 	if err != nil {
 		return fmt.Errorf("DELETE error creating request: %w", err)
 	}
+
+	q := req.URL.Query()
+	q.Set("groupId", user.GroupID)
+	q.Set("userId", user.UserID)
+	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
@@ -223,7 +229,7 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	req, err := client.newRequest(ctx, client.baseURL+"/user", http.MethodPut, jsonData)
+	req, err := client.newRequest(ctx, "/user", http.MethodPut, jsonData)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -238,12 +244,15 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 
 // GetUserCredentials fetches all the credentials of a user.
 func (client Client) GetUserCredentials(ctx context.Context, user User) ([]SecurityInfo, error) {
-	url := client.baseURL + "/user/credentials/list?userId=" + user.UserID + "&groupId=" + user.GroupID
-
-	req, err := client.newRequest(ctx, url, http.MethodGet, nil)
+	req, err := client.newRequest(ctx, "/user/credentials/list", http.MethodGet, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating credentials request: %w", err)
 	}
+
+	q := req.URL.Query()
+	q.Set("groupId", user.GroupID)
+	q.Set("userId", user.UserID)
+	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
@@ -292,12 +301,14 @@ func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) e
 
 // Deletes a group if it is without members.
 func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
-	url := client.baseURL + "/group?groupId=" + groupId
-
-	req, err := client.newRequest(ctx, url, http.MethodDelete, nil)
+	req, err := client.newRequest(ctx, "/group", http.MethodDelete, nil)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
+
+	q := req.URL.Query()
+	q.Set("groupId", groupId)
+	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
@@ -309,14 +320,12 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 
 // Creates a group.
 func (client Client) CreateGroup(ctx context.Context, group Group) error {
-	url := client.baseURL + "/group"
-
 	jsonData, err := json.Marshal(toInternal(group))
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	req, err := client.newRequest(ctx, url, http.MethodPut, jsonData)
+	req, err := client.newRequest(ctx, "/group", http.MethodPut, jsonData)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -331,15 +340,13 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 
 // Updates a group if it does not exists.
 func (client Client) UpdateGroup(ctx context.Context, group Group) error {
-	url := client.baseURL + "/group"
-
 	jsonData, err := json.Marshal(toInternal(group))
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
 	// Create a context with a timeout
-	req, err := client.newRequest(ctx, url, http.MethodPost, jsonData)
+	req, err := client.newRequest(ctx, "/group", http.MethodPost, jsonData)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -355,12 +362,14 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 // Get a group. Returns an error even in the case of a group not found.
 // This error can then be checked against ErrNotFound: errors.Is(err, ErrNotFound)
 func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, error) {
-	url := client.baseURL + "/group?groupId=" + groupId
-
-	req, err := client.newRequest(ctx, url, http.MethodGet, nil)
+	req, err := client.newRequest(ctx, "/group", http.MethodGet, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	q := req.URL.Query()
+	q.Set("groupId", groupId)
+	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
@@ -396,7 +405,7 @@ func (client Client) newRequest(ctx context.Context, url string, method string, 
 	if body != nil {
 		buffer = bytes.NewBuffer(body)
 	}
-	req, err := http.NewRequestWithContext(ctx, method, url, buffer)
+	req, err := http.NewRequestWithContext(ctx, method, client.baseURL+url, buffer)
 	if err != nil {
 		return req, fmt.Errorf("error creating request: %w", err)
 	}
