@@ -108,7 +108,7 @@ func toInternalUser(u User) userInternal {
 	}
 }
 
-// The cloudian API doc names this data `SecurityInfo` so we retain that name.
+// SecurityInfo is the Cloudian API's term for secure credentials
 type SecurityInfo struct {
 	AccessKey Secret `json:"accessKey"`
 	SecretKey Secret `json:"secretKey"`
