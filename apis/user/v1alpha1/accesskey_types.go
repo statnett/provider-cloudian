@@ -27,12 +27,10 @@ import (
 
 // AccessKeyParameters are the configurable fields of a AccessKey.
 type AccessKeyParameters struct {
-	ConfigurableField string `json:"configurableField"`
 }
 
 // AccessKeyObservation are the observable fields of a AccessKey.
 type AccessKeyObservation struct {
-	ObservableField string `json:"observableField,omitempty"`
 }
 
 // A AccessKeySpec defines the desired state of a AccessKey.
