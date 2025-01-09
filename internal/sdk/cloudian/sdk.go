@@ -152,7 +152,7 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 		params["offset"] = *offsetUserId
 	}
 
-	resp, err := client.newRequest(ctx, http.MethodGet, "/user/list", params, nil)
+	resp, err := client.doRequest(ctx, http.MethodGet, "/user/list", params, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +191,7 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 
 // Delete a single user. Errors if the user does not exist.
 func (client Client) DeleteUser(ctx context.Context, user User) error {
-	resp, err := client.newRequest(ctx, http.MethodDelete, "/user",
+	resp, err := client.doRequest(ctx, http.MethodDelete, "/user",
 		map[string]string{"groupId": user.GroupID, "userId": user.UserID}, nil)
 	if err != nil {
 		return err
@@ -214,7 +214,7 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	resp, err := client.newRequest(ctx, http.MethodPut, "/user", nil, jsonData)
+	resp, err := client.doRequest(ctx, http.MethodPut, "/user", nil, jsonData)
 	if err != nil {
 		return err
 	}
@@ -224,7 +224,7 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 
 // GetUserCredentials fetches all the credentials of a user.
 func (client Client) GetUserCredentials(ctx context.Context, user User) ([]SecurityInfo, error) {
-	resp, err := client.newRequest(ctx, http.MethodGet, "/user/credentials/list",
+	resp, err := client.doRequest(ctx, http.MethodGet, "/user/credentials/list",
 		map[string]string{"groupId": user.GroupID, "userId": user.UserID}, nil)
 	if err != nil {
 		return nil, err
@@ -271,7 +271,7 @@ func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) e
 
 // Deletes a group if it is without members.
 func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
-	resp, err := client.newRequest(ctx, http.MethodDelete, "/group",
+	resp, err := client.doRequest(ctx, http.MethodDelete, "/group",
 		map[string]string{"groupId": groupId}, nil)
 	if err != nil {
 		return err
@@ -287,7 +287,7 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	resp, err := client.newRequest(ctx, http.MethodPut, "/group", nil, jsonData)
+	resp, err := client.doRequest(ctx, http.MethodPut, "/group", nil, jsonData)
 	if err != nil {
 		return err
 	}
@@ -303,7 +303,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	}
 
 	// Create a context with a timeout
-	resp, err := client.newRequest(ctx, http.MethodPost, "/group", nil, jsonData)
+	resp, err := client.doRequest(ctx, http.MethodPost, "/group", nil, jsonData)
 	if err != nil {
 		return err
 	}
@@ -314,7 +314,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 // Get a group. Returns an error even in the case of a group not found.
 // This error can then be checked against ErrNotFound: errors.Is(err, ErrNotFound)
 func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, error) {
-	resp, err := client.newRequest(ctx, http.MethodGet, "/group",
+	resp, err := client.doRequest(ctx, http.MethodGet, "/group",
 		map[string]string{"groupId": groupId}, nil)
 	if err != nil {
 		return nil, err
@@ -344,7 +344,7 @@ func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, erro
 	}
 }
 
-func (client Client) newRequest(ctx context.Context, method string, url string, query map[string]string, body []byte) (*http.Response, error) {
+func (client Client) doRequest(ctx context.Context, method string, url string, query map[string]string, body []byte) (*http.Response, error) {
 	var buffer io.Reader = nil
 	if body != nil {
 		buffer = bytes.NewBuffer(body)
