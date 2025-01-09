@@ -384,7 +384,6 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	// Create a context with a timeout
 	resp, err := client.doRequest(ctx, http.MethodPost, "/group", nil, jsonData)
 	if err != nil {
 		return err
