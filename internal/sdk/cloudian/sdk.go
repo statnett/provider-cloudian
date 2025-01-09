@@ -186,7 +186,6 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 	}
 
 	return retVal, nil
-
 }
 
 // Delete a single user. Errors if the user does not exist.
@@ -196,6 +195,7 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 	if err != nil {
 		return err
 	}
+
 	defer resp.Body.Close() // nolint:errcheck
 
 	switch resp.StatusCode {
@@ -204,7 +204,6 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 	default:
 		return fmt.Errorf("DELETE unexpected status. Failure: %d", resp.StatusCode)
 	}
-
 }
 
 // Create a single user of type `User` into a groupId
@@ -353,7 +352,14 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 		return err
 	}
 
-	return resp.Body.Close()
+	defer resp.Body.Close() // nolint:errcheck
+
+	switch resp.StatusCode {
+	case 200:
+		return nil
+	default:
+		return fmt.Errorf("DELETE unexpected status. Failure: %d", resp.StatusCode)
+	}
 }
 
 // Creates a group.
