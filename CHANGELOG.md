@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.4](https://github.com/statnett/provider-cloudian/compare/v0.0.3...v0.0.4) (2025-01-09)
+
+
+### Features
+
+* bootstrap empty AccessKey kind ([#86](https://github.com/statnett/provider-cloudian/issues/86)) ([a443195](https://github.com/statnett/provider-cloudian/commit/a443195ceb14f0e2a038bbf73ea772d952f2bc54))
+* **sdk:** create credentials ([#85](https://github.com/statnett/provider-cloudian/issues/85)) ([1588392](https://github.com/statnett/provider-cloudian/commit/1588392864b478421be6ee3480cba7b59a5ff918))
+
 ## [0.0.3](https://github.com/statnett/provider-cloudian/compare/v0.0.2...v0.0.3) (2025-01-08)
 
 
