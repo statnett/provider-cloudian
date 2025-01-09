@@ -250,8 +250,42 @@ func (client Client) CreateUserCredentials(ctx context.Context, user User) (*Sec
 	}
 }
 
-// GetUserCredentials fetches all the credentials of a user.
-func (client Client) GetUserCredentials(ctx context.Context, user User) ([]SecurityInfo, error) {
+// GetUserCredentials fetches a set of credentials for a user.
+func (client Client) GetUserCredentials(ctx context.Context, user User, accessKey string) (*SecurityInfo, error) {
+	resp, err := client.doRequest(ctx, http.MethodGet, "/user/credentials",
+		map[string]string{
+			"groupId":   user.GroupID,
+			"userId":    user.UserID,
+			"accessKey": accessKey,
+		}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close() // nolint:errcheck
+
+	switch resp.StatusCode {
+	case 200:
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("error reading get credentials response: %w", err)
+		}
+
+		var securityInfo SecurityInfo
+		if err := json.Unmarshal(body, &securityInfo); err != nil {
+			return nil, fmt.Errorf("error parsing get credentials response: %w", err)
+		}
+
+		return &securityInfo, nil
+	case 204:
+		return nil, ErrNotFound
+	default:
+		return nil, fmt.Errorf("error: get credentials unexpected status code: %d", resp.StatusCode)
+	}
+}
+
+// ListUserCredentials fetches all the credentials of a user.
+func (client Client) ListUserCredentials(ctx context.Context, user User) ([]SecurityInfo, error) {
 	resp, err := client.doRequest(ctx, http.MethodGet, "/user/credentials/list",
 		map[string]string{"groupId": user.GroupID, "userId": user.UserID}, nil)
 	if err != nil {
@@ -264,12 +298,12 @@ func (client Client) GetUserCredentials(ctx context.Context, user User) ([]Secur
 	case 200:
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, fmt.Errorf("error reading credentials response: %w", err)
+			return nil, fmt.Errorf("error reading list credentials response: %w", err)
 		}
 
 		var securityInfo []SecurityInfo
 		if err := json.Unmarshal(body, &securityInfo); err != nil {
-			return nil, fmt.Errorf("error parsing credentials response: %w", err)
+			return nil, fmt.Errorf("error parsing list credentials response: %w", err)
 		}
 
 		return securityInfo, nil
