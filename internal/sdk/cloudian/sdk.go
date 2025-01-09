@@ -251,13 +251,9 @@ func (client Client) CreateUserCredentials(ctx context.Context, user User) (*Sec
 }
 
 // GetUserCredentials fetches a set of credentials for a user.
-func (client Client) GetUserCredentials(ctx context.Context, user User, accessKey string) (*SecurityInfo, error) {
+func (client Client) GetUserCredentials(ctx context.Context, accessKey string) (*SecurityInfo, error) {
 	resp, err := client.doRequest(ctx, http.MethodGet, "/user/credentials",
-		map[string]string{
-			"groupId":   user.GroupID,
-			"userId":    user.UserID,
-			"accessKey": accessKey,
-		}, nil)
+		map[string]string{"accessKey": accessKey}, nil)
 	if err != nil {
 		return nil, err
 	}
