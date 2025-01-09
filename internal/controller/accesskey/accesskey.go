@@ -18,7 +18,6 @@ package accesskey
 
 import (
 	"context"
-	"log"
 
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"

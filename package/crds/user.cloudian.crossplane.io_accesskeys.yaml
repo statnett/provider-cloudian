@@ -73,6 +73,21 @@ spec:
               forProvider:
                 description: AccessKeyParameters are the configurable fields of a
                   AccessKey.
+                properties:
+                  groupId:
+                    description: GroupID is the group ID (known as Name in the GUI).
+                    maxLength: 64
+                    minLength: 1
+                    type: string
+                  userId:
+                    description: UserID is the user ID (also known as Username in
+                      the GUI).
+                    maxLength: 64
+                    minLength: 1
+                    type: string
+                required:
+                - groupId
+                - userId
                 type: object
               managementPolicies:
                 default:
@@ -246,6 +261,11 @@ spec:
             properties:
               atProvider:
                 description: AccessKeyObservation are the observable fields of a AccessKey.
+                properties:
+                  accessKey:
+                    description: AccessKey is the S3 Access Key ID, with a corresponding
+                      SecretKey.
+                    type: string
                 type: object
               conditions:
                 description: Conditions of the resource.
