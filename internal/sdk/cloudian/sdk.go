@@ -311,6 +311,24 @@ func (client Client) ListUserCredentials(ctx context.Context, user User) ([]Secu
 	}
 }
 
+// DeleteUserCredentials deletes a set of credentials for a user.
+func (client Client) DeleteUserCredentials(ctx context.Context, accessKey string) error {
+	resp, err := client.doRequest(ctx, http.MethodDelete, "/user/credentials",
+		map[string]string{"accessKey": accessKey}, nil)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close() // nolint:errcheck
+
+	switch resp.StatusCode {
+	case 200:
+		return nil
+	default:
+		return fmt.Errorf("DELETE unexpected status. Failure: %d", resp.StatusCode)
+	}
+}
+
 // Delete a group and all its members.
 func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) error {
 	users, err := client.ListUsers(ctx, groupId, nil)
