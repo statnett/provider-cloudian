@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.5](https://github.com/statnett/provider-cloudian/compare/v0.0.4...v0.0.5) (2025-01-09)
+
+
+### Features
+
+* **sdk:** delete user credentials ([#90](https://github.com/statnett/provider-cloudian/issues/90)) ([3a0176d](https://github.com/statnett/provider-cloudian/commit/3a0176d412a4e64156cebd0c991b3f2241ea5b38))
+* **sdk:** get use credentials ([#89](https://github.com/statnett/provider-cloudian/issues/89)) ([cdfa16f](https://github.com/statnett/provider-cloudian/commit/cdfa16fa047d53427ef57c8554ba963e9e27356f))
+
+
+### Bug Fixes
+
+* **sdk:** delete group non-success handling ([#91](https://github.com/statnett/provider-cloudian/issues/91)) ([2228b48](https://github.com/statnett/provider-cloudian/commit/2228b4892eb1644db5425c9bb08097bee453b4b7))
+
 ## [0.0.4](https://github.com/statnett/provider-cloudian/compare/v0.0.3...v0.0.4) (2025-01-09)
 
 
