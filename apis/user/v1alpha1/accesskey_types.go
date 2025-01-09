@@ -27,10 +27,20 @@ import (
 
 // AccessKeyParameters are the configurable fields of a AccessKey.
 type AccessKeyParameters struct {
+	// GroupID is the group ID (known as Name in the GUI).
+	//+kubebuilder:validation:MinLength=1
+	//+kubebuilder:validation:MaxLength=64
+	GroupID string `json:"groupId"`
+	// UserID is the user ID (also known as Username in the GUI).
+	//+kubebuilder:validation:MinLength=1
+	//+kubebuilder:validation:MaxLength=64
+	UserID string `json:"userId"`
 }
 
 // AccessKeyObservation are the observable fields of a AccessKey.
 type AccessKeyObservation struct {
+	// AccessKey is the S3 Access Key ID, with a corresponding SecretKey.
+	AccessKey string `json:"accessKey,omitempty"`
 }
 
 // A AccessKeySpec defines the desired state of a AccessKey.

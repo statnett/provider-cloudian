@@ -18,16 +18,18 @@ package accesskey
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/connection"
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
 	"github.com/crossplane/crossplane-runtime/pkg/event"
+	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
@@ -42,7 +44,9 @@ const (
 	errNotAccessKey = "managed resource is not a AccessKey custom resource"
 	errTrackPCUsage = "cannot track ProviderConfig usage"
 	errGetPC        = "cannot get ProviderConfig"
+	errCreateCreds  = "cannot create credentials"
 	errGetCreds     = "cannot get credentials"
+	errDeleteCreds  = "cannot delete credentials"
 
 	errNewClient = "cannot create new Service"
 )
@@ -142,8 +146,20 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.New(errNotAccessKey)
 	}
 
-	// These fmt statements should be removed in the real implementation.
-	fmt.Printf("Observing: %+v", cr)
+	if meta.GetExternalName(cr) == "" {
+		return managed.ExternalObservation{ResourceExists: false}, nil
+	}
+
+	creds, err := c.cloudianService.GetUserCredentials(ctx, meta.GetExternalName(cr))
+	if errors.Is(err, cloudian.ErrNotFound) {
+		return managed.ExternalObservation{ResourceExists: false}, nil
+	}
+	if err != nil {
+		return managed.ExternalObservation{}, errors.Wrap(err, errGetCreds)
+	}
+
+	cr.Status.AtProvider.AccessKey = meta.GetExternalName(cr)
+	cr.SetConditions(xpv1.Available())
 
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
@@ -154,11 +170,14 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
+		// TODO: Check Inactivate / Activate
 		ResourceUpToDate: true,
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
-		ConnectionDetails: managed.ConnectionDetails{},
+		ConnectionDetails: managed.ConnectionDetails{
+			"secretKey": []byte(creds.SecretKey),
+		},
 	}, nil
 }
 
@@ -168,22 +187,34 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, errors.New(errNotAccessKey)
 	}
 
-	fmt.Printf("Creating: %+v", cr)
+	cr.SetConditions(xpv1.Creating())
+
+	creds, err := c.cloudianService.CreateUserCredentials(ctx, cloudian.User{
+		GroupID: cr.Spec.ForProvider.GroupID,
+		UserID:  cr.Spec.ForProvider.UserID,
+	})
+	if err != nil {
+		return managed.ExternalCreation{}, errors.Wrap(err, errCreateCreds)
+	}
+
+	meta.SetExternalName(cr, creds.AccessKey)
 
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
 		// external resource. These will be stored as the connection secret.
-		ConnectionDetails: managed.ConnectionDetails{},
+		ConnectionDetails: managed.ConnectionDetails{
+			"secretKey": []byte(creds.SecretKey),
+		},
 	}, nil
 }
 
 func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
-	cr, ok := mg.(*v1alpha1.AccessKey)
+	_, ok := mg.(*v1alpha1.AccessKey)
 	if !ok {
 		return managed.ExternalUpdate{}, errors.New(errNotAccessKey)
 	}
 
-	fmt.Printf("Updating: %+v", cr)
+	// TODO: Update Inactivate / Activate
 
 	return managed.ExternalUpdate{
 		// Optionally return any details that may be required to connect to the
@@ -198,7 +229,12 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalDelete{}, errors.New(errNotAccessKey)
 	}
 
-	fmt.Printf("Deleting: %+v", cr)
+	cr.SetConditions(xpv1.Deleting())
+
+	err := c.cloudianService.DeleteUserCredentials(ctx, meta.GetExternalName(cr))
+	if err != nil && !errors.Is(err, cloudian.ErrNotFound) {
+		return managed.ExternalDelete{}, errors.Wrap(err, errGetCreds)
+	}
 
 	return managed.ExternalDelete{}, nil
 }
