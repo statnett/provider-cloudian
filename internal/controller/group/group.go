@@ -52,9 +52,6 @@ const (
 	errUpdateGroup = "cannot update Group"
 )
 
-// A NoOpService does nothing.
-type NoOpService struct{}
-
 var (
 	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error) {
 		// FIXME: Don't require InsecureSkipVerify
