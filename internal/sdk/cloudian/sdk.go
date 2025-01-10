@@ -135,8 +135,6 @@ func NewClient(baseURL string, authHeader string, opts ...func(*Client)) *Client
 
 // List all users of a group.
 func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId *string) ([]User, error) {
-	var retVal, users []User
-
 	params := map[string]string{
 		"groupId":    groupId,
 		"userType":   "all",
@@ -147,6 +145,7 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 		params["offset"] = *offsetUserId
 	}
 
+	var users []User
 	_, err := client.newRequest(ctx).
 		SetQueryParams(params).
 		SetResult(&users).
@@ -155,23 +154,18 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 		return nil, fmt.Errorf("GET list users failed: %w", err)
 	}
 
-	retVal = append(retVal, users...)
-
-	// list users is a paginated API endpoint, so we need to check the limit and use an offset to fetch more
+	// Paginated API endpoint where limit+1 elements indicates more pages
 	if len(users) > ListLimit {
-		retVal = retVal[0 : len(retVal)-1] // Remove the last element, which is the offset
-		// There is some ambiguity in the GET /user/list endpoint documentation, but it seems
-		// that UserId is the correct key for this parameter
-		// Fetch more results
+		// Fetch remaining users starting from the user after the limit
 		moreUsers, err := client.ListUsers(ctx, groupId, &users[ListLimit].UserID)
 		if err != nil {
-			return nil, fmt.Errorf("GET list users failed: %w", err)
+			return nil, err
 		}
-
-		retVal = append(retVal, moreUsers...)
+		// Exclude first user as it's a duplicate from previous fetch
+		users = append(users, moreUsers[1:]...)
 	}
 
-	return retVal, nil
+	return users, nil
 }
 
 // Delete a single user. Errors if the user does not exist.
