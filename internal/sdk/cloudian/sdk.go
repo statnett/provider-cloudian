@@ -186,7 +186,6 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 	}
 
 	return retVal, nil
-
 }
 
 // Delete a single user. Errors if the user does not exist.
@@ -196,6 +195,7 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 	if err != nil {
 		return err
 	}
+
 	defer resp.Body.Close() // nolint:errcheck
 
 	switch resp.StatusCode {
@@ -204,7 +204,6 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 	default:
 		return fmt.Errorf("DELETE unexpected status. Failure: %d", resp.StatusCode)
 	}
-
 }
 
 // Create a single user of type `User` into a groupId
@@ -250,8 +249,38 @@ func (client Client) CreateUserCredentials(ctx context.Context, user User) (*Sec
 	}
 }
 
-// GetUserCredentials fetches all the credentials of a user.
-func (client Client) GetUserCredentials(ctx context.Context, user User) ([]SecurityInfo, error) {
+// GetUserCredentials fetches a set of credentials for a user.
+func (client Client) GetUserCredentials(ctx context.Context, accessKey string) (*SecurityInfo, error) {
+	resp, err := client.doRequest(ctx, http.MethodGet, "/user/credentials",
+		map[string]string{"accessKey": accessKey}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close() // nolint:errcheck
+
+	switch resp.StatusCode {
+	case 200:
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("error reading get credentials response: %w", err)
+		}
+
+		var securityInfo SecurityInfo
+		if err := json.Unmarshal(body, &securityInfo); err != nil {
+			return nil, fmt.Errorf("error parsing get credentials response: %w", err)
+		}
+
+		return &securityInfo, nil
+	case 204:
+		return nil, ErrNotFound
+	default:
+		return nil, fmt.Errorf("error: get credentials unexpected status code: %d", resp.StatusCode)
+	}
+}
+
+// ListUserCredentials fetches all the credentials of a user.
+func (client Client) ListUserCredentials(ctx context.Context, user User) ([]SecurityInfo, error) {
 	resp, err := client.doRequest(ctx, http.MethodGet, "/user/credentials/list",
 		map[string]string{"groupId": user.GroupID, "userId": user.UserID}, nil)
 	if err != nil {
@@ -264,12 +293,12 @@ func (client Client) GetUserCredentials(ctx context.Context, user User) ([]Secur
 	case 200:
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, fmt.Errorf("error reading credentials response: %w", err)
+			return nil, fmt.Errorf("error reading list credentials response: %w", err)
 		}
 
 		var securityInfo []SecurityInfo
 		if err := json.Unmarshal(body, &securityInfo); err != nil {
-			return nil, fmt.Errorf("error parsing credentials response: %w", err)
+			return nil, fmt.Errorf("error parsing list credentials response: %w", err)
 		}
 
 		return securityInfo, nil
@@ -278,6 +307,24 @@ func (client Client) GetUserCredentials(ctx context.Context, user User) ([]Secur
 		return nil, ErrNotFound
 	default:
 		return nil, fmt.Errorf("error: list credentials unexpected status code: %d", resp.StatusCode)
+	}
+}
+
+// DeleteUserCredentials deletes a set of credentials for a user.
+func (client Client) DeleteUserCredentials(ctx context.Context, accessKey string) error {
+	resp, err := client.doRequest(ctx, http.MethodDelete, "/user/credentials",
+		map[string]string{"accessKey": accessKey}, nil)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close() // nolint:errcheck
+
+	switch resp.StatusCode {
+	case 200:
+		return nil
+	default:
+		return fmt.Errorf("DELETE unexpected status. Failure: %d", resp.StatusCode)
 	}
 }
 
@@ -305,7 +352,14 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 		return err
 	}
 
-	return resp.Body.Close()
+	defer resp.Body.Close() // nolint:errcheck
+
+	switch resp.StatusCode {
+	case 200:
+		return nil
+	default:
+		return fmt.Errorf("DELETE unexpected status. Failure: %d", resp.StatusCode)
+	}
 }
 
 // Creates a group.
@@ -330,7 +384,6 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	// Create a context with a timeout
 	resp, err := client.doRequest(ctx, http.MethodPost, "/group", nil, jsonData)
 	if err != nil {
 		return err
