@@ -27,16 +27,9 @@ func TestGetGroup(t *testing.T) {
 	}))
 	defer mockServer.Close()
 
-	mockClient := &http.Client{}
-
-	_, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, mockServer.URL, nil)
-	if err != nil {
-		t.Fatalf("Failed to create request: %v", err)
-	}
-
 	cloudianClient := Client{
 		baseURL:    mockServer.URL,
-		httpClient: mockClient,
+		httpClient: &http.Client{},
 		authHeader: "",
 	}
 
