@@ -22,7 +22,6 @@ func TestGetGroup(t *testing.T) {
 	}
 
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"groupId": "QA"}`))
 	}))
 	defer mockServer.Close()
