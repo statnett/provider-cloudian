@@ -14,7 +14,11 @@ func TestSecretUnmarshal(t *testing.T) {
 		t.Errorf("Error deserializing from JSON: %v", err)
 	}
 
-	if secrets[0].SecretKey.String() != "********" {
+	if string(secrets[0].AccessKey) != "124" {
+		t.Errorf("Expected string equality to 124, got %v", secrets[0].AccessKey)
+	}
+
+	if secrets[0].AccessKey.String() != "********" {
 		t.Errorf("Expected obfuscated string, got %v", secrets[0].SecretKey)
 	}
 }
