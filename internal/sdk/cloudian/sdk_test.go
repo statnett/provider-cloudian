@@ -1,110 +1,16 @@
 package cloudian
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/rand"
-	"reflect"
-	"strings"
+	"net/http"
+	"net/http/httptest"
 	"testing"
-	"testing/quick"
+
+	"github.com/google/go-cmp/cmp"
 )
-
-func TestRealisticGroupSerialization(t *testing.T) {
-	jsonString := `{
-			"active": "true",
-			"groupId": "QA",
-			"groupName": "Quality Assurance Group",
-			"ldapEnabled": false,
-			"s3endpointshttp": ["ALL"],
-			"s3endpointshttps": ["ALL"],
-			"s3websiteendpoints": ["ALL"]
-		}`
-
-	var group groupInternal
-	err := json.Unmarshal([]byte(jsonString), &group)
-	if err != nil {
-		t.Errorf("Error deserializing from JSON: %v", err)
-	}
-
-	if group.GroupID != "QA" {
-		t.Errorf("Expected QA, got %v", group.GroupID)
-	}
-}
-
-func TestUnmarshalUsers(t *testing.T) {
-	jsonString := `[
-		{
-			"active": "true",
-			"address1": "",
-			"address2": "",
-			"canonicalUserId": "fd221552ff4ddc857d7a9ca316bb8344",
-			"city": "",
-			"country": "",
-			"emailAddr": "",
-			"fullName": "Glory Bee",
-			"groupId": "QA",
-			"ldapEnabled": false,
-			"phone": "",
-			"state": "",
-			"userId": "Glory",
-			"userType": "User",
-			"website": "",
-			"zip": ""
-		},
-		{
-			"active": "true",
-			"address1": "",
-			"address2": "",
-			"canonicalUserId": "bd0796cd9746ef9cc4ef656ddaacfac4",
-			"city": "",
-			"country": "",
-			"emailAddr": "",
-			"fullName": "John Thompson",
-			"groupId": "QA",
-			"ldapEnabled": false,
-			"phone": "",
-			"state": "",
-			"userId": "John",
-			"userType": "User",
-			"website": "",
-			"zip": ""
-			}]`
-
-	var users []User
-	err := json.Unmarshal([]byte(jsonString), &users)
-	if err != nil {
-		t.Errorf("Error deserializing users from JSON: %v", err)
-	}
-
-	if users[0].UserID != "Glory" {
-		t.Errorf("Expected Glory as the userId of first user, got %v", users[0].UserID)
-	}
-
-	if users[1].UserID != "John" {
-		t.Errorf("Expected John as the userId of second user, got %v", users[1].UserID)
-	}
-
-}
-
-func (group groupInternal) Generate(rand *rand.Rand, size int) reflect.Value {
-	return reflect.ValueOf(groupInternal{
-		Active:             "true",
-		GroupID:            randomString(16),
-		GroupName:          randomString(32),
-		LDAPEnabled:        true,
-		LDAPGroup:          randomString(8),
-		LDAPMatchAttribute: randomString(8),
-		LDAPSearch:         randomString(8),
-		LDAPSearchUserBase: randomString(8),
-		LDAPServerURL:      randomString(8),
-		LDAPUserDNTemplate: randomString(8),
-		S3EndpointsHTTP:    []string{randomString(8), randomString(8)},
-		S3EndpointsHTTPS:   []string{randomString(8), randomString(8)},
-		S3WebSiteEndpoints: []string{randomString(8), randomString(8)},
-	})
-}
 
 func TestGenericError(t *testing.T) {
 	err := errors.New("Random failure")
@@ -122,49 +28,121 @@ func TestWrappedErrNotFound(t *testing.T) {
 	}
 }
 
-func TestGroupSerialization(t *testing.T) {
-	f := func(group groupInternal) bool {
-		data, err := json.Marshal(group)
-		if err != nil {
-			return false
-		}
+func TestGetGroup(t *testing.T) {
+	cloudianClient, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(groupInternal{GroupID: "QA", Active: "true"})
+	})
+	defer testServer.Close()
 
-		var deserialized groupInternal
-		if err = json.Unmarshal(data, &deserialized); err != nil {
-			return false
-		}
-
-		return reflect.DeepEqual(group, deserialized)
+	expected := Group{
+		GroupID: "QA",
+		Active:  true,
 	}
 
-	if err := quick.Check(f, nil); err != nil {
-		t.Error(err)
+	group, err := cloudianClient.GetGroup(context.TODO(), "QA")
+
+	if err != nil {
+		t.Errorf("Error getting group: %v", err)
+	}
+
+	if diff := cmp.Diff(expected, *group); diff != "" {
+		t.Errorf("GetGroup() mismatch (-want +got):\n%s", diff)
+	}
+
+}
+
+func TestGetGroupNotFound(t *testing.T) {
+	cloudianClient, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNoContent)
+	})
+	defer testServer.Close()
+
+	_, err := cloudianClient.GetGroup(context.TODO(), "QA")
+
+	if !errors.Is(err, ErrNotFound) {
+		t.Errorf("Expected error to be ErrNotFound")
 	}
 }
 
-func TestGroupToInternalRoundtrip(t *testing.T) {
-	f := func(group groupInternal) bool {
-		// Override fuzzed s3-endpoint entries with known values
-		group.S3EndpointsHTTP = []string{"ALL"}
-		group.S3EndpointsHTTPS = []string{"ALL"}
-		group.S3WebSiteEndpoints = []string{"ALL"}
+func TestCreateCredentials(t *testing.T) {
+	expected := SecurityInfo{AccessKey: "123", SecretKey: "abc"}
+	cloudianClient, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(expected)
+	})
+	defer testServer.Close()
 
-		roundtrip := toInternal(fromInternal(group))
-		return reflect.DeepEqual(group, roundtrip)
+	credentials, err := cloudianClient.CreateUserCredentials(context.TODO(), User{GroupID: "QA", UserID: "user1"})
+
+	if err != nil {
+		t.Errorf("Error creating credentials: %v", err)
 	}
 
-	if err := quick.Check(f, nil); err != nil {
-		t.Error(err)
+	if diff := cmp.Diff(expected, *credentials); diff != "" {
+		t.Errorf("CreateUserCredentials() mismatch (-want +got):\n%s", diff)
 	}
 }
 
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
+func TestGetUserCredentials(t *testing.T) {
+	expected := &SecurityInfo{AccessKey: "123", SecretKey: "abc"}
+	cloudianClient, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(expected)
+	})
+	defer testServer.Close()
 
-func randomString(length int) string {
-	var sb strings.Builder
-	runes := []rune(charset)
-	for i := 0; i < length; i++ {
-		sb.WriteRune(runes[rand.Intn(len(runes))])
+	credentials, err := cloudianClient.GetUserCredentials(context.TODO(), "123")
+
+	if err != nil {
+		t.Errorf("Error getting credentials: %v", err)
 	}
-	return sb.String()
+
+	if diff := cmp.Diff(expected, credentials); diff != "" {
+		t.Errorf("GetUserCredentials() mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestListUserCredentials(t *testing.T) {
+	expected := []SecurityInfo{
+		{AccessKey: "123", SecretKey: "abc"},
+		{AccessKey: "456", SecretKey: "def"},
+	}
+	cloudianClient, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(expected)
+	})
+	defer testServer.Close()
+
+	credentials, err := cloudianClient.ListUserCredentials(
+		context.TODO(), User{UserID: "", GroupID: ""},
+	)
+
+	if err != nil {
+		t.Errorf("Error listing credentials: %v", err)
+	}
+
+	if diff := cmp.Diff(expected, credentials); diff != "" {
+		t.Errorf("ListUserCredentials() mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestListUsers(t *testing.T) {
+	expected := []User{{GroupID: "QA", UserID: "user1"}}
+	cloudianClient, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(expected)
+	})
+	defer testServer.Close()
+
+	users, err := cloudianClient.ListUsers(context.TODO(), "QA", nil)
+
+	if err != nil {
+		t.Errorf("Error listing users: %v", err)
+	}
+
+	if diff := cmp.Diff(expected, users); diff != "" {
+		t.Errorf("ListUsers() mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func mockBy(handler http.HandlerFunc) (*Client, *httptest.Server) {
+	mockServer := httptest.NewServer(handler)
+
+	return NewClient(mockServer.URL, ""), mockServer
 }
