@@ -81,7 +81,7 @@ func TestCreateCredentials(t *testing.T) {
 }
 
 func TestGetUserCredentials(t *testing.T) {
-	expected := &SecurityInfo{AccessKey: "123", SecretKey: "abc"}
+	expected := SecurityInfo{AccessKey: "123", SecretKey: "abc"}
 	cloudianClient, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(expected)
 	})
@@ -93,7 +93,7 @@ func TestGetUserCredentials(t *testing.T) {
 		t.Errorf("Error getting credentials: %v", err)
 	}
 
-	if diff := cmp.Diff(expected, credentials); diff != "" {
+	if diff := cmp.Diff(expected, *credentials); diff != "" {
 		t.Errorf("GetUserCredentials() mismatch (-want +got):\n%s", diff)
 	}
 }
