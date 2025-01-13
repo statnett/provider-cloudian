@@ -71,7 +71,6 @@ func TestCreateCredentials(t *testing.T) {
 	defer testServer.Close()
 
 	credentials, err := cloudianClient.CreateUserCredentials(context.TODO(), User{GroupID: "QA", UserID: "user1"})
-
 	if err != nil {
 		t.Errorf("Error creating credentials: %v", err)
 	}
