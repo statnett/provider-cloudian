@@ -40,7 +40,6 @@ func TestGetGroup(t *testing.T) {
 	}
 
 	group, err := cloudianClient.GetGroup(context.TODO(), "QA")
-
 	if err != nil {
 		t.Errorf("Error getting group: %v", err)
 	}
