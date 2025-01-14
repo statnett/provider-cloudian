@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.6](https://github.com/statnett/provider-cloudian/compare/v0.0.5...v0.0.6) (2025-01-14)
+
+
+### Features
+
+* connection config.toml in connection details ([#100](https://github.com/statnett/provider-cloudian/issues/100)) ([6d0735c](https://github.com/statnett/provider-cloudian/commit/6d0735c753e5e002f9c913c6d29565bd42a37b6c))
+* reconcile AccessKey ([#93](https://github.com/statnett/provider-cloudian/issues/93)) ([79bf9b9](https://github.com/statnett/provider-cloudian/commit/79bf9b955b8f470bf29b4a25c0847a2f86e8a2b2))
+
 ## [0.0.5](https://github.com/statnett/provider-cloudian/compare/v0.0.4...v0.0.5) (2025-01-09)
 
 
