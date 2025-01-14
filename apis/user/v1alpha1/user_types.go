@@ -30,7 +30,7 @@ type UserParameters struct {
 	// Group for the new user.
 	// +optional
 	// +immutable
-	GroupID string `json:"groupId"`
+	GroupID string `json:"groupId,omitempty"`
 
 	// GroupIDRef is a reference to a group to retrieve its groupId.
 	// +optional
