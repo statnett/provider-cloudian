@@ -147,7 +147,18 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.New(errNotUser)
 	}
 
-	users, err := c.cloudianService.ListUsers(ctx, cr.Spec.ForProvider.Group, nil)
+	externalName := meta.GetExternalName(cr)
+	if externalName == "" {
+		return managed.ExternalObservation{}, nil
+	}
+
+	group := cr.Spec.ForProvider.Group
+	if group == "" {
+		return managed.ExternalObservation{}, nil
+	}
+
+	// TODO: GET User instead of listing users for group
+	users, err := c.cloudianService.ListUsers(ctx, group, nil)
 	if err != nil {
 		return managed.ExternalObservation{}, errors.Wrap(err, errListUsers)
 	}
