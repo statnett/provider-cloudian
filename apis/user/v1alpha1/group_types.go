@@ -31,11 +31,6 @@ type GroupParameters struct {
 	//+optional
 	//+kubebuilder:default=true
 	Active bool `json:"active"`
-	// GroupID is the group ID (known as Name in the GUI).
-	//+kubebuilder:validation:MinLength=1
-	//+kubebuilder:validation:MaxLength=64
-	//+kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]*$`
-	GroupID string `json:"groupId"`
 	// GroupName is the group name (known as Description in the GUI).
 	//+optional
 	//+kubebuilder:validation:MinLength=1

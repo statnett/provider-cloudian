@@ -29,6 +29,7 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/connection"
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
 	"github.com/crossplane/crossplane-runtime/pkg/event"
+	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
@@ -147,7 +148,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.New(errNotGroup)
 	}
 
-	observedGroup, err := c.cloudianService.GetGroup(ctx, cr.Spec.ForProvider.GroupID)
+	observedGroup, err := c.cloudianService.GetGroup(ctx, meta.GetExternalName(mg))
 	if err != nil {
 		if errors.Is(err, cloudian.ErrNotFound) {
 			return managed.ExternalObservation{ResourceExists: false}, nil
@@ -166,7 +167,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
-		ResourceUpToDate: isUpToDate(cr.Spec.ForProvider, *observedGroup),
+		ResourceUpToDate: isUpToDate(meta.GetExternalName(mg), cr.Spec.ForProvider, *observedGroup),
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
@@ -182,7 +183,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	cr.SetConditions(xpv1.Creating())
 
-	if err := c.cloudianService.CreateGroup(ctx, newCloudianGroup(cr.Spec.ForProvider)); err != nil {
+	if err := c.cloudianService.CreateGroup(ctx, newCloudianGroup(meta.GetExternalName(mg), cr.Spec.ForProvider)); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
 	}
 
@@ -199,7 +200,7 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalUpdate{}, errors.New(errNotGroup)
 	}
 
-	if err := c.cloudianService.UpdateGroup(ctx, newCloudianGroup(cr.Spec.ForProvider)); err != nil {
+	if err := c.cloudianService.UpdateGroup(ctx, newCloudianGroup(meta.GetExternalName(mg), cr.Spec.ForProvider)); err != nil {
 		return managed.ExternalUpdate{}, errors.Wrap(err, errUpdateGroup)
 	}
 
@@ -218,7 +219,7 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	cr.SetConditions(xpv1.Deleting())
 
-	if err := c.cloudianService.DeleteGroup(ctx, cr.Spec.ForProvider.GroupID); err != nil {
+	if err := c.cloudianService.DeleteGroup(ctx, meta.GetExternalName(mg)); err != nil {
 		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteGroup)
 	}
 
@@ -229,14 +230,14 @@ func (c *external) Disconnect(ctx context.Context) error {
 	return nil
 }
 
-func isUpToDate(desired v1alpha1.GroupParameters, observed cloudian.Group) bool {
-	return newCloudianGroup(desired) == observed
+func isUpToDate(name string, desired v1alpha1.GroupParameters, observed cloudian.Group) bool {
+	return newCloudianGroup(name, desired) == observed
 }
 
-func newCloudianGroup(gp v1alpha1.GroupParameters) cloudian.Group {
+func newCloudianGroup(name string, gp v1alpha1.GroupParameters) cloudian.Group {
 	return cloudian.Group{
 		Active:             gp.Active,
-		GroupID:            gp.GroupID,
+		GroupID:            name,
 		GroupName:          gp.GroupName,
 		LDAPEnabled:        ptr.Deref(gp.LDAPEnabled, false),
 		LDAPGroup:          ptr.Deref(gp.LDAPGroup, ""),

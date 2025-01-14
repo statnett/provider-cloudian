@@ -78,12 +78,6 @@ spec:
                     description: Active determines whether the group is enabled (true)
                       or disabled (false) in the system.
                     type: boolean
-                  groupId:
-                    description: GroupID is the group ID (known as Name in the GUI).
-                    maxLength: 64
-                    minLength: 1
-                    pattern: ^[A-Za-z0-9_-]*$
-                    type: string
                   groupName:
                     description: GroupName is the group name (known as Description
                       in the GUI).
@@ -117,8 +111,6 @@ spec:
                       group will be authenticated against the LDAP system when they
                       log into the CMC.
                     type: string
-                required:
-                - groupId
                 type: object
               managementPolicies:
                 default:
