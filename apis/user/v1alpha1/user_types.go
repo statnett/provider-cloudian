@@ -30,16 +30,16 @@ type UserParameters struct {
 	// Group for the new user.
 	// +optional
 	// +immutable
-	GroupID string `json:"groupId,omitempty"`
+	Group string `json:"group,omitempty"`
 
-	// GroupIDRef is a reference to a group to retrieve its groupId.
+	// GroupRef is a reference to a group to retrieve its groupId.
 	// +optional
 	// +immutable
-	GroupIDRef *xpv1.Reference `json:"groupIdRef,omitempty"`
+	GroupRef *xpv1.Reference `json:"groupRef,omitempty"`
 
-	// GroupIDSelector selects reference to a group to retrieve its groupId.
+	// GroupSelector selects reference to a group to retrieve its groupId.
 	// +optional
-	GroupIDSelector *xpv1.Selector `json:"groupIdSelector,omitempty"`
+	GroupSelector *xpv1.Selector `json:"groupSelector,omitempty"`
 }
 
 // UserObservation are the observable fields of a User.

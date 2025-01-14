@@ -73,12 +73,12 @@ spec:
               forProvider:
                 description: UserParameters are the configurable fields of a User.
                 properties:
-                  groupId:
+                  group:
                     description: Group for the new user.
                     type: string
-                  groupIdRef:
-                    description: GroupIDRef is a reference to a group to retrieve
-                      its groupId.
+                  groupRef:
+                    description: GroupRef is a reference to a group to retrieve its
+                      groupId.
                     properties:
                       name:
                         description: Name of the referenced object.
@@ -111,8 +111,8 @@ spec:
                     required:
                     - name
                     type: object
-                  groupIdSelector:
-                    description: GroupIDSelector selects reference to a group to retrieve
+                  groupSelector:
+                    description: GroupSelector selects reference to a group to retrieve
                       its groupId.
                     properties:
                       matchControllerRef:

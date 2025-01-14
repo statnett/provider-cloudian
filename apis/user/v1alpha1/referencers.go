@@ -30,9 +30,9 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 
 	// resolve spec.forProvider.groupIdRef
 	rsp, err := r.Resolve(ctx, reference.ResolutionRequest{
-		CurrentValue: mg.Spec.ForProvider.GroupID,
-		Reference:    mg.Spec.ForProvider.GroupIDRef,
-		Selector:     mg.Spec.ForProvider.GroupIDSelector,
+		CurrentValue: mg.Spec.ForProvider.Group,
+		Reference:    mg.Spec.ForProvider.GroupRef,
+		Selector:     mg.Spec.ForProvider.GroupSelector,
 		To:           reference.To{Managed: &Group{}, List: &GroupList{}},
 		Extract:      reference.ExternalName(),
 	})
@@ -41,8 +41,8 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 		return errors.Wrap(err, "spec.forProvider.groupId")
 	}
 
-	mg.Spec.ForProvider.GroupID = rsp.ResolvedValue
-	mg.Spec.ForProvider.GroupIDRef = rsp.ResolvedReference
+	mg.Spec.ForProvider.Group = rsp.ResolvedValue
+	mg.Spec.ForProvider.GroupRef = rsp.ResolvedReference
 
 	return nil
 }
