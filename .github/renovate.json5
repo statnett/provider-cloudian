@@ -7,5 +7,4 @@
       "automerge": true,
     },
   ],
-  "postUpdateOptions": ["gomodTidy"],
 }
