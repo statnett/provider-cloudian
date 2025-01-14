@@ -28,6 +28,7 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/connection"
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
 	"github.com/crossplane/crossplane-runtime/pkg/event"
+	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
@@ -151,7 +152,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.Wrap(err, errListUsers)
 	}
 
-	upToDate := isUpToDate(cr.Spec.ForProvider, users)
+	upToDate := isUpToDate(meta.GetExternalName(mg), users)
 
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
@@ -170,9 +171,9 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	}, nil
 }
 
-func isUpToDate(spec v1alpha1.UserParameters, users []cloudian.User) bool {
+func isUpToDate(userId string, users []cloudian.User) bool {
 	for _, user := range users {
-		if user.UserID == spec.UserID {
+		if user.UserID == userId {
 			return true
 		}
 	}
@@ -187,7 +188,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	user := cloudian.User{
 		GroupID: cr.Spec.ForProvider.GroupID,
-		UserID:  cr.Spec.ForProvider.UserID,
+		UserID:  meta.GetExternalName(mg),
 	}
 	if err := c.cloudianService.CreateUser(ctx, user); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateUser)
@@ -223,7 +224,7 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	user := cloudian.User{
 		GroupID: cr.Spec.ForProvider.GroupID,
-		UserID:  cr.Spec.ForProvider.UserID,
+		UserID:  meta.GetExternalName(mg),
 	}
 	if err := c.cloudianService.DeleteUser(ctx, user); err != nil {
 		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteUser)

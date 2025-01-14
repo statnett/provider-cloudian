@@ -75,11 +75,8 @@ spec:
                 properties:
                   groupId:
                     type: string
-                  userId:
-                    type: string
                 required:
                 - groupId
-                - userId
                 type: object
               managementPolicies:
                 default:
