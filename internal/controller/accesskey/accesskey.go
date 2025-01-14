@@ -196,7 +196,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateCreds)
 	}
 
-	meta.SetExternalName(cr, string(creds.AccessKey))
+	meta.SetExternalName(cr, creds.AccessKey)
 
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
