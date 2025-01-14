@@ -18,6 +18,7 @@ package accesskey
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -174,9 +175,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
-		ConnectionDetails: managed.ConnectionDetails{
-			"secretKey": []byte(creds.SecretKey),
-		},
+		ConnectionDetails: connectionDetails(creds),
 	}, nil
 }
 
@@ -201,9 +200,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
 		// external resource. These will be stored as the connection secret.
-		ConnectionDetails: managed.ConnectionDetails{
-			"secretKey": []byte(creds.SecretKey),
-		},
+		ConnectionDetails: connectionDetails(creds),
 	}, nil
 }
 
@@ -240,4 +237,17 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 
 func (c *external) Disconnect(ctx context.Context) error {
 	return nil
+}
+
+func connectionDetails(creds *cloudian.SecurityInfo) managed.ConnectionDetails {
+	return managed.ConnectionDetails{
+		"secretKey": []byte(creds.SecretKey),
+		"config.toml": []byte(fmt.Sprintf(
+			`[default]
+aws_access_key_id = %s
+aws_secret_access_key = %s`,
+			creds.AccessKey,
+			creds.SecretKey,
+		)),
+	}
 }
