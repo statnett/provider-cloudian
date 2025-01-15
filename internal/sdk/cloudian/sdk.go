@@ -134,15 +134,15 @@ func NewClient(baseURL string, authHeader string, opts ...func(*Client)) *Client
 }
 
 // List all users of a group.
-func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId *string) ([]User, error) {
+func (client Client) ListUsers(ctx context.Context, groupID string, offsetUserID *string) ([]User, error) {
 	params := map[string]string{
-		"groupId":    groupId,
+		"groupId":    groupID,
 		"userType":   "all",
 		"userStatus": "all",
 		"limit":      strconv.Itoa(ListLimit),
 	}
-	if offsetUserId != nil {
-		params["offset"] = *offsetUserId
+	if offsetUserID != nil {
+		params["offset"] = *offsetUserID
 	}
 
 	var users []User
@@ -157,7 +157,7 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 	// Paginated API endpoint where limit+1 elements indicates more pages
 	if len(users) > ListLimit {
 		// Fetch remaining users starting from the user after the limit
-		moreUsers, err := client.ListUsers(ctx, groupId, &users[ListLimit].UserID)
+		moreUsers, err := client.ListUsers(ctx, groupID, &users[ListLimit].UserID)
 		if err != nil {
 			return nil, err
 		}
@@ -290,8 +290,8 @@ func (client Client) DeleteUserCredentials(ctx context.Context, accessKey string
 }
 
 // Delete a group and all its members.
-func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) error {
-	users, err := client.ListUsers(ctx, groupId, nil)
+func (client Client) DeleteGroupRecursive(ctx context.Context, groupID string) error {
+	users, err := client.ListUsers(ctx, groupID, nil)
 	if err != nil {
 		return fmt.Errorf("error listing users: %w", err)
 	}
@@ -302,13 +302,13 @@ func (client Client) DeleteGroupRecursive(ctx context.Context, groupId string) e
 		}
 	}
 
-	return client.DeleteGroup(ctx, groupId)
+	return client.DeleteGroup(ctx, groupID)
 }
 
 // Deletes a group if it is without members.
-func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
+func (client Client) DeleteGroup(ctx context.Context, groupID string) error {
 	resp, err := client.newRequest(ctx).
-		SetQueryParams(map[string]string{"groupId": groupId}).
+		SetQueryParams(map[string]string{"groupId": groupID}).
 		Delete("/group")
 	if err != nil {
 		return err
@@ -358,10 +358,10 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 
 // Get a group. Returns an error even in the case of a group not found.
 // This error can then be checked against ErrNotFound: errors.Is(err, ErrNotFound)
-func (client Client) GetGroup(ctx context.Context, groupId string) (*Group, error) {
+func (client Client) GetGroup(ctx context.Context, groupID string) (*Group, error) {
 	var group groupInternal
 	resp, err := client.newRequest(ctx).
-		SetQueryParams(map[string]string{"groupId": groupId}).
+		SetQueryParams(map[string]string{"groupId": groupID}).
 		SetResult(&group).
 		Get("/group")
 	if err != nil {
