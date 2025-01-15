@@ -134,15 +134,15 @@ func NewClient(baseURL string, authHeader string, opts ...func(*Client)) *Client
 }
 
 // List all users of a group.
-func (client Client) ListUsers(ctx context.Context, groupID string, offsetUserID *string) ([]User, error) {
+func (client Client) ListUsers(ctx context.Context, groupID string, userID *string) ([]User, error) {
 	params := map[string]string{
 		"groupId":    groupID,
 		"userType":   "all",
 		"userStatus": "all",
 		"limit":      strconv.Itoa(ListLimit),
 	}
-	if offsetUserID != nil {
-		params["offset"] = *offsetUserID
+	if userID != nil {
+		params["offset"] = *userID
 	}
 
 	var users []User
