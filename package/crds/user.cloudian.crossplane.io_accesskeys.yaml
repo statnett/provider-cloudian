@@ -80,8 +80,8 @@ spec:
                   userId:
                     description: User for the new access key.
                     type: string
-                  userRef:
-                    description: UserRef is a reference to a user to retrieve its
+                  userIdRef:
+                    description: UserIDRef is a reference to a user to retrieve its
                       userId.
                     properties:
                       name:
@@ -115,8 +115,8 @@ spec:
                     required:
                     - name
                     type: object
-                  userSelector:
-                    description: UserSelector selects reference to a user to retrieve
+                  userIdSelector:
+                    description: UserIDSelector selects reference to a user to retrieve
                       its userId.
                     properties:
                       matchControllerRef:

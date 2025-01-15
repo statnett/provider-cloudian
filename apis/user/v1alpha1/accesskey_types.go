@@ -37,14 +37,14 @@ type AccessKeyParameters struct {
 	// +immutable
 	UserID string `json:"userId,omitempty"`
 
-	// UserRef is a reference to a user to retrieve its userId.
+	// UserIDRef is a reference to a user to retrieve its userId.
 	// +optional
 	// +immutable
-	UserRef *xpv1.Reference `json:"userRef,omitempty"`
+	UserIDRef *xpv1.Reference `json:"userIdRef,omitempty"`
 
-	// UserSelector selects reference to a user to retrieve its userId.
+	// UserIDSelector selects reference to a user to retrieve its userId.
 	// +optional
-	UserSelector *xpv1.Selector `json:"userSelector,omitempty"`
+	UserIDSelector *xpv1.Selector `json:"userIdSelector,omitempty"`
 }
 
 // AccessKeyObservation are the observable fields of a AccessKey.

@@ -32,8 +32,8 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 	// resolve spec.forProvider.group
 	rsp, err := r.Resolve(ctx, reference.ResolutionRequest{
 		CurrentValue: mg.Spec.ForProvider.GroupID,
-		Reference:    mg.Spec.ForProvider.GroupRef,
-		Selector:     mg.Spec.ForProvider.GroupSelector,
+		Reference:    mg.Spec.ForProvider.GroupIDRef,
+		Selector:     mg.Spec.ForProvider.GroupIDSelector,
 		To:           reference.To{Managed: &Group{}, List: &GroupList{}},
 		Extract:      reference.ExternalName(),
 	})
@@ -42,7 +42,7 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 	}
 
 	mg.Spec.ForProvider.GroupID = rsp.ResolvedValue
-	mg.Spec.ForProvider.GroupRef = rsp.ResolvedReference
+	mg.Spec.ForProvider.GroupIDRef = rsp.ResolvedReference
 
 	return nil
 }
@@ -54,8 +54,8 @@ func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) err
 	// resolve spec.forProvider.user
 	rsp, err := r.Resolve(ctx, reference.ResolutionRequest{
 		CurrentValue: mg.Spec.ForProvider.UserID,
-		Reference:    mg.Spec.ForProvider.UserRef,
-		Selector:     mg.Spec.ForProvider.UserSelector,
+		Reference:    mg.Spec.ForProvider.UserIDRef,
+		Selector:     mg.Spec.ForProvider.UserIDSelector,
 		To:           reference.To{Managed: &User{}, List: &UserList{}},
 		Extract:      reference.ExternalName(),
 	})
@@ -64,12 +64,12 @@ func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) err
 	}
 
 	mg.Spec.ForProvider.UserID = rsp.ResolvedValue
-	mg.Spec.ForProvider.UserRef = rsp.ResolvedReference
+	mg.Spec.ForProvider.UserIDRef = rsp.ResolvedReference
 
 	// resolve spec.forProvider.group
 	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
-		Reference: mg.Spec.ForProvider.UserRef,
-		Selector:  mg.Spec.ForProvider.UserSelector,
+		Reference: mg.Spec.ForProvider.UserIDRef,
+		Selector:  mg.Spec.ForProvider.UserIDSelector,
 		To:        reference.To{Managed: &User{}, List: &UserList{}},
 		Extract: func(mg resource.Managed) string {
 			user, ok := mg.(*User)
