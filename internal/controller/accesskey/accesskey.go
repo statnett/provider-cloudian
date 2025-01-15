@@ -188,8 +188,8 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 	cr.SetConditions(xpv1.Creating())
 
 	creds, err := c.cloudianService.CreateUserCredentials(ctx, cloudian.User{
-		GroupID: cr.Spec.ForProvider.Group,
-		UserID:  cr.Spec.ForProvider.User,
+		GroupID: cr.Spec.ForProvider.GroupID,
+		UserID:  cr.Spec.ForProvider.UserID,
 	})
 	if err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateCreds)

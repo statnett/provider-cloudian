@@ -74,10 +74,10 @@ spec:
                 description: AccessKeyParameters are the configurable fields of a
                   AccessKey.
                 properties:
-                  group:
-                    description: Group for the new access key.
+                  groupId:
+                    description: GroupID for the new access key.
                     type: string
-                  user:
+                  userId:
                     description: User for the new access key.
                     type: string
                   userRef:

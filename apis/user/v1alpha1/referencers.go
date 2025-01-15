@@ -31,7 +31,7 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 
 	// resolve spec.forProvider.group
 	rsp, err := r.Resolve(ctx, reference.ResolutionRequest{
-		CurrentValue: mg.Spec.ForProvider.Group,
+		CurrentValue: mg.Spec.ForProvider.GroupID,
 		Reference:    mg.Spec.ForProvider.GroupRef,
 		Selector:     mg.Spec.ForProvider.GroupSelector,
 		To:           reference.To{Managed: &Group{}, List: &GroupList{}},
@@ -41,7 +41,7 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 		return errors.Wrap(err, "spec.forProvider.group")
 	}
 
-	mg.Spec.ForProvider.Group = rsp.ResolvedValue
+	mg.Spec.ForProvider.GroupID = rsp.ResolvedValue
 	mg.Spec.ForProvider.GroupRef = rsp.ResolvedReference
 
 	return nil
@@ -53,7 +53,7 @@ func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) err
 
 	// resolve spec.forProvider.user
 	rsp, err := r.Resolve(ctx, reference.ResolutionRequest{
-		CurrentValue: mg.Spec.ForProvider.User,
+		CurrentValue: mg.Spec.ForProvider.UserID,
 		Reference:    mg.Spec.ForProvider.UserRef,
 		Selector:     mg.Spec.ForProvider.UserSelector,
 		To:           reference.To{Managed: &User{}, List: &UserList{}},
@@ -63,7 +63,7 @@ func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) err
 		return errors.Wrap(err, "spec.forProvider.user")
 	}
 
-	mg.Spec.ForProvider.User = rsp.ResolvedValue
+	mg.Spec.ForProvider.UserID = rsp.ResolvedValue
 	mg.Spec.ForProvider.UserRef = rsp.ResolvedReference
 
 	// resolve spec.forProvider.group
@@ -76,14 +76,14 @@ func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) err
 			if !ok {
 				return ""
 			}
-			return user.Spec.ForProvider.Group
+			return user.Spec.ForProvider.GroupID
 		},
 	})
 	if err != nil {
 		return errors.Wrap(err, "spec.forProvider.group")
 	}
 
-	mg.Spec.ForProvider.Group = rsp.ResolvedValue
+	mg.Spec.ForProvider.GroupID = rsp.ResolvedValue
 
 	return nil
 }

@@ -73,7 +73,7 @@ spec:
               forProvider:
                 description: UserParameters are the configurable fields of a User.
                 properties:
-                  group:
+                  groupId:
                     description: Group for the new user.
                     type: string
                   groupRef:

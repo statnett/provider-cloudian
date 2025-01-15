@@ -152,7 +152,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, nil
 	}
 
-	group := cr.Spec.ForProvider.Group
+	group := cr.Spec.ForProvider.GroupID
 	if group == "" {
 		return managed.ExternalObservation{}, nil
 	}
@@ -198,7 +198,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 	}
 
 	user := cloudian.User{
-		GroupID: cr.Spec.ForProvider.Group,
+		GroupID: cr.Spec.ForProvider.GroupID,
 		UserID:  meta.GetExternalName(mg),
 	}
 	if err := c.cloudianService.CreateUser(ctx, user); err != nil {
@@ -234,7 +234,7 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 	}
 
 	user := cloudian.User{
-		GroupID: cr.Spec.ForProvider.Group,
+		GroupID: cr.Spec.ForProvider.GroupID,
 		UserID:  meta.GetExternalName(mg),
 	}
 	if err := c.cloudianService.DeleteUser(ctx, user); err != nil {

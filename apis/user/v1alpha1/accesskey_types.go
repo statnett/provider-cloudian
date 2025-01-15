@@ -27,15 +27,15 @@ import (
 
 // AccessKeyParameters are the configurable fields of a AccessKey.
 type AccessKeyParameters struct {
-	// Group for the new access key.
+	// GroupID for the new access key.
 	// +optional
 	// +immutable
-	Group string `json:"group,omitempty"`
+	GroupID string `json:"groupId,omitempty"`
 
 	// User for the new access key.
 	// +optional
 	// +immutable
-	User string `json:"user,omitempty"`
+	UserID string `json:"userId,omitempty"`
 
 	// UserRef is a reference to a user to retrieve its userId.
 	// +optional
