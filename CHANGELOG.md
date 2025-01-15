@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.1.0](https://github.com/statnett/provider-cloudian/compare/v0.0.6...v0.1.0) (2025-01-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* 1:1 between MR and infra for ID fields ([#115](https://github.com/statnett/provider-cloudian/issues/115))
+* ref user in access key ([#112](https://github.com/statnett/provider-cloudian/issues/112))
+* use Crossplane reference to connect User to Group ([#104](https://github.com/statnett/provider-cloudian/issues/104))
+* set Cloudian Group and User ids from Crossplane external-name ([#102](https://github.com/statnett/provider-cloudian/issues/102))
+
+### Features
+
+* use Crossplane reference to connect User to Group ([#104](https://github.com/statnett/provider-cloudian/issues/104)) ([9a17ac1](https://github.com/statnett/provider-cloudian/commit/9a17ac1f4b708d3385f5e4572a2dee85c61bd745))
+
+
+### Bug Fixes
+
+* **deps:** update module sigs.k8s.io/controller-tools to v0.17.1 ([#99](https://github.com/statnett/provider-cloudian/issues/99)) ([84f2c6e](https://github.com/statnett/provider-cloudian/commit/84f2c6e2b713d9e4211f89609372e8118b0d6e07))
+* **sdk:** create creds ([#114](https://github.com/statnett/provider-cloudian/issues/114)) ([84f5f25](https://github.com/statnett/provider-cloudian/commit/84f5f2502491ed8e0e078cd404007af6f54f055c))
+* **sdk:** error handling ([#113](https://github.com/statnett/provider-cloudian/issues/113)) ([9aba614](https://github.com/statnett/provider-cloudian/commit/9aba614cd7f14b9d417a9a648b2b11be3c2b50cf))
+
+
+### Miscellaneous Chores
+
+* 1:1 between MR and infra for ID fields ([#115](https://github.com/statnett/provider-cloudian/issues/115)) ([445e881](https://github.com/statnett/provider-cloudian/commit/445e8819ed68323f426e58a5174a9251abd07a44))
+* ref user in access key ([#112](https://github.com/statnett/provider-cloudian/issues/112)) ([02617c2](https://github.com/statnett/provider-cloudian/commit/02617c2aa6f7f72ecf5c3232f366b13deeff7b19))
+* set Cloudian Group and User ids from Crossplane external-name ([#102](https://github.com/statnett/provider-cloudian/issues/102)) ([5c60527](https://github.com/statnett/provider-cloudian/commit/5c605277674ad17607fb05f5934c5131960de3f5))
+
 ## [0.0.6](https://github.com/statnett/provider-cloudian/compare/v0.0.5...v0.0.6) (2025-01-14)
 
 
