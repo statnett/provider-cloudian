@@ -215,7 +215,7 @@ func (client Client) CreateUserCredentials(ctx context.Context, user User) (*Sec
 
 	resp, err := client.newRequest(ctx).
 		SetResult(&securityInfo).
-		SetBody(map[string]string{"groupId": user.GroupID, "userId": user.UserID}).
+		SetQueryParams(map[string]string{"groupId": user.GroupID, "userId": user.UserID}).
 		Put("/user/credentials")
 	if err != nil {
 		return nil, err
