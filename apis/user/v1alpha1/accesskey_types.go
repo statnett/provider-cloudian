@@ -27,14 +27,24 @@ import (
 
 // AccessKeyParameters are the configurable fields of a AccessKey.
 type AccessKeyParameters struct {
-	// GroupID is the group ID (known as Name in the GUI).
-	//+kubebuilder:validation:MinLength=1
-	//+kubebuilder:validation:MaxLength=64
-	GroupID string `json:"groupId"`
-	// UserID is the user ID (also known as Username in the GUI).
-	//+kubebuilder:validation:MinLength=1
-	//+kubebuilder:validation:MaxLength=64
-	UserID string `json:"userId"`
+	// Group for the new access key.
+	// +optional
+	// +immutable
+	Group string `json:"group,omitempty"`
+
+	// User for the new access key.
+	// +optional
+	// +immutable
+	User string `json:"user,omitempty"`
+
+	// UserRef is a reference to a user to retrieve its userId.
+	// +optional
+	// +immutable
+	UserRef *xpv1.Reference `json:"userRef,omitempty"`
+
+	// UserSelector selects reference to a user to retrieve its userId.
+	// +optional
+	UserSelector *xpv1.Selector `json:"userSelector,omitempty"`
 }
 
 // AccessKeyObservation are the observable fields of a AccessKey.
