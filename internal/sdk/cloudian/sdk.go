@@ -190,7 +190,7 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 	case 200:
 		return nil
 	default:
-		return fmt.Errorf("DELETE user unexpected status: %d, %w", resp.StatusCode(), err)
+		return fmt.Errorf("DELETE user unexpected status: %d", resp.StatusCode())
 	}
 
 }
@@ -208,7 +208,7 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 	case 200:
 		return nil
 	default:
-		return fmt.Errorf("CREATE user unexpected status: %d, %w", resp.StatusCode(), err)
+		return fmt.Errorf("CREATE user unexpected status: %d", resp.StatusCode())
 	}
 }
 
@@ -228,7 +228,7 @@ func (client Client) CreateUserCredentials(ctx context.Context, user User) (*Sec
 	case 200:
 		return &securityInfo, nil
 	default:
-		return nil, fmt.Errorf("CREATE user credentials unexpected status: %d, %w", resp.StatusCode(), err)
+		return nil, fmt.Errorf("CREATE user credentials unexpected status: %d", resp.StatusCode())
 	}
 }
 
@@ -291,7 +291,7 @@ func (client Client) DeleteUserCredentials(ctx context.Context, accessKey string
 	case 200:
 		return nil
 	default:
-		return fmt.Errorf("DELETE credentials unexpected status: %d, %w", resp.StatusCode(), err)
+		return fmt.Errorf("DELETE credentials unexpected status: %d", resp.StatusCode())
 	}
 }
 
@@ -324,7 +324,7 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 	case 200:
 		return nil
 	default:
-		return fmt.Errorf("DELETE group unexpected statusCode: %d, %w", resp.StatusCode(), err)
+		return fmt.Errorf("DELETE group unexpected statusCode: %d", resp.StatusCode())
 	}
 }
 
@@ -341,7 +341,7 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 	case 200:
 		return err
 	default:
-		return fmt.Errorf("CREATE group unexpected status: %d, %w", resp.StatusCode(), err)
+		return fmt.Errorf("CREATE group unexpected status: %d", resp.StatusCode())
 	}
 }
 
@@ -358,7 +358,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	case 200:
 		return err
 	default:
-		return fmt.Errorf("Update group unexpected status: %d, %w", resp.StatusCode(), err)
+		return fmt.Errorf("Update group unexpected status: %d", resp.StatusCode())
 	}
 }
 
