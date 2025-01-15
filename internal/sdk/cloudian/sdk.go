@@ -196,7 +196,7 @@ func (client Client) DeleteUser(ctx context.Context, user User) error {
 
 // Create a single user of type `User` into a groupId
 func (client Client) CreateUser(ctx context.Context, user User) error {
-	_, err := client.newRequest(ctx).
+	resp, err := client.newRequest(ctx).
 		SetBody(toInternalUser(user)).
 		Put("/user")
 
@@ -212,7 +212,7 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 func (client Client) CreateUserCredentials(ctx context.Context, user User) (*SecurityInfo, error) {
 	var securityInfo SecurityInfo
 
-	_, err := client.newRequest(ctx).
+	resp, err := client.newRequest(ctx).
 		SetResult(&securityInfo).
 		SetBody(map[string]string{"groupId": user.GroupID, "userId": user.UserID}).
 		Put("/user/credentials")
@@ -224,7 +224,7 @@ func (client Client) CreateUserCredentials(ctx context.Context, user User) (*Sec
 	case 200:
 		return &securityInfo, nil
 	default:
-		return fmt.Errorf("CREATE user credentials unexpected status: %d, %w", resp.StatusCode(), err)
+		return nil, fmt.Errorf("CREATE user credentials unexpected status: %d, %w", resp.StatusCode(), err)
 	}
 }
 
@@ -326,7 +326,7 @@ func (client Client) DeleteGroup(ctx context.Context, groupId string) error {
 
 // Creates a group.
 func (client Client) CreateGroup(ctx context.Context, group Group) error {
-	_, err := client.newRequest(ctx).
+	resp, err := client.newRequest(ctx).
 		SetBody(toInternal(group)).
 		Put("/group")
 
@@ -340,7 +340,7 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 
 // Updates a group if it does not exists.
 func (client Client) UpdateGroup(ctx context.Context, group Group) error {
-	_, err := client.newRequest(ctx).
+	resp, err := client.newRequest(ctx).
 		SetBody(toInternal(group)).
 		Post("/group")
 
