@@ -200,7 +200,12 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 		SetBody(toInternalUser(user)).
 		Put("/user")
 
-	return err
+	switch resp.StatusCode() {
+	case 200:
+		return nil
+	default:
+		return fmt.Errorf("CREATE user unexpected status: %d, %w", resp.StatusCode(), err)
+	}
 }
 
 // CreateUserCredentials creates a new set of credentials for a user.
@@ -215,7 +220,12 @@ func (client Client) CreateUserCredentials(ctx context.Context, user User) (*Sec
 		return nil, err
 	}
 
-	return &securityInfo, nil
+	switch resp.StatusCode() {
+	case 200:
+		return &securityInfo, nil
+	default:
+		return fmt.Errorf("CREATE user credentials unexpected status: %d, %w", resp.StatusCode(), err)
+	}
 }
 
 // GetUserCredentials fetches all the credentials of a user.
@@ -320,7 +330,12 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 		SetBody(toInternal(group)).
 		Put("/group")
 
-	return err
+	switch resp.StatusCode() {
+	case 200:
+		return err
+	default:
+		return fmt.Errorf("CREATE group unexpected status: %d, %w", resp.StatusCode(), err)
+	}
 }
 
 // Updates a group if it does not exists.
@@ -329,7 +344,12 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 		SetBody(toInternal(group)).
 		Post("/group")
 
-	return err
+	switch resp.StatusCode() {
+	case 200:
+		return err
+	default:
+		return fmt.Errorf("Update group unexpected status: %d, %w", resp.StatusCode(), err)
+	}
 }
 
 // Get a group. Returns an error even in the case of a group not found.
