@@ -33,7 +33,6 @@ type GroupParameters struct {
 	Active bool `json:"active"`
 	// GroupName is the group name (known as Description in the GUI).
 	//+optional
-	//+kubebuilder:validation:MinLength=1
 	//+kubebuilder:validation:MaxLength=64
 	GroupName string `json:"groupName,omitempty"`
 	// LDAPEnabled determines whether LDAP authentication is enabled for members of this group.

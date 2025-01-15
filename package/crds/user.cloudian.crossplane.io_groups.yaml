@@ -82,7 +82,6 @@ spec:
                     description: GroupName is the group name (known as Description
                       in the GUI).
                     maxLength: 64
-                    minLength: 1
                     type: string
                   ldapEnabled:
                     default: false
