@@ -200,6 +200,9 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 	resp, err := client.newRequest(ctx).
 		SetBody(toInternalUser(user)).
 		Put("/user")
+	if err != nil {
+		return err
+	}
 
 	switch resp.StatusCode() {
 	case 200:
@@ -330,6 +333,9 @@ func (client Client) CreateGroup(ctx context.Context, group Group) error {
 	resp, err := client.newRequest(ctx).
 		SetBody(toInternal(group)).
 		Put("/group")
+	if err != nil {
+		return err
+	}
 
 	switch resp.StatusCode() {
 	case 200:
@@ -344,6 +350,9 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	resp, err := client.newRequest(ctx).
 		SetBody(toInternal(group)).
 		Post("/group")
+	if err != nil {
+		return err
+	}
 
 	switch resp.StatusCode() {
 	case 200:
