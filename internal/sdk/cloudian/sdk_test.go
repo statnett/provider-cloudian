@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -114,28 +115,30 @@ func TestListUserCredentials(t *testing.T) {
 }
 
 func TestListUsers(t *testing.T) {
-	mkUsers := func(offset, n int) []User {
-		users := make([]User, 0)
-		for i := offset; i < n; i++ {
-			users = append(users, User{GroupID: "QA", UserID: fmt.Sprintf("user%d", i)})
-		}
-		return users
+	var expected []User
+	for i := 0; i < 500; i++ {
+		expected = append(expected, User{GroupID: "QA", UserID: strconv.Itoa(i)})
 	}
-	// We pretend 102 users exist in the cloudian server
-	expected := mkUsers(0, 102)
 
 	cloudianClient, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Query().Get("offset") == "" {
-			// return 101 users in the first batch (the 101th indicating there are "more results")
-			json.NewEncoder(w).Encode(expected[:101])
-		} else {
-			// return the two last users (0-indexed) as the last batch
-			json.NewEncoder(w).Encode(expected[100:])
+		index := 0
+
+		if offset := r.URL.Query().Get("offset"); offset != "" {
+			var err error
+			index, err = strconv.Atoi(r.URL.Query().Get("offset"))
+			if err != nil {
+				panic(err)
+			}
 		}
+
+		end := index + 101
+		if end > len(expected) {
+			end = len(expected)
+		}
+		json.NewEncoder(w).Encode(expected[index:end])
 	})
 	defer testServer.Close()
 
-	// the first 101 users (indicating "more results" from server)
 	users, err := cloudianClient.ListUsers(context.Background(), "QA", nil)
 	if err != nil {
 		t.Errorf("Error listing users: %v", err)
