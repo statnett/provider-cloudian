@@ -10,6 +10,8 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+const ListLimit = 100
+
 type Client struct {
 	client *resty.Client
 }
@@ -135,12 +137,11 @@ func NewClient(baseURL string, authHeader string, opts ...func(*Client)) *Client
 func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId *string) ([]User, error) {
 	var retVal, users []User
 
-	limit := 100
 	params := map[string]string{
 		"groupId":    groupId,
 		"userType":   "all",
 		"userStatus": "all",
-		"limit":      strconv.Itoa(limit),
+		"limit":      strconv.Itoa(ListLimit),
 	}
 	if offsetUserId != nil {
 		params["offset"] = *offsetUserId
@@ -157,12 +158,12 @@ func (client Client) ListUsers(ctx context.Context, groupId string, offsetUserId
 	retVal = append(retVal, users...)
 
 	// list users is a paginated API endpoint, so we need to check the limit and use an offset to fetch more
-	if len(users) > limit {
+	if len(users) > ListLimit {
 		retVal = retVal[0 : len(retVal)-1] // Remove the last element, which is the offset
 		// There is some ambiguity in the GET /user/list endpoint documentation, but it seems
 		// that UserId is the correct key for this parameter
 		// Fetch more results
-		moreUsers, err := client.ListUsers(ctx, groupId, &users[limit].UserID)
+		moreUsers, err := client.ListUsers(ctx, groupId, &users[ListLimit].UserID)
 		if err != nil {
 			return nil, fmt.Errorf("GET list users failed: %w", err)
 		}

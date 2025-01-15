@@ -131,7 +131,8 @@ func TestListUsers(t *testing.T) {
 			}
 		}
 
-		end := index + 101
+		// return one more than limit to indicate more pages
+		end := index + ListLimit + 1
 		if end > len(expected) {
 			end = len(expected)
 		}
