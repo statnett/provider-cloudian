@@ -206,6 +206,31 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 	}
 }
 
+// GetUser gets a user. Returns an error even in the case of a user not found.
+// This error can then be checked against ErrNotFound: errors.Is(err, ErrNotFound)
+func (client Client) GetUser(ctx context.Context, user User) (*User, error) {
+	// FIXME: Introduce UserId struct and enrich User
+	resp, err := client.newRequest(ctx).
+		SetQueryParams(map[string]string{
+			"groupId": user.GroupID,
+			"userId":  user.UserID,
+		}).
+		Get("/user")
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.StatusCode() {
+	case 200:
+		return &user, nil
+	case 204:
+		// Cloudian-API returns 204 if the user does not exist
+		return nil, ErrNotFound
+	default:
+		return nil, fmt.Errorf("error: GET user unexpected status code: %d", resp.StatusCode())
+	}
+}
+
 // CreateUserCredentials creates a new set of credentials for a user.
 func (client Client) CreateUserCredentials(ctx context.Context, user User) (*SecurityInfo, error) {
 	var securityInfo SecurityInfo
@@ -376,7 +401,7 @@ func (client Client) GetGroup(ctx context.Context, groupID string) (*Group, erro
 		// Cloudian-API returns 204 if the group does not exist
 		return nil, ErrNotFound
 	default:
-		return nil, fmt.Errorf("GET unexpected status. Failure: %w", err)
+		return nil, fmt.Errorf("error: GET group unexpected status code: %d", resp.StatusCode())
 	}
 }
 

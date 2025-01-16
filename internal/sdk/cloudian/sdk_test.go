@@ -154,3 +154,31 @@ func mockBy(handler http.HandlerFunc) (*Client, *httptest.Server) {
 	mockServer := httptest.NewServer(handler)
 	return NewClient(mockServer.URL, ""), mockServer
 }
+
+func TestClient_GetUser(t *testing.T) {
+	tests := []struct {
+		name    string
+		user    User
+		status  int
+		wantErr error
+	}{
+		{name: "Exists", user: User{UserID: strconv.Itoa(http.StatusOK)}},
+		{name: "Not found", user: User{UserID: strconv.Itoa(http.StatusNoContent)}, wantErr: ErrNotFound},
+	}
+
+	client, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
+		userId := r.URL.Query().Get("userId")
+		statusCode, _ := strconv.Atoi(userId)
+		w.WriteHeader(statusCode)
+	})
+	defer testServer.Close()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := client.GetUser(context.Background(), tt.user)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("GetUser() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
