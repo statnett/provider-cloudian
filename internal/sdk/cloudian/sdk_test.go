@@ -150,6 +150,43 @@ func TestListUsers(t *testing.T) {
 
 }
 
+func TestQosQueryMap(t *testing.T) {
+	expected := map[string]string{
+		"userId":               "1",
+		"groupId":              "1",
+		"hlStorageQuotaKBytes": fmt.Sprintf("%d", 1*1024*1024),
+		"wlStorageQuotaKBytes": fmt.Sprintf("%d", 750*1024),
+		"hlStorageQuotaCount":  "1000",
+		"wlStorageQuotaCount":  "750",
+		"hlRequestRate":        "200",
+		"wlRequestRate":        "150",
+		"hlDataKBytesIn":       fmt.Sprintf("%d", 1*1024*1024),
+		"wlDataKBytesIn":       fmt.Sprintf("%d", 750*1024),
+		"hlDataKBytesOut":      fmt.Sprintf("%d", 1*1024*1024),
+		"wlDataKBytesOut":      fmt.Sprintf("%d", 750*1024),
+	}
+	actual := qosQueryMap(
+		User{
+			UserID:  "1",
+			GroupID: "1",
+		},
+		QoS{
+			StorageQuota:                 1 * GB,
+			StorageQuotaWarning:          750 * MB,
+			StorageQuotaCount:            1000,
+			StorageQuotaCountWarning:     750,
+			RequestRatePrMin:             200,
+			RequestRatePrMinWarning:      150,
+			DataRatePrMinInbound:         1 * GB,
+			DataRatePrMinInboundWarning:  750 * MB,
+			DataRatePrMinOutbound:        1 * GB,
+			DataRatePrMinOutboundWarning: 750 * MB,
+		})
+	if diff := cmp.Diff(expected, actual); diff != "" {
+		t.Errorf("qosQueryMap() mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func mockBy(handler http.HandlerFunc) (*Client, *httptest.Server) {
 	mockServer := httptest.NewServer(handler)
 	return NewClient(mockServer.URL, ""), mockServer
