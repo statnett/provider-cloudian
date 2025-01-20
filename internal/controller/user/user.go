@@ -25,6 +25,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/connection"
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
 	"github.com/crossplane/crossplane-runtime/pkg/event"
@@ -48,7 +49,6 @@ const (
 	errNewClient  = "cannot create new Service"
 	errCreateUser = "cannot create User"
 	errDeleteUser = "cannot delete User"
-	errListUsers  = "cannot list Users"
 	errGetUser    = "cannot get User"
 )
 
@@ -157,38 +157,33 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, nil
 	}
 
-	// TODO: GET User instead of listing users for group
-	users, err := c.cloudianService.ListUsers(ctx, group, nil)
+	_, err := c.cloudianService.GetUser(ctx, cloudian.User{
+		GroupID: group,
+		UserID:  externalName})
+	if errors.Is(err, cloudian.ErrNotFound) {
+		return managed.ExternalObservation{ResourceExists: false}, nil
+	}
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(err, errListUsers)
+		return managed.ExternalObservation{}, errors.Wrap(err, errGetUser)
 	}
 
-	upToDate := isUpToDate(meta.GetExternalName(mg), users)
+	cr.SetConditions(xpv1.Available())
 
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
 		// the managed resource reconciler know that it needs to call Create to
 		// (re)create the resource, or that it has successfully been deleted.
-		ResourceExists: upToDate,
+		ResourceExists: true,
 
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
-		ResourceUpToDate: upToDate,
+		ResourceUpToDate: true,
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
 		ConnectionDetails: managed.ConnectionDetails{},
 	}, nil
-}
-
-func isUpToDate(userId string, users []cloudian.User) bool {
-	for _, user := range users {
-		if user.UserID == userId {
-			return true
-		}
-	}
-	return false
 }
 
 func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
