@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.1](https://github.com/statnett/provider-cloudian/compare/v0.1.0...v0.1.1) (2025-01-26)
+
+
+### Features
+
+* introduce Cloudian GET User ([#121](https://github.com/statnett/provider-cloudian/issues/121)) ([ca33d5a](https://github.com/statnett/provider-cloudian/commit/ca33d5a65d65ae5b7f678ead768974a2a28ed89b))
+* **sdk:** qos ([#124](https://github.com/statnett/provider-cloudian/issues/124)) ([270de4b](https://github.com/statnett/provider-cloudian/commit/270de4baec1a808a07d296f9513542e3f0fb9410))
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes packages to v0.32.1 ([#118](https://github.com/statnett/provider-cloudian/issues/118)) ([4a1f9ea](https://github.com/statnett/provider-cloudian/commit/4a1f9eabd97d114dc93804999c75270b86f225ff))
+* **deps:** update module github.com/go-resty/resty/v2 to v2.16.5 ([#123](https://github.com/statnett/provider-cloudian/issues/123)) ([53e0913](https://github.com/statnett/provider-cloudian/commit/53e09130846cbb96e3e7adc0f9676a66c7d8662a))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.0 ([#120](https://github.com/statnett/provider-cloudian/issues/120)) ([aae9cb8](https://github.com/statnett/provider-cloudian/commit/aae9cb86e107c3ef75c2192bb48673e7d5d51f39))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.1 ([#125](https://github.com/statnett/provider-cloudian/issues/125)) ([2c9f93f](https://github.com/statnett/provider-cloudian/commit/2c9f93f74c3ade7949af5600294fcc97fc65b38e))
+
 ## [0.1.0](https://github.com/statnett/provider-cloudian/compare/v0.0.6...v0.1.0) (2025-01-15)
 
 
