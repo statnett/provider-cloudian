@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.2](https://github.com/statnett/provider-cloudian/compare/v0.1.1...v0.1.2) (2025-02-06)
+
+
+### Features
+
+* bootstrap empty GroupQualityOfServiceLimits kind  ([#127](https://github.com/statnett/provider-cloudian/issues/127)) ([2928cf0](https://github.com/statnett/provider-cloudian/commit/2928cf06887a3379d31899f9130da68a34397655))
+* bootstrap empty UserQualityOfServiceLimits kind ([#133](https://github.com/statnett/provider-cloudian/issues/133)) ([92fea02](https://github.com/statnett/provider-cloudian/commit/92fea024ba367d5272f3998ce9be84fea8fb091f))
+* reconcile qos ([#130](https://github.com/statnett/provider-cloudian/issues/130)) ([7575ce9](https://github.com/statnett/provider-cloudian/commit/7575ce926b54acccb2e315ba151b4eb1f97084b9))
+* reference group in qos ([#129](https://github.com/statnett/provider-cloudian/issues/129)) ([09ffc2f](https://github.com/statnett/provider-cloudian/commit/09ffc2f6866d03147bd3840d6f009beb31303d79))
+* **sdk:** delete qos ([#131](https://github.com/statnett/provider-cloudian/issues/131)) ([f53e471](https://github.com/statnett/provider-cloudian/commit/f53e471cdd78511522165125867c4a947a8b996c))
+* **sdk:** support QOS region ([#126](https://github.com/statnett/provider-cloudian/issues/126)) ([764e393](https://github.com/statnett/provider-cloudian/commit/764e3935ba10a06926c30d32cdf2a68676d28fbb))
+
+
+### Bug Fixes
+
+* **sdk:** hacky support for qos not found ([#132](https://github.com/statnett/provider-cloudian/issues/132)) ([944a54e](https://github.com/statnett/provider-cloudian/commit/944a54e9bcefc2753a3e0e3c3f4ef623ec504902))
+
 ## [0.1.1](https://github.com/statnett/provider-cloudian/compare/v0.1.0...v0.1.1) (2025-01-26)
 
 
