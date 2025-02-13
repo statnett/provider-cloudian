@@ -200,6 +200,16 @@ func (client Client) CreateUser(ctx context.Context, user User) error {
 
 	switch resp.StatusCode() {
 	case 200:
+		// Delete the (one) access key boodstrapped with new user
+		creds, err := client.ListUserCredentials(ctx, user)
+		if err != nil {
+			return err
+		}
+		for _, cred := range creds {
+			if err := client.DeleteUserCredentials(ctx, cred.AccessKey); err != nil {
+				return err
+			}
+		}
 		return nil
 	default:
 		return fmt.Errorf("CREATE user unexpected status: %d", resp.StatusCode())
@@ -291,7 +301,7 @@ func (client Client) ListUserCredentials(ctx context.Context, user User) ([]Secu
 		return securityInfo, nil
 	case 204:
 		// Cloudian-API returns 204 if no security credentials found
-		return nil, ErrNotFound
+		return nil, nil
 	default:
 		return nil, fmt.Errorf("error: list credentials unexpected status code: %d", resp.StatusCode())
 	}

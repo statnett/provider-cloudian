@@ -232,6 +232,15 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 		GroupID: cr.Spec.ForProvider.GroupID,
 		UserID:  meta.GetExternalName(mg),
 	}
+
+	creds, err := c.cloudianService.ListUserCredentials(ctx, user)
+	if err != nil {
+		return managed.ExternalDelete{}, err
+	}
+	if len(creds) > 0 {
+		return managed.ExternalDelete{}, errors.New("User has access keys and cannot be deleted")
+	}
+
 	if err := c.cloudianService.DeleteUser(ctx, user); err != nil {
 		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteUser)
 	}

@@ -28,3 +28,14 @@ spec:
       storageQuotaBytes: 1Ti
   providerConfigRef:
     name: example
+---
+apiVersion: user.cloudian.crossplane.io/v1alpha1
+kind: AccessKey
+metadata:
+  name: bar
+spec:
+  forProvider:
+    userIdRef:
+      name: bar
+  providerConfigRef:
+    name: example
