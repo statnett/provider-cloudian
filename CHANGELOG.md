@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.2](https://github.com/statnett/provider-cloudian/compare/v0.1.1...v0.1.2) (2025-02-13)
+
+
+### Features
+
+* bootstrap empty GroupQualityOfServiceLimits kind  ([#127](https://github.com/statnett/provider-cloudian/issues/127)) ([2928cf0](https://github.com/statnett/provider-cloudian/commit/2928cf06887a3379d31899f9130da68a34397655))
+* bootstrap empty UserQualityOfServiceLimits kind ([#133](https://github.com/statnett/provider-cloudian/issues/133)) ([92fea02](https://github.com/statnett/provider-cloudian/commit/92fea024ba367d5272f3998ce9be84fea8fb091f))
+* reconcile qos ([#130](https://github.com/statnett/provider-cloudian/issues/130)) ([7575ce9](https://github.com/statnett/provider-cloudian/commit/7575ce926b54acccb2e315ba151b4eb1f97084b9))
+* reconcile user qos limits ([#138](https://github.com/statnett/provider-cloudian/issues/138)) ([c58ebfa](https://github.com/statnett/provider-cloudian/commit/c58ebfab8d0cf32c042f5d586949e456c4c9c5d2))
+* reference group in qos ([#129](https://github.com/statnett/provider-cloudian/issues/129)) ([09ffc2f](https://github.com/statnett/provider-cloudian/commit/09ffc2f6866d03147bd3840d6f009beb31303d79))
+* **sdk:** delete qos ([#131](https://github.com/statnett/provider-cloudian/issues/131)) ([f53e471](https://github.com/statnett/provider-cloudian/commit/f53e471cdd78511522165125867c4a947a8b996c))
+* **sdk:** support QOS region ([#126](https://github.com/statnett/provider-cloudian/issues/126)) ([764e393](https://github.com/statnett/provider-cloudian/commit/764e3935ba10a06926c30d32cdf2a68676d28fbb))
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/crossplane/crossplane-runtime to v1.19.0 ([#141](https://github.com/statnett/provider-cloudian/issues/141)) ([d1f73c8](https://github.com/statnett/provider-cloudian/commit/d1f73c8bf2c21082aba4fccdb03e86acbdabde8f))
+* **deps:** update module sigs.k8s.io/controller-tools to v0.17.2 ([#140](https://github.com/statnett/provider-cloudian/issues/140)) ([fd054ba](https://github.com/statnett/provider-cloudian/commit/fd054ba5c2c1a6b1d61ab4743ad413117762b5cb))
+* field names in resolve reference errors ([#136](https://github.com/statnett/provider-cloudian/issues/136)) ([11b8e2d](https://github.com/statnett/provider-cloudian/commit/11b8e2d39d254b14f143827648c24d3cc83164ee))
+* **sdk:** hacky support for qos not found ([#132](https://github.com/statnett/provider-cloudian/issues/132)) ([944a54e](https://github.com/statnett/provider-cloudian/commit/944a54e9bcefc2753a3e0e3c3f4ef623ec504902))
+
 ## [0.1.1](https://github.com/statnett/provider-cloudian/compare/v0.1.0...v0.1.1) (2025-01-26)
 
 
