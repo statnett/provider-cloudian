@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.3](https://github.com/statnett/provider-cloudian/compare/v0.1.2...v0.1.3) (2025-02-20)
+
+
+### Features
+
+* show canonical id in user status ([#153](https://github.com/statnett/provider-cloudian/issues/153)) ([fa81bde](https://github.com/statnett/provider-cloudian/commit/fa81bde14d067ec267d5e6046d6026f891d0908c))
+
+
+### Bug Fixes
+
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.2 ([#149](https://github.com/statnett/provider-cloudian/issues/149)) ([ad5bd3f](https://github.com/statnett/provider-cloudian/commit/ad5bd3fce5e50311b4a6f328fc78c10c7c68b57a))
+
 ## [0.1.2](https://github.com/statnett/provider-cloudian/compare/v0.1.1...v0.1.2) (2025-02-14)
 
 
