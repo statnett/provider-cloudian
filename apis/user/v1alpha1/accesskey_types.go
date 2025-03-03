@@ -49,8 +49,8 @@ type AccessKeyParameters struct {
 
 // AccessKeyObservation are the observable fields of a AccessKey.
 type AccessKeyObservation struct {
-	// AccessKey is the S3 Access Key ID, with a corresponding SecretKey.
-	AccessKey string `json:"accessKey,omitempty"`
+	// ID is the S3 Access Key ID, with a corresponding SecretKey.
+	ID string `json:"id,omitempty"`
 }
 
 // A AccessKeySpec defines the desired state of a AccessKey.
