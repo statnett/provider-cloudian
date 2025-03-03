@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/statnett/provider-cloudian/compare/v0.1.3...v0.1.4) (2025-03-03)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/google/go-cmp to v0.7.0 ([#154](https://github.com/statnett/provider-cloudian/issues/154)) ([2e69a39](https://github.com/statnett/provider-cloudian/commit/2e69a39fa14144e4f53cfd8d4d63beac593567b9))
+
 ## [0.1.3](https://github.com/statnett/provider-cloudian/compare/v0.1.2...v0.1.3) (2025-02-20)
 
 
