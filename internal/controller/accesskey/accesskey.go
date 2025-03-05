@@ -158,7 +158,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.Wrap(err, errGetCreds)
 	}
 
-	cr.Status.AtProvider.AccessKey = meta.GetExternalName(cr)
+	cr.Status.AtProvider.ID = meta.GetExternalName(cr)
 	cr.SetConditions(xpv1.Available())
 
 	return managed.ExternalObservation{

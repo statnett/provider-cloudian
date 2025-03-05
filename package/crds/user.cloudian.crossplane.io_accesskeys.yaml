@@ -330,8 +330,8 @@ spec:
               atProvider:
                 description: AccessKeyObservation are the observable fields of a AccessKey.
                 properties:
-                  accessKey:
-                    description: AccessKey is the S3 Access Key ID, with a corresponding
+                  id:
+                    description: ID is the S3 Access Key ID, with a corresponding
                       SecretKey.
                     type: string
                 type: object
