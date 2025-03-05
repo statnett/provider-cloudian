@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.0](https://github.com/statnett/provider-cloudian/compare/v0.1.3...v0.2.0) (2025-03-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename access key id ([#158](https://github.com/statnett/provider-cloudian/issues/158))
+
+### Bug Fixes
+
+* **deps:** update module github.com/google/go-cmp to v0.7.0 ([#154](https://github.com/statnett/provider-cloudian/issues/154)) ([2e69a39](https://github.com/statnett/provider-cloudian/commit/2e69a39fa14144e4f53cfd8d4d63beac593567b9))
+
+
+### Miscellaneous Chores
+
+* rename access key id ([#158](https://github.com/statnett/provider-cloudian/issues/158)) ([7e51c17](https://github.com/statnett/provider-cloudian/commit/7e51c17c53a2dc3fb33c96fdae4b48d291e46e87))
+
 ## [0.1.3](https://github.com/statnett/provider-cloudian/compare/v0.1.2...v0.1.3) (2025-02-20)
 
 
