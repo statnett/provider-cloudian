@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.2.0](https://github.com/statnett/provider-cloudian/compare/v0.1.3...v0.2.0) (2025-03-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* not insecure by default ([#164](https://github.com/statnett/provider-cloudian/issues/164))
+* rename access key id ([#158](https://github.com/statnett/provider-cloudian/issues/158))
+
+### Bug Fixes
+
+* **deps:** update kubernetes packages to v0.32.3 ([#161](https://github.com/statnett/provider-cloudian/issues/161)) ([0291425](https://github.com/statnett/provider-cloudian/commit/029142500190aabca48c65ddcfda7d6ae4a4dc8e))
+* **deps:** update module github.com/google/go-cmp to v0.7.0 ([#154](https://github.com/statnett/provider-cloudian/issues/154)) ([2e69a39](https://github.com/statnett/provider-cloudian/commit/2e69a39fa14144e4f53cfd8d4d63beac593567b9))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.3 ([#159](https://github.com/statnett/provider-cloudian/issues/159)) ([ea4244f](https://github.com/statnett/provider-cloudian/commit/ea4244f4b32931e32bae4d65cf4cdb3ff3d9d47e))
+* not insecure by default ([#164](https://github.com/statnett/provider-cloudian/issues/164)) ([357d4c3](https://github.com/statnett/provider-cloudian/commit/357d4c34d308c6ec2695f1c9157f4560d24fe159))
+
+
+### Miscellaneous Chores
+
+* rename access key id ([#158](https://github.com/statnett/provider-cloudian/issues/158)) ([7e51c17](https://github.com/statnett/provider-cloudian/commit/7e51c17c53a2dc3fb33c96fdae4b48d291e46e87))
+
 ## [0.1.3](https://github.com/statnett/provider-cloudian/compare/v0.1.2...v0.1.3) (2025-02-20)
 
 
