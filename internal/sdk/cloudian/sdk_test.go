@@ -171,7 +171,7 @@ func TestClient_GetUser(t *testing.T) {
 		statusCode, _ := strconv.Atoi(userId)
 		if statusCode == http.StatusOK {
 			for _, tt := range tests {
-				if tt.user.GroupUserID.UserID == userId {
+				if tt.user.UserID == userId {
 					json.NewEncoder(w).Encode(tt.user)
 					break
 				}
