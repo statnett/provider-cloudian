@@ -157,7 +157,7 @@ func (client Client) ListUsers(ctx context.Context, groupID string, userID *stri
 	// Paginated API endpoint where limit+1 elements indicates more pages
 	if len(users) > ListLimit {
 		// Fetch remaining users starting from the user after the limit
-		moreUsers, err := client.ListUsers(ctx, groupID, &users[ListLimit].GroupUserID.UserID)
+		moreUsers, err := client.ListUsers(ctx, groupID, &users[ListLimit].UserID)
 		if err != nil {
 			return nil, err
 		}
@@ -379,7 +379,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 	case 200:
 		return err
 	default:
-		return fmt.Errorf("Update group unexpected status: %d", resp.StatusCode())
+		return fmt.Errorf("update group unexpected status: %d", resp.StatusCode())
 	}
 }
 

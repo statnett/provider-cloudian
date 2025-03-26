@@ -69,10 +69,10 @@ jobs:
       # We could run 'make lint' but we prefer this action because it leaves
       # 'annotations' (i.e. it comments on PRs to point out linter violations).
       - name: Lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@1481404843c368bc19ca9406f87d6e0fc97bdcfd # v7.0.0
         with:
           # renovate: datasource=go depName=github.com/golangci/golangci-lint
-          version: v1.64.8
+          version: v2.0.2
           args: --timeout 5m
 
   check-diff:
