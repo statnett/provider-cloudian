@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.1](https://github.com/statnett/provider-cloudian/compare/v0.2.0...v0.2.1) (2025-04-14)
+
+
+### Bug Fixes
+
+* **deps:** update k8s.io/utils digest to 1f6e0b7 ([#165](https://github.com/statnett/provider-cloudian/issues/165)) ([908781b](https://github.com/statnett/provider-cloudian/commit/908781be8e6e143d1a58c603a9dcb52d9dc4bc00))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.4 ([#168](https://github.com/statnett/provider-cloudian/issues/168)) ([74ef77d](https://github.com/statnett/provider-cloudian/commit/74ef77d811e2f205ccd16fdbefef74f40644e0f5))
+* **deps:** update module sigs.k8s.io/controller-tools to v0.17.3 ([#171](https://github.com/statnett/provider-cloudian/issues/171)) ([dddfd47](https://github.com/statnett/provider-cloudian/commit/dddfd470e3f9e219ee8b95573687ef0eea2b5b8d))
+
 ## [0.2.0](https://github.com/statnett/provider-cloudian/compare/v0.1.3...v0.2.0) (2025-03-18)
 
 
