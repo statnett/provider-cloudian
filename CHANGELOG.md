@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.1](https://github.com/statnett/provider-cloudian/compare/v0.2.0...v0.2.1) (2025-05-03)
+
+
+### Bug Fixes
+
+* **deps:** update github.com/crossplane/crossplane-tools digest to de0e510 ([#175](https://github.com/statnett/provider-cloudian/issues/175)) ([cf12899](https://github.com/statnett/provider-cloudian/commit/cf12899d90f7da1af83e2f3796423ae273362e6b))
+* **deps:** update k8s.io/utils digest to 0f33e8f ([#178](https://github.com/statnett/provider-cloudian/issues/178)) ([c05e62d](https://github.com/statnett/provider-cloudian/commit/c05e62dde65cb113276d7c0685a83273920a3811))
+* **deps:** update k8s.io/utils digest to 1f6e0b7 ([#165](https://github.com/statnett/provider-cloudian/issues/165)) ([908781b](https://github.com/statnett/provider-cloudian/commit/908781be8e6e143d1a58c603a9dcb52d9dc4bc00))
+* **deps:** update kubernetes packages to v0.33.0 ([#176](https://github.com/statnett/provider-cloudian/issues/176)) ([d92c4db](https://github.com/statnett/provider-cloudian/commit/d92c4db4be47051556918ced3282eda09f23d972))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.4 ([#168](https://github.com/statnett/provider-cloudian/issues/168)) ([74ef77d](https://github.com/statnett/provider-cloudian/commit/74ef77d811e2f205ccd16fdbefef74f40644e0f5))
+* **deps:** update module sigs.k8s.io/controller-tools to v0.17.3 ([#171](https://github.com/statnett/provider-cloudian/issues/171)) ([dddfd47](https://github.com/statnett/provider-cloudian/commit/dddfd470e3f9e219ee8b95573687ef0eea2b5b8d))
+
 ## [0.2.0](https://github.com/statnett/provider-cloudian/compare/v0.1.3...v0.2.0) (2025-03-18)
 
 
