@@ -55,11 +55,9 @@ const (
 
 var (
 	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error) {
-		// FIXME: Don't require InsecureSkipVerify
 		return cloudian.NewClient(
 			providerConfig.Spec.Endpoint,
 			authHeader,
-			cloudian.WithInsecureTLSVerify(true),
 		), nil
 	}
 )

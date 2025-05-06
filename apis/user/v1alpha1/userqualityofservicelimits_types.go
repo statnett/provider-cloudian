@@ -25,14 +25,14 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 )
 
-// AccessKeyParameters are the configurable fields of a AccessKey.
-type AccessKeyParameters struct {
-	// GroupID of the access key.
+// UserQualityOfServiceLimitsParameters are the configurable fields of a UserQualityOfServiceLimits.
+type UserQualityOfServiceLimitsParameters struct {
+	// GroupID of the quality of service limits.
 	// +optional
 	// +immutable
 	GroupID string `json:"groupId,omitempty"`
 
-	// UserId of the access key.
+	// UserID of the quality of service limits.
 	// +optional
 	// +immutable
 	UserID string `json:"userId,omitempty"`
@@ -45,60 +45,64 @@ type AccessKeyParameters struct {
 	// UserIDSelector selects a user to retrieve its groupId and userId.
 	// +optional
 	UserIDSelector *xpv1.Selector `json:"userIdSelector,omitempty"`
+
+	// Region in which to apply the quality of service limits. Default region if unspecified.
+	// +optional
+	Region string `json:"region,omitempty"`
+
+	QOS `json:",inline"`
 }
 
-// AccessKeyObservation are the observable fields of a AccessKey.
-type AccessKeyObservation struct {
-	// ID is the S3 Access Key ID, with a corresponding SecretKey.
-	ID string `json:"id,omitempty"`
+// UserQualityOfServiceLimitsObservation are the observable fields of a UserQualityOfServiceLimits.
+type UserQualityOfServiceLimitsObservation struct {
 }
 
-// A AccessKeySpec defines the desired state of a AccessKey.
-type AccessKeySpec struct {
+// A UserQualityOfServiceLimitsSpec defines the desired state of a UserQualityOfServiceLimits.
+type UserQualityOfServiceLimitsSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
-	ForProvider       AccessKeyParameters `json:"forProvider"`
+	ForProvider       UserQualityOfServiceLimitsParameters `json:"forProvider"`
 }
 
-// A AccessKeyStatus represents the observed state of a AccessKey.
-type AccessKeyStatus struct {
+// A UserQualityOfServiceLimitsStatus represents the observed state of a UserQualityOfServiceLimits.
+type UserQualityOfServiceLimitsStatus struct {
 	xpv1.ResourceStatus `json:",inline"`
-	AtProvider          AccessKeyObservation `json:"atProvider,omitempty"`
+	AtProvider          UserQualityOfServiceLimitsObservation `json:"atProvider,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// AccessKey represents an access key for a Cloudian user.
+// UserQualityOfServiceLimits represents the quality of service limits for a Cloudian user, within a region.
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:printcolumn:name="EXTERNAL-NAME",type="string",JSONPath=".metadata.annotations.crossplane\\.io/external-name"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster,categories={crossplane,managed,cloudian}
-type AccessKey struct {
+type UserQualityOfServiceLimits struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AccessKeySpec   `json:"spec"`
-	Status AccessKeyStatus `json:"status,omitempty"`
+	Spec   UserQualityOfServiceLimitsSpec   `json:"spec"`
+	Status UserQualityOfServiceLimitsStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// AccessKeyList contains a list of AccessKey
-type AccessKeyList struct {
+// UserQualityOfServiceLimitsList contains a list of UserQualityOfServiceLimits
+type UserQualityOfServiceLimitsList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []AccessKey `json:"items"`
+	Items           []UserQualityOfServiceLimits `json:"items"`
 }
 
-// AccessKey type metadata.
+// UserQualityOfServiceLimits type metadata.
 var (
-	AccessKeyKind             = reflect.TypeOf(AccessKey{}).Name()
-	AccessKeyGroupKind        = schema.GroupKind{Group: MetadataGroup, Kind: AccessKeyKind}.String()
-	AccessKeyKindAPIVersion   = AccessKeyKind + "." + SchemeGroupVersion.String()
-	AccessKeyGroupVersionKind = SchemeGroupVersion.WithKind(AccessKeyKind)
+	UserQualityOfServiceLimitsKind             = reflect.TypeOf(UserQualityOfServiceLimits{}).Name()
+	UserQualityOfServiceLimitsGroupKind        = schema.GroupKind{Group: MetadataGroup, Kind: UserQualityOfServiceLimitsKind}.String()
+	UserQualityOfServiceLimitsKindAPIVersion   = UserQualityOfServiceLimitsKind + "." + SchemeGroupVersion.String()
+	UserQualityOfServiceLimitsGroupVersionKind = SchemeGroupVersion.WithKind(UserQualityOfServiceLimitsKind)
 )
 
 func init() {
-	SchemeBuilder.Register(&AccessKey{}, &AccessKeyList{})
+	SchemeBuilder.Register(&UserQualityOfServiceLimits{}, &UserQualityOfServiceLimitsList{})
 }

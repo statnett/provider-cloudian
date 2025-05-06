@@ -7,3 +7,7 @@ A lightweight [Crossplane™](https://crossplane.io/) provider, based on the [pr
 
 > [!IMPORTANT]
 > This provider is not yet stable enough for production, and should be considered a work in progress.
+
+## Usage
+
+See the [example provider config](./examples/provider/config.yaml) and [examples resources](./examples/v1alpha1/).

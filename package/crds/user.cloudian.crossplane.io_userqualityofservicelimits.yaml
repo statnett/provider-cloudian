@@ -4,7 +4,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.17.3
-  name: groups.user.cloudian.crossplane.io
+  name: userqualityofservicelimits.user.cloudian.crossplane.io
 spec:
   group: user.cloudian.crossplane.io
   names:
@@ -12,10 +12,10 @@ spec:
     - crossplane
     - managed
     - cloudian
-    kind: Group
-    listKind: GroupList
-    plural: groups
-    singular: group
+    kind: UserQualityOfServiceLimits
+    listKind: UserQualityOfServiceLimitsList
+    plural: userqualityofservicelimits
+    singular: userqualityofservicelimits
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -34,7 +34,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Group represents a Cloudian group.
+        description: UserQualityOfServiceLimits represents the quality of service
+          limits for a Cloudian user, within a region.
         properties:
           apiVersion:
             description: |-
@@ -54,7 +55,8 @@ spec:
           metadata:
             type: object
           spec:
-            description: A GroupSpec defines the desired state of a Group.
+            description: A UserQualityOfServiceLimitsSpec defines the desired state
+              of a UserQualityOfServiceLimits.
             properties:
               deletionPolicy:
                 default: Delete
@@ -71,45 +73,163 @@ spec:
                 - Delete
                 type: string
               forProvider:
-                description: GroupParameters are the configurable fields of a Group.
+                description: UserQualityOfServiceLimitsParameters are the configurable
+                  fields of a UserQualityOfServiceLimits.
                 properties:
-                  active:
-                    default: true
-                    description: Active determines whether the group is enabled (true)
-                      or disabled (false) in the system.
-                    type: boolean
-                  groupName:
-                    description: GroupName is the group name (known as Description
-                      in the GUI).
-                    maxLength: 64
+                  groupId:
+                    description: GroupID of the quality of service limits.
                     type: string
-                  ldapEnabled:
-                    default: false
-                    description: LDAPEnabled determines whether LDAP authentication
-                      is enabled for members of this group.
-                    type: boolean
-                  ldapGroup:
-                    description: LDAPGroup us the group's name from the LDAP system.
+                  hard:
+                    description: Hard is the hard limit.
+                    properties:
+                      inboundBytesPerMin:
+                        description: InboundBytesPerMin is the limit for inbound data
+                          per minute in bytes.
+                        nullable: true
+                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
+                        type: string
+                      outboundBytesPerMin:
+                        description: OutboundKiBsPerMin is the limit for outbound
+                          data per minute in bytes.
+                        nullable: true
+                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
+                        type: string
+                      requestsPerMin:
+                        description: RequestsPerMin is the limit for number of HTTP
+                          requests per minute.
+                        format: int32
+                        nullable: true
+                        type: integer
+                      storageQuotaBytes:
+                        description: StorageQuotaBytes is the limit for total stored
+                          data in bytes.
+                        nullable: true
+                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
+                        type: string
+                      storageQuotaCount:
+                        description: StorageQuotaCount is the limit for total number
+                          of objects.
+                        format: int32
+                        nullable: true
+                        type: integer
+                    type: object
+                  region:
+                    description: Region in which to apply the quality of service limits.
+                      Default region if unspecified.
                     type: string
-                  ldapMatchAttribute:
+                  userId:
+                    description: UserID of the quality of service limits.
                     type: string
-                  ldapSearch:
-                    type: string
-                  ldapSearchUserBase:
-                    description: LDAPSearchUserBase specifies the LDAP search base
-                      from which the CMC should start when retrieving the user's LDAP
-                      record in order to apply filtering.
-                    type: string
-                  ldapServerURL:
-                    description: LDAPServerURL specifies the URL that the CMC should
-                      use to access the LDAP Server when authenticating users in this
-                      group.
-                    type: string
-                  ldapUserDNTemplate:
-                    description: LDAPUserDNTemplate specifies how users within this
-                      group will be authenticated against the LDAP system when they
-                      log into the CMC.
-                    type: string
+                  userIdRef:
+                    description: UserIDRef references a user to retrieve its groupId
+                      and userId.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                      policy:
+                        description: Policies for referencing.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  userIdSelector:
+                    description: UserIDSelector selects a user to retrieve its groupId
+                      and userId.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  warning:
+                    description: Warning is the soft limit that triggers a warning.
+                    properties:
+                      inboundBytesPerMin:
+                        description: InboundBytesPerMin is the limit for inbound data
+                          per minute in bytes.
+                        nullable: true
+                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
+                        type: string
+                      outboundBytesPerMin:
+                        description: OutboundKiBsPerMin is the limit for outbound
+                          data per minute in bytes.
+                        nullable: true
+                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
+                        type: string
+                      requestsPerMin:
+                        description: RequestsPerMin is the limit for number of HTTP
+                          requests per minute.
+                        format: int32
+                        nullable: true
+                        type: integer
+                      storageQuotaBytes:
+                        description: StorageQuotaBytes is the limit for total stored
+                          data in bytes.
+                        nullable: true
+                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
+                        type: string
+                      storageQuotaCount:
+                        description: StorageQuotaCount is the limit for total number
+                          of objects.
+                        format: int32
+                        nullable: true
+                        type: integer
+                    type: object
                 type: object
               managementPolicies:
                 default:
@@ -279,10 +399,12 @@ spec:
             - forProvider
             type: object
           status:
-            description: A GroupStatus represents the observed state of a Group.
+            description: A UserQualityOfServiceLimitsStatus represents the observed
+              state of a UserQualityOfServiceLimits.
             properties:
               atProvider:
-                description: GroupObservation are the observable fields of a Group.
+                description: UserQualityOfServiceLimitsObservation are the observable
+                  fields of a UserQualityOfServiceLimits.
                 type: object
               conditions:
                 description: Conditions of the resource.

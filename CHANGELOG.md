@@ -1,5 +1,89 @@
 # Changelog
 
+## [0.2.1](https://github.com/statnett/provider-cloudian/compare/v0.2.0...v0.2.1) (2025-05-03)
+
+
+### Bug Fixes
+
+* **deps:** update github.com/crossplane/crossplane-tools digest to de0e510 ([#175](https://github.com/statnett/provider-cloudian/issues/175)) ([cf12899](https://github.com/statnett/provider-cloudian/commit/cf12899d90f7da1af83e2f3796423ae273362e6b))
+* **deps:** update k8s.io/utils digest to 0f33e8f ([#178](https://github.com/statnett/provider-cloudian/issues/178)) ([c05e62d](https://github.com/statnett/provider-cloudian/commit/c05e62dde65cb113276d7c0685a83273920a3811))
+* **deps:** update k8s.io/utils digest to 1f6e0b7 ([#165](https://github.com/statnett/provider-cloudian/issues/165)) ([908781b](https://github.com/statnett/provider-cloudian/commit/908781be8e6e143d1a58c603a9dcb52d9dc4bc00))
+* **deps:** update kubernetes packages to v0.33.0 ([#176](https://github.com/statnett/provider-cloudian/issues/176)) ([d92c4db](https://github.com/statnett/provider-cloudian/commit/d92c4db4be47051556918ced3282eda09f23d972))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.4 ([#168](https://github.com/statnett/provider-cloudian/issues/168)) ([74ef77d](https://github.com/statnett/provider-cloudian/commit/74ef77d811e2f205ccd16fdbefef74f40644e0f5))
+* **deps:** update module sigs.k8s.io/controller-tools to v0.17.3 ([#171](https://github.com/statnett/provider-cloudian/issues/171)) ([dddfd47](https://github.com/statnett/provider-cloudian/commit/dddfd470e3f9e219ee8b95573687ef0eea2b5b8d))
+
+## [0.2.0](https://github.com/statnett/provider-cloudian/compare/v0.1.3...v0.2.0) (2025-03-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* not insecure by default ([#164](https://github.com/statnett/provider-cloudian/issues/164))
+* rename access key id ([#158](https://github.com/statnett/provider-cloudian/issues/158))
+
+### Bug Fixes
+
+* **deps:** update kubernetes packages to v0.32.3 ([#161](https://github.com/statnett/provider-cloudian/issues/161)) ([0291425](https://github.com/statnett/provider-cloudian/commit/029142500190aabca48c65ddcfda7d6ae4a4dc8e))
+* **deps:** update module github.com/google/go-cmp to v0.7.0 ([#154](https://github.com/statnett/provider-cloudian/issues/154)) ([2e69a39](https://github.com/statnett/provider-cloudian/commit/2e69a39fa14144e4f53cfd8d4d63beac593567b9))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.3 ([#159](https://github.com/statnett/provider-cloudian/issues/159)) ([ea4244f](https://github.com/statnett/provider-cloudian/commit/ea4244f4b32931e32bae4d65cf4cdb3ff3d9d47e))
+* not insecure by default ([#164](https://github.com/statnett/provider-cloudian/issues/164)) ([357d4c3](https://github.com/statnett/provider-cloudian/commit/357d4c34d308c6ec2695f1c9157f4560d24fe159))
+
+
+### Miscellaneous Chores
+
+* rename access key id ([#158](https://github.com/statnett/provider-cloudian/issues/158)) ([7e51c17](https://github.com/statnett/provider-cloudian/commit/7e51c17c53a2dc3fb33c96fdae4b48d291e46e87))
+
+## [0.1.3](https://github.com/statnett/provider-cloudian/compare/v0.1.2...v0.1.3) (2025-02-20)
+
+
+### Features
+
+* show canonical id in user status ([#153](https://github.com/statnett/provider-cloudian/issues/153)) ([fa81bde](https://github.com/statnett/provider-cloudian/commit/fa81bde14d067ec267d5e6046d6026f891d0908c))
+
+
+### Bug Fixes
+
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.2 ([#149](https://github.com/statnett/provider-cloudian/issues/149)) ([ad5bd3f](https://github.com/statnett/provider-cloudian/commit/ad5bd3fce5e50311b4a6f328fc78c10c7c68b57a))
+
+## [0.1.2](https://github.com/statnett/provider-cloudian/compare/v0.1.1...v0.1.2) (2025-02-14)
+
+
+### Features
+
+* block user delete untill access keys deleted ([#144](https://github.com/statnett/provider-cloudian/issues/144)) ([08181e9](https://github.com/statnett/provider-cloudian/commit/08181e97635982a4b1d84d6b0258038fc8fd8ca6))
+* bootstrap empty GroupQualityOfServiceLimits kind  ([#127](https://github.com/statnett/provider-cloudian/issues/127)) ([2928cf0](https://github.com/statnett/provider-cloudian/commit/2928cf06887a3379d31899f9130da68a34397655))
+* bootstrap empty UserQualityOfServiceLimits kind ([#133](https://github.com/statnett/provider-cloudian/issues/133)) ([92fea02](https://github.com/statnett/provider-cloudian/commit/92fea024ba367d5272f3998ce9be84fea8fb091f))
+* reconcile qos ([#130](https://github.com/statnett/provider-cloudian/issues/130)) ([7575ce9](https://github.com/statnett/provider-cloudian/commit/7575ce926b54acccb2e315ba151b4eb1f97084b9))
+* reconcile user qos limits ([#138](https://github.com/statnett/provider-cloudian/issues/138)) ([c58ebfa](https://github.com/statnett/provider-cloudian/commit/c58ebfab8d0cf32c042f5d586949e456c4c9c5d2))
+* reference group in qos ([#129](https://github.com/statnett/provider-cloudian/issues/129)) ([09ffc2f](https://github.com/statnett/provider-cloudian/commit/09ffc2f6866d03147bd3840d6f009beb31303d79))
+* remove all users access keys upon creation ([#146](https://github.com/statnett/provider-cloudian/issues/146)) ([cc52399](https://github.com/statnett/provider-cloudian/commit/cc5239927bfd747a43684cd6217764e254e1cc1b))
+* **sdk:** delete qos ([#131](https://github.com/statnett/provider-cloudian/issues/131)) ([f53e471](https://github.com/statnett/provider-cloudian/commit/f53e471cdd78511522165125867c4a947a8b996c))
+* **sdk:** support QOS region ([#126](https://github.com/statnett/provider-cloudian/issues/126)) ([764e393](https://github.com/statnett/provider-cloudian/commit/764e3935ba10a06926c30d32cdf2a68676d28fbb))
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes packages to v0.32.2 ([#145](https://github.com/statnett/provider-cloudian/issues/145)) ([d0aa4e2](https://github.com/statnett/provider-cloudian/commit/d0aa4e229a3af66c6368ecd1df29886102a29df9))
+* **deps:** update module github.com/crossplane/crossplane-runtime to v1.19.0 ([#141](https://github.com/statnett/provider-cloudian/issues/141)) ([d1f73c8](https://github.com/statnett/provider-cloudian/commit/d1f73c8bf2c21082aba4fccdb03e86acbdabde8f))
+* **deps:** update module sigs.k8s.io/controller-tools to v0.17.2 ([#140](https://github.com/statnett/provider-cloudian/issues/140)) ([fd054ba](https://github.com/statnett/provider-cloudian/commit/fd054ba5c2c1a6b1d61ab4743ad413117762b5cb))
+* field names in resolve reference errors ([#136](https://github.com/statnett/provider-cloudian/issues/136)) ([11b8e2d](https://github.com/statnett/provider-cloudian/commit/11b8e2d39d254b14f143827648c24d3cc83164ee))
+* **sdk:** hacky support for qos not found ([#132](https://github.com/statnett/provider-cloudian/issues/132)) ([944a54e](https://github.com/statnett/provider-cloudian/commit/944a54e9bcefc2753a3e0e3c3f4ef623ec504902))
+
+## [0.1.1](https://github.com/statnett/provider-cloudian/compare/v0.1.0...v0.1.1) (2025-01-26)
+
+
+### Features
+
+* introduce Cloudian GET User ([#121](https://github.com/statnett/provider-cloudian/issues/121)) ([ca33d5a](https://github.com/statnett/provider-cloudian/commit/ca33d5a65d65ae5b7f678ead768974a2a28ed89b))
+* **sdk:** qos ([#124](https://github.com/statnett/provider-cloudian/issues/124)) ([270de4b](https://github.com/statnett/provider-cloudian/commit/270de4baec1a808a07d296f9513542e3f0fb9410))
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes packages to v0.32.1 ([#118](https://github.com/statnett/provider-cloudian/issues/118)) ([4a1f9ea](https://github.com/statnett/provider-cloudian/commit/4a1f9eabd97d114dc93804999c75270b86f225ff))
+* **deps:** update module github.com/go-resty/resty/v2 to v2.16.5 ([#123](https://github.com/statnett/provider-cloudian/issues/123)) ([53e0913](https://github.com/statnett/provider-cloudian/commit/53e09130846cbb96e3e7adc0f9676a66c7d8662a))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.0 ([#120](https://github.com/statnett/provider-cloudian/issues/120)) ([aae9cb8](https://github.com/statnett/provider-cloudian/commit/aae9cb86e107c3ef75c2192bb48673e7d5d51f39))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.20.1 ([#125](https://github.com/statnett/provider-cloudian/issues/125)) ([2c9f93f](https://github.com/statnett/provider-cloudian/commit/2c9f93f74c3ade7949af5600294fcc97fc65b38e))
+
 ## [0.1.0](https://github.com/statnett/provider-cloudian/compare/v0.0.6...v0.1.0) (2025-01-15)
 
 

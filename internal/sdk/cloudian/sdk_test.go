@@ -68,7 +68,7 @@ func TestCreateCredentials(t *testing.T) {
 	})
 	defer testServer.Close()
 
-	credentials, err := cloudianClient.CreateUserCredentials(context.TODO(), User{GroupID: "QA", UserID: "user1"})
+	credentials, err := cloudianClient.CreateUserCredentials(context.TODO(), GroupUserID{GroupID: "QA", UserID: "user1"})
 	if err != nil {
 		t.Errorf("Error creating credentials: %v", err)
 	}
@@ -104,7 +104,7 @@ func TestListUserCredentials(t *testing.T) {
 	defer testServer.Close()
 
 	credentials, err := cloudianClient.ListUserCredentials(
-		context.TODO(), User{UserID: "", GroupID: ""},
+		context.TODO(), GroupUserID{UserID: "", GroupID: ""},
 	)
 	if err != nil {
 		t.Errorf("Error listing credentials: %v", err)
@@ -117,7 +117,7 @@ func TestListUserCredentials(t *testing.T) {
 func TestListUsers(t *testing.T) {
 	var expected []User
 	for i := 0; i < 500; i++ {
-		expected = append(expected, User{GroupID: "QA", UserID: strconv.Itoa(i)})
+		expected = append(expected, User{GroupUserID: GroupUserID{GroupID: "QA", UserID: strconv.Itoa(i)}})
 	}
 
 	cloudianClient, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
@@ -162,22 +162,42 @@ func TestClient_GetUser(t *testing.T) {
 		status  int
 		wantErr error
 	}{
-		{name: "Exists", user: User{UserID: strconv.Itoa(http.StatusOK)}},
-		{name: "Not found", user: User{UserID: strconv.Itoa(http.StatusNoContent)}, wantErr: ErrNotFound},
+		{name: "Exists", user: User{GroupUserID: GroupUserID{UserID: strconv.Itoa(http.StatusOK)}, CanonicalID: "123"}},
+		{name: "Not found", user: User{GroupUserID: GroupUserID{UserID: strconv.Itoa(http.StatusNoContent)}, CanonicalID: "123"}, wantErr: ErrNotFound},
 	}
 
 	client, testServer := mockBy(func(w http.ResponseWriter, r *http.Request) {
 		userId := r.URL.Query().Get("userId")
 		statusCode, _ := strconv.Atoi(userId)
+		if statusCode == http.StatusOK {
+			for _, tt := range tests {
+				if tt.user.UserID == userId {
+					json.NewEncoder(w).Encode(tt.user)
+					break
+				}
+			}
+		}
 		w.WriteHeader(statusCode)
 	})
 	defer testServer.Close()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := client.GetUser(context.Background(), tt.user)
+			user, err := client.GetUser(context.Background(), tt.user.GroupUserID)
+
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("GetUser() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			switch tt.wantErr {
+			case nil:
+				if !cmp.Equal(user, &tt.user) {
+					t.Errorf("GetUser() got = %v, expected %v", user, tt.user)
+				}
+			default:
+				if user != nil {
+					t.Errorf("GetUser() got = %v, expected nil", user)
+				}
 			}
 		})
 	}

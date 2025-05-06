@@ -53,11 +53,9 @@ const (
 
 var (
 	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error) {
-		// FIXME: Don't require InsecureSkipVerify
 		return cloudian.NewClient(
 			providerConfig.Spec.Endpoint,
 			authHeader,
-			cloudian.WithInsecureTLSVerify(true),
 		), nil
 	}
 )
@@ -158,7 +156,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.Wrap(err, errGetCreds)
 	}
 
-	cr.Status.AtProvider.AccessKey = meta.GetExternalName(cr)
+	cr.Status.AtProvider.ID = meta.GetExternalName(cr)
 	cr.SetConditions(xpv1.Available())
 
 	return managed.ExternalObservation{
@@ -187,7 +185,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	cr.SetConditions(xpv1.Creating())
 
-	creds, err := c.cloudianService.CreateUserCredentials(ctx, cloudian.User{
+	creds, err := c.cloudianService.CreateUserCredentials(ctx, cloudian.GroupUserID{
 		GroupID: cr.Spec.ForProvider.GroupID,
 		UserID:  cr.Spec.ForProvider.UserID,
 	})

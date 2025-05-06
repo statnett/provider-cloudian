@@ -54,11 +54,9 @@ const (
 
 var (
 	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error) {
-		// FIXME: Don't require InsecureSkipVerify
 		return cloudian.NewClient(
 			providerConfig.Spec.Endpoint,
 			authHeader,
-			cloudian.WithInsecureTLSVerify(true),
 		), nil
 	}
 )
@@ -157,7 +155,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, nil
 	}
 
-	_, err := c.cloudianService.GetUser(ctx, cloudian.User{
+	user, err := c.cloudianService.GetUser(ctx, cloudian.GroupUserID{
 		GroupID: group,
 		UserID:  externalName})
 	if errors.Is(err, cloudian.ErrNotFound) {
@@ -167,6 +165,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.Wrap(err, errGetUser)
 	}
 
+	cr.Status.AtProvider.CanonicalID = user.CanonicalID
 	cr.SetConditions(xpv1.Available())
 
 	return managed.ExternalObservation{
@@ -193,11 +192,26 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 	}
 
 	user := cloudian.User{
-		GroupID: cr.Spec.ForProvider.GroupID,
-		UserID:  meta.GetExternalName(mg),
+		GroupUserID: cloudian.GroupUserID{
+			GroupID: cr.Spec.ForProvider.GroupID,
+			UserID:  meta.GetExternalName(mg),
+		},
+		UserType: cloudian.UserTypeStandard,
 	}
 	if err := c.cloudianService.CreateUser(ctx, user); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateUser)
+	}
+
+	// When Cloudian creates a user, a single access key is created inside it.
+	// Delete the access key, so that the user does not have any non-managed access keys.
+	creds, err := c.cloudianService.ListUserCredentials(ctx, user.GroupUserID)
+	if err != nil {
+		return managed.ExternalCreation{}, errors.Wrap(err, "failed to list access keys of user")
+	}
+	for _, cred := range creds {
+		if err := c.cloudianService.DeleteUserCredentials(ctx, cred.AccessKey); err != nil {
+			return managed.ExternalCreation{}, errors.Wrap(err, "failed to delete initial access key of user")
+		}
 	}
 
 	return managed.ExternalCreation{
@@ -228,11 +242,20 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalDelete{}, errors.New(errNotUser)
 	}
 
-	user := cloudian.User{
+	guid := cloudian.GroupUserID{
 		GroupID: cr.Spec.ForProvider.GroupID,
 		UserID:  meta.GetExternalName(mg),
 	}
-	if err := c.cloudianService.DeleteUser(ctx, user); err != nil {
+
+	creds, err := c.cloudianService.ListUserCredentials(ctx, guid)
+	if err != nil {
+		return managed.ExternalDelete{}, err
+	}
+	if len(creds) > 0 {
+		return managed.ExternalDelete{}, errors.New("User has access keys and cannot be deleted")
+	}
+
+	if err := c.cloudianService.DeleteUser(ctx, guid); err != nil {
 		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteUser)
 	}
 

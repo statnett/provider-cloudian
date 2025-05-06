@@ -44,6 +44,7 @@ type UserParameters struct {
 
 // UserObservation are the observable fields of a User.
 type UserObservation struct {
+	CanonicalID string `json:"canonicalId,omitempty"`
 }
 
 // A UserSpec defines the desired state of a User.
@@ -60,7 +61,7 @@ type UserStatus struct {
 
 // +kubebuilder:object:root=true
 
-// A User is an example API type.
+// User represents a Cloudian user.
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:printcolumn:name="EXTERNAL-NAME",type="string",JSONPath=".metadata.annotations.crossplane\\.io/external-name"

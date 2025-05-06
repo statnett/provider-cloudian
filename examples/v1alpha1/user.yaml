@@ -1,0 +1,41 @@
+---
+apiVersion: user.cloudian.crossplane.io/v1alpha1
+kind: User
+metadata:
+  name: bar
+spec:
+  forProvider:
+    groupIdRef:
+      name: foo
+  providerConfigRef:
+    name: example
+---
+apiVersion: user.cloudian.crossplane.io/v1alpha1
+kind: UserQualityOfServiceLimits
+metadata:
+  name: bar
+spec:
+  forProvider:
+    userIdRef:
+      name: bar
+    hard:
+      inboundBytesPerMin: 5Mi
+      outboundBytesPerMin: 10Mi
+      requestsPerMin: 50
+      storageQuotaBytes: 2Ti
+      storageQuotaCount: 50000
+    warning:
+      storageQuotaBytes: 1Ti
+  providerConfigRef:
+    name: example
+---
+apiVersion: user.cloudian.crossplane.io/v1alpha1
+kind: AccessKey
+metadata:
+  name: bar
+spec:
+  forProvider:
+    userIdRef:
+      name: bar
+  providerConfigRef:
+    name: example

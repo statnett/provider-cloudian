@@ -23,7 +23,9 @@ import (
 	"github.com/statnett/provider-cloudian/internal/controller/accesskey"
 	"github.com/statnett/provider-cloudian/internal/controller/config"
 	"github.com/statnett/provider-cloudian/internal/controller/group"
+	"github.com/statnett/provider-cloudian/internal/controller/groupqualityofservicelimits"
 	"github.com/statnett/provider-cloudian/internal/controller/user"
+	"github.com/statnett/provider-cloudian/internal/controller/userqualityofservicelimits"
 )
 
 // Setup creates all Cloudian controllers with the supplied logger and adds them to
@@ -33,7 +35,9 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		accesskey.Setup,
 		config.Setup,
 		group.Setup,
+		groupqualityofservicelimits.Setup,
 		user.Setup,
+		userqualityofservicelimits.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err

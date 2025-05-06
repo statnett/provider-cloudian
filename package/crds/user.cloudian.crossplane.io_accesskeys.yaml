@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.1
+    controller-gen.kubebuilder.io/version: v0.17.3
   name: accesskeys.user.cloudian.crossplane.io
 spec:
   group: user.cloudian.crossplane.io
@@ -34,7 +34,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: A AccessKey is an example API type.
+        description: AccessKey represents an access key for a Cloudian user.
         properties:
           apiVersion:
             description: |-
@@ -75,14 +75,14 @@ spec:
                   AccessKey.
                 properties:
                   groupId:
-                    description: GroupID for the new access key.
+                    description: GroupID of the access key.
                     type: string
                   userId:
-                    description: User for the new access key.
+                    description: UserId of the access key.
                     type: string
                   userIdRef:
-                    description: UserIDRef is a reference to a user to retrieve its
-                      userId.
+                    description: UserIDRef references a user to retrieve its groupId
+                      and userId.
                     properties:
                       name:
                         description: Name of the referenced object.
@@ -116,8 +116,8 @@ spec:
                     - name
                     type: object
                   userIdSelector:
-                    description: UserIDSelector selects reference to a user to retrieve
-                      its userId.
+                    description: UserIDSelector selects a user to retrieve its groupId
+                      and userId.
                     properties:
                       matchControllerRef:
                         description: |-
@@ -330,8 +330,8 @@ spec:
               atProvider:
                 description: AccessKeyObservation are the observable fields of a AccessKey.
                 properties:
-                  accessKey:
-                    description: AccessKey is the S3 Access Key ID, with a corresponding
+                  id:
+                    description: ID is the S3 Access Key ID, with a corresponding
                       SecretKey.
                     type: string
                 type: object

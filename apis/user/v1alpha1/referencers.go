@@ -29,7 +29,6 @@ import (
 func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 	r := reference.NewAPIResolver(c, mg)
 
-	// resolve spec.forProvider.group
 	rsp, err := r.Resolve(ctx, reference.ResolutionRequest{
 		CurrentValue: mg.Spec.ForProvider.GroupID,
 		Reference:    mg.Spec.ForProvider.GroupIDRef,
@@ -38,7 +37,28 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 		Extract:      reference.ExternalName(),
 	})
 	if err != nil {
-		return errors.Wrap(err, "spec.forProvider.group")
+		return errors.Wrap(err, "unable to resolve spec.forProvider.groupId")
+	}
+
+	mg.Spec.ForProvider.GroupID = rsp.ResolvedValue
+	mg.Spec.ForProvider.GroupIDRef = rsp.ResolvedReference
+
+	return nil
+}
+
+// ResolveReferences of this GroupQualityOfServiceLimits
+func (mg *GroupQualityOfServiceLimits) ResolveReferences(ctx context.Context, c client.Reader) error {
+	r := reference.NewAPIResolver(c, mg)
+
+	rsp, err := r.Resolve(ctx, reference.ResolutionRequest{
+		CurrentValue: mg.Spec.ForProvider.GroupID,
+		Reference:    mg.Spec.ForProvider.GroupIDRef,
+		Selector:     mg.Spec.ForProvider.GroupIDSelector,
+		To:           reference.To{Managed: &Group{}, List: &GroupList{}},
+		Extract:      reference.ExternalName(),
+	})
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve spec.forProvider.groupId")
 	}
 
 	mg.Spec.ForProvider.GroupID = rsp.ResolvedValue
@@ -51,7 +71,6 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) error {
 	r := reference.NewAPIResolver(c, mg)
 
-	// resolve spec.forProvider.user
 	rsp, err := r.Resolve(ctx, reference.ResolutionRequest{
 		CurrentValue: mg.Spec.ForProvider.UserID,
 		Reference:    mg.Spec.ForProvider.UserIDRef,
@@ -60,13 +79,12 @@ func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) err
 		Extract:      reference.ExternalName(),
 	})
 	if err != nil {
-		return errors.Wrap(err, "spec.forProvider.user")
+		return errors.Wrap(err, "unable to resolve spec.forProvider.userId")
 	}
 
 	mg.Spec.ForProvider.UserID = rsp.ResolvedValue
 	mg.Spec.ForProvider.UserIDRef = rsp.ResolvedReference
 
-	// resolve spec.forProvider.group
 	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
 		Reference: mg.Spec.ForProvider.UserIDRef,
 		Selector:  mg.Spec.ForProvider.UserIDSelector,
@@ -80,7 +98,46 @@ func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) err
 		},
 	})
 	if err != nil {
-		return errors.Wrap(err, "spec.forProvider.group")
+		return errors.Wrap(err, "unable to resolve spec.forProvider.groupId")
+	}
+
+	mg.Spec.ForProvider.GroupID = rsp.ResolvedValue
+
+	return nil
+}
+
+// ResolveReferences of this UserQualityOfServiceLimits
+func (mg *UserQualityOfServiceLimits) ResolveReferences(ctx context.Context, c client.Reader) error {
+	r := reference.NewAPIResolver(c, mg)
+
+	rsp, err := r.Resolve(ctx, reference.ResolutionRequest{
+		CurrentValue: mg.Spec.ForProvider.UserID,
+		Reference:    mg.Spec.ForProvider.UserIDRef,
+		Selector:     mg.Spec.ForProvider.UserIDSelector,
+		To:           reference.To{Managed: &User{}, List: &UserList{}},
+		Extract:      reference.ExternalName(),
+	})
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve spec.forProvider.userId")
+	}
+
+	mg.Spec.ForProvider.UserID = rsp.ResolvedValue
+	mg.Spec.ForProvider.UserIDRef = rsp.ResolvedReference
+
+	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
+		Reference: mg.Spec.ForProvider.UserIDRef,
+		Selector:  mg.Spec.ForProvider.UserIDSelector,
+		To:        reference.To{Managed: &User{}, List: &UserList{}},
+		Extract: func(mg resource.Managed) string {
+			user, ok := mg.(*User)
+			if !ok {
+				return ""
+			}
+			return user.Spec.ForProvider.GroupID
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve spec.forProvider.groupId")
 	}
 
 	mg.Spec.ForProvider.GroupID = rsp.ResolvedValue

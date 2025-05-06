@@ -1,0 +1,29 @@
+---
+apiVersion: user.cloudian.crossplane.io/v1alpha1
+kind: Group
+metadata:
+  name: foo
+spec:
+  forProvider:
+    groupName: crossplane provisioned group
+  providerConfigRef:
+    name: example
+---
+apiVersion: user.cloudian.crossplane.io/v1alpha1
+kind: GroupQualityOfServiceLimits
+metadata:
+  name: foo
+spec:
+  forProvider:
+    groupIdRef:
+      name: foo
+    hard:
+      inboundBytesPerMin: 10Mi
+      outboundBytesPerMin: 20Mi
+      requestsPerMin: 100
+      storageQuotaBytes: 4Ti
+      storageQuotaCount: 100000
+    warning:
+      storageQuotaBytes: 2Ti
+  providerConfigRef:
+    name: example
