@@ -10,8 +10,6 @@ on:
   workflow_dispatch: {}
 
 env:
-  # Common versions
-  GO_VERSION: '1.23'
   DOCKER_BUILDX_VERSION: 'v0.23.0'
 
 jobs:
@@ -43,7 +41,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: 'go.mod'
 
       - name: Find the Go Build Cache
         id: go
@@ -89,7 +87,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: 'go.mod'
 
       - name: Find the Go Build Cache
         id: go
@@ -139,7 +137,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: 'go.mod'
 
       - name: Find the Go Build Cache
         id: go
@@ -206,7 +204,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: 'go.mod'
 
       - name: Find the Go Build Cache
         id: go
