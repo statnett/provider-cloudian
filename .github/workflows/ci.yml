@@ -42,9 +42,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-        
-      - name: Print go version
-        run: go version
 
       - name: Find the Go Build Cache
         id: go
