@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.3](https://github.com/statnett/provider-cloudian/compare/v0.2.2...v0.2.3) (2025-10-28)
+
+
+### Bug Fixes
+
+* **deps:** update github.com/crossplane/crossplane-tools digest to 00d407d ([#201](https://github.com/statnett/provider-cloudian/issues/201)) ([7883f84](https://github.com/statnett/provider-cloudian/commit/7883f84d0596196d66c624328a10a430a94ec3e5))
+* **deps:** update github.com/crossplane/crossplane-tools digest to 889cfb1 ([#192](https://github.com/statnett/provider-cloudian/issues/192)) ([5c22b4d](https://github.com/statnett/provider-cloudian/commit/5c22b4d10ba843c3e93f19545d3177c8e69c49c9))
+* **deps:** update github.com/crossplane/crossplane-tools digest to dd45172 ([#228](https://github.com/statnett/provider-cloudian/issues/228)) ([94c7a8c](https://github.com/statnett/provider-cloudian/commit/94c7a8c5c94fa187515ead289b827f13a639a341))
+* **deps:** update k8s.io/utils digest to 4c0f3b2 ([#193](https://github.com/statnett/provider-cloudian/issues/193)) ([bae977c](https://github.com/statnett/provider-cloudian/commit/bae977cb9093e6115a472a998e36f4762572b057))
+* **deps:** update kubernetes packages to v0.33.2 ([#196](https://github.com/statnett/provider-cloudian/issues/196)) ([682b976](https://github.com/statnett/provider-cloudian/commit/682b9762ed15e2871e97a1e779604174af1955bd))
+* **deps:** update kubernetes packages to v0.33.3 ([#199](https://github.com/statnett/provider-cloudian/issues/199)) ([ccae8d3](https://github.com/statnett/provider-cloudian/commit/ccae8d3de065470aea700f53339b6a1225bf2497))
+* **deps:** update kubernetes packages to v0.33.4 ([#208](https://github.com/statnett/provider-cloudian/issues/208)) ([31a1755](https://github.com/statnett/provider-cloudian/commit/31a17557c70287d1a0b7c286158c2056bd267d4a))
+
 ## [0.2.2](https://github.com/statnett/provider-cloudian/compare/v0.2.1...v0.2.2) (2025-05-28)
 
 
