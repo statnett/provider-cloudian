@@ -19,8 +19,8 @@ package v1alpha1
 import (
 	"context"
 
-	"github.com/crossplane/crossplane-runtime/pkg/reference"
-	resource "github.com/crossplane/crossplane-runtime/pkg/resource"
+	"github.com/crossplane/crossplane-runtime/v2/pkg/reference"
+	resource "github.com/crossplane/crossplane-runtime/v2/pkg/resource"
 	"github.com/pkg/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

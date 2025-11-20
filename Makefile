@@ -20,6 +20,7 @@ GO_STATIC_PACKAGES = $(GO_PROJECT)/cmd/provider
 GO_LDFLAGS += -X $(GO_PROJECT)/internal/version.Version=$(VERSION)
 GO_SUBDIRS += cmd internal apis
 GO111MODULE = on
+GOLANGCILINT_VERSION = 2.1.2
 -include build/makelib/golang.mk
 
 # ====================================================================================
@@ -58,7 +59,7 @@ fallthrough: submodules
 e2e.run: test-integration
 
 # Run integration tests.
-test-integration: $(KIND) $(KUBECTL) $(UP) $(HELM3)
+test-integration: $(KIND) $(KUBECTL) $(CROSSPLANE_CLI) $(HELM3)
 	@$(INFO) running integration tests using kind $(KIND_VERSION)
 	@KIND_NODE_IMAGE_TAG=${KIND_NODE_IMAGE_TAG} $(ROOT_DIR)/cluster/local/integration_tests.sh || $(FAIL)
 	@$(OK) integration tests passed
@@ -77,10 +78,13 @@ submodules:
 go.cachedir:
 	@go env GOCACHE
 
+go.mod.cachedir:
+	@go env GOMODCACHE
+
 # NOTE(hasheddan): we must ensure up is installed in tool cache prior to build
 # as including the k8s_tools machinery prior to the xpkg machinery sets UP to
 # point to tool cache.
-build.init: $(UP)
+build.init: $(CROSSPLANE_CLI)
 
 # This is for running out-of-cluster locally, and is for convenience. Running
 # this make target will print out the command which was used. For more control,
