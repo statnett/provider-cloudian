@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/statnett/provider-cloudian/compare/v0.2.3...v0.3.0) (2025-11-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade crossplane-runtime to v2 ([#239](https://github.com/statnett/provider-cloudian/issues/239))
+
+### Bug Fixes
+
+* **deps:** update kubernetes go packages ([#212](https://github.com/statnett/provider-cloudian/issues/212)) ([146538e](https://github.com/statnett/provider-cloudian/commit/146538e1fb694f0bf307d6d80ed4c610bf0b3133))
+* upgrade crossplane-runtime to v2 ([#239](https://github.com/statnett/provider-cloudian/issues/239)) ([a0b0769](https://github.com/statnett/provider-cloudian/commit/a0b07692a763afd769b5f88cff8eff76b3792e24))
+
 ## [0.2.3](https://github.com/statnett/provider-cloudian/compare/v0.2.2...v0.2.3) (2025-10-28)
 
 
