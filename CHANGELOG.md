@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.1](https://github.com/statnett/provider-cloudian/compare/v0.3.0...v0.3.1) (2025-11-24)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/go-resty/resty/v2 to v2.17.0 ([#245](https://github.com/statnett/provider-cloudian/issues/245)) ([2eb9a92](https://github.com/statnett/provider-cloudian/commit/2eb9a92152f0c7777387c719c12c640e46be16ee))
+* **deps:** update module google.golang.org/grpc to v1.77.0 ([#249](https://github.com/statnett/provider-cloudian/issues/249)) ([0a5adb2](https://github.com/statnett/provider-cloudian/commit/0a5adb223ff694681de33c36c64effa467e58f4a))
+* **deps:** update module k8s.io/apiextensions-apiserver to v0.34.2 ([#248](https://github.com/statnett/provider-cloudian/issues/248)) ([d0902e8](https://github.com/statnett/provider-cloudian/commit/d0902e84519556e8e3372ce9d764124baf78b0ee))
+* panic on controller startup ([#246](https://github.com/statnett/provider-cloudian/issues/246)) ([ab89a2d](https://github.com/statnett/provider-cloudian/commit/ab89a2d1d8f69a4e754d378750784779013fdbb3))
+
 ## [0.3.0](https://github.com/statnett/provider-cloudian/compare/v0.2.3...v0.3.0) (2025-11-20)
 
 
