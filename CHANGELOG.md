@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/statnett/provider-cloudian/compare/v0.3.1...v0.3.2) (2025-12-02)
+
+
+### Bug Fixes
+
+* incorrect PC field reference ([#250](https://github.com/statnett/provider-cloudian/issues/250)) ([7f61bde](https://github.com/statnett/provider-cloudian/commit/7f61bde9a0ffbaa7fe1c826d2b2fac2a66243e01))
+
 ## [0.3.1](https://github.com/statnett/provider-cloudian/compare/v0.3.0...v0.3.1) (2025-11-24)
 
 
