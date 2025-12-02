@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/statnett/provider-cloudian/compare/v0.3.2...v0.3.3) (2025-12-02)
+
+
+### Bug Fixes
+
+* add Usage to provider config kinds ([#252](https://github.com/statnett/provider-cloudian/issues/252)) ([9fbb701](https://github.com/statnett/provider-cloudian/commit/9fbb701e21118f7ea79b1181327699632c7fa598))
+
 ## [0.3.2](https://github.com/statnett/provider-cloudian/compare/v0.3.1...v0.3.2) (2025-12-02)
 
 
