@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.4](https://github.com/statnett/provider-cloudian/compare/v0.3.3...v0.3.4) (2025-12-03)
+
+
+### Bug Fixes
+
+* remove half-implemented safe-start ([#257](https://github.com/statnett/provider-cloudian/issues/257)) ([8cce697](https://github.com/statnett/provider-cloudian/commit/8cce697a64bf6864c0224c66e39b1e549cdb0dc3))
+
 ## [0.3.3](https://github.com/statnett/provider-cloudian/compare/v0.3.2...v0.3.3) (2025-12-02)
 
 
