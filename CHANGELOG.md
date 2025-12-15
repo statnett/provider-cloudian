@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.5](https://github.com/statnett/provider-cloudian/compare/v0.3.4...v0.3.5) (2025-12-15)
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes go packages to v0.34.3 ([#264](https://github.com/statnett/provider-cloudian/issues/264)) ([e6fc372](https://github.com/statnett/provider-cloudian/commit/e6fc37206d346eb9f0a8fb8f3068172e04ecb604))
+* **deps:** update module github.com/go-resty/resty/v2 to v2.17.1 ([#268](https://github.com/statnett/provider-cloudian/issues/268)) ([7a20d61](https://github.com/statnett/provider-cloudian/commit/7a20d619793a1fc88feba067b3749e4d28cba11f))
+
 ## [0.3.4](https://github.com/statnett/provider-cloudian/compare/v0.3.3...v0.3.4) (2025-12-03)
 
 
