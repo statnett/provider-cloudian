@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.7](https://github.com/statnett/provider-cloudian/compare/v0.3.6...v0.3.7) (2026-02-11)
+
+
+### Bug Fixes
+
+* **deps:** update k8s.io/utils digest to 914a6e7 ([#278](https://github.com/statnett/provider-cloudian/issues/278)) ([99d8243](https://github.com/statnett/provider-cloudian/commit/99d8243888c1ae708d0a0fce97a4a20877936ae4))
+
 ## [0.3.6](https://github.com/statnett/provider-cloudian/compare/v0.3.5...v0.3.6) (2025-12-29)
 
 
