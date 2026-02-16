@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.7](https://github.com/statnett/provider-cloudian/compare/v0.3.6...v0.3.7) (2026-02-16)
+
+
+### Bug Fixes
+
+* **deps:** update k8s.io/utils digest to 914a6e7 ([#278](https://github.com/statnett/provider-cloudian/issues/278)) ([99d8243](https://github.com/statnett/provider-cloudian/commit/99d8243888c1ae708d0a0fce97a4a20877936ae4))
+* **deps:** update module github.com/go-resty/resty/v2 to v2.17.2 ([#297](https://github.com/statnett/provider-cloudian/issues/297)) ([d09dde4](https://github.com/statnett/provider-cloudian/commit/d09dde42151858b72a8bc7439b87a12567ab5c94))
+* **deps:** update module google.golang.org/grpc to v1.79.1 ([#295](https://github.com/statnett/provider-cloudian/issues/295)) ([a2ab1d5](https://github.com/statnett/provider-cloudian/commit/a2ab1d56a17984290e7d98f69bb080dfa288df68))
+
 ## [0.3.6](https://github.com/statnett/provider-cloudian/compare/v0.3.5...v0.3.6) (2025-12-29)
 
 
