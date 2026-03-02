@@ -108,7 +108,7 @@ type User struct {
 
 // SecurityInfo is the Cloudian API's term for secure credentials
 type SecurityInfo struct {
-	AccessKey string `json:"accessKey"`
+	AccessKey string `json:"accessKey"` // #nosec G117 -- AccessKey is intentionally part of API payload
 	SecretKey string `json:"secretKey"`
 }
 
