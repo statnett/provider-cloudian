@@ -40,7 +40,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 
 	r := providerconfig.NewReconciler(mgr, of,
 		providerconfig.WithLogger(o.Logger.WithValues("controller", name)),
-		providerconfig.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))))
+		providerconfig.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name)))) //lint:ignore SA1019 crossplane-runtime needs to migrate to the new events API
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
