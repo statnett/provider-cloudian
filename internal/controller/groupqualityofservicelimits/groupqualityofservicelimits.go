@@ -70,7 +70,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 			newServiceFn: newCloudianService}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
-		//nolint:SA1019 // crossplane-runtime still depends on deprecated API
+		//nolint:staticcheck // SA1004 crossplane-runtime still depends on deprecated API
 		managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))))
 
 	return ctrl.NewControllerManagedBy(mgr).

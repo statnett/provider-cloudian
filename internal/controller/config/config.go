@@ -40,7 +40,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 
 	r := providerconfig.NewReconciler(mgr, of,
 		providerconfig.WithLogger(o.Logger.WithValues("controller", name)),
-		//nolint:SA1019 // crossplane-runtime still depends on deprecated API
+		//nolint:staticcheck // SA1004 crossplane-runtime still depends on deprecated API
 		providerconfig.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))))
 
 	return ctrl.NewControllerManagedBy(mgr).
