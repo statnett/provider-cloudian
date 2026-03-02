@@ -72,7 +72,8 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 			newServiceFn: newCloudianService}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
-		managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name)))) //lint:ignore SA1019 crossplane-runtime needs to migrate to the new events API
+		//lint:ignore SA1019 crossplane-runtime needs to migrate to the new events API
+		managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))))
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
