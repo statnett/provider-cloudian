@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.8](https://github.com/statnett/provider-cloudian/compare/v0.3.7...v0.3.8) (2026-03-09)
+
+
+### Bug Fixes
+
+* **deps:** update module google.golang.org/grpc to v1.79.2 ([#311](https://github.com/statnett/provider-cloudian/issues/311)) ([141f9f1](https://github.com/statnett/provider-cloudian/commit/141f9f182d770f17d603caec861143cddbc8b0fd))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.23.3 ([#310](https://github.com/statnett/provider-cloudian/issues/310)) ([0553a34](https://github.com/statnett/provider-cloudian/commit/0553a3491cd780b8a4603b35d9ff38d018189114))
+
 ## [0.3.7](https://github.com/statnett/provider-cloudian/compare/v0.3.6...v0.3.7) (2026-03-02)
 
 
