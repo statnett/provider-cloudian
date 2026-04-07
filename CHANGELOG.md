@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.10](https://github.com/statnett/provider-cloudian/compare/v0.3.9...v0.3.10) (2026-04-07)
+
+
+### Bug Fixes
+
+* **deps:** update module google.golang.org/grpc to v1.80.0 ([#329](https://github.com/statnett/provider-cloudian/issues/329)) ([bde706f](https://github.com/statnett/provider-cloudian/commit/bde706ff2d856f566c6b06109e6b7161dee9b8c0))
+
 ## [0.3.9](https://github.com/statnett/provider-cloudian/compare/v0.3.8...v0.3.9) (2026-03-30)
 
 
