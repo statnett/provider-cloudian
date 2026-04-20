@@ -1,6 +1,6 @@
 module github.com/statnett/provider-cloudian
 
-go 1.25.0
+go 1.25.9
 
 tool (
 	github.com/crossplane/crossplane-tools/cmd/angryjet
@@ -9,7 +9,7 @@ tool (
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
-	github.com/crossplane/crossplane-runtime/v2 v2.2.0
+	github.com/crossplane/crossplane-runtime/v2 v2.2.1
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/google/go-cmp v0.7.0
 	github.com/pkg/errors v0.9.1
