@@ -102,7 +102,3 @@ var (
 	UserQualityOfServiceLimitsKindAPIVersion   = UserQualityOfServiceLimitsKind + "." + SchemeGroupVersion.String()
 	UserQualityOfServiceLimitsGroupVersionKind = SchemeGroupVersion.WithKind(UserQualityOfServiceLimitsKind)
 )
-
-func init() {
-	SchemeBuilder.Register(&UserQualityOfServiceLimits{}, &UserQualityOfServiceLimitsList{})
-}
