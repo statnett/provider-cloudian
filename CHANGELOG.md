@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.11](https://github.com/statnett/provider-cloudian/compare/v0.3.10...v0.3.11) (2026-05-01)
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes go packages ([#344](https://github.com/statnett/provider-cloudian/issues/344)) ([d189eed](https://github.com/statnett/provider-cloudian/commit/d189eed383aca4812801624184b18d34281f4f3e))
+
 ## [0.3.10](https://github.com/statnett/provider-cloudian/compare/v0.3.9...v0.3.10) (2026-04-28)
 
 
