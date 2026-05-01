@@ -98,7 +98,3 @@ var (
 	AccessKeyKindAPIVersion   = AccessKeyKind + "." + SchemeGroupVersion.String()
 	AccessKeyGroupVersionKind = SchemeGroupVersion.WithKind(AccessKeyKind)
 )
-
-func init() {
-	SchemeBuilder.Register(&AccessKey{}, &AccessKeyList{})
-}

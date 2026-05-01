@@ -92,7 +92,3 @@ var (
 	UserKindAPIVersion   = UserKind + "." + SchemeGroupVersion.String()
 	UserGroupVersionKind = SchemeGroupVersion.WithKind(UserKind)
 )
-
-func init() {
-	SchemeBuilder.Register(&User{}, &UserList{})
-}

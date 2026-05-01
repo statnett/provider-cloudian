@@ -106,7 +106,3 @@ var (
 	GroupKindAPIVersion   = GroupKind + "." + SchemeGroupVersion.String()
 	GroupGroupVersionKind = SchemeGroupVersion.WithKind(GroupKind)
 )
-
-func init() {
-	SchemeBuilder.Register(&Group{}, &GroupList{})
-}
