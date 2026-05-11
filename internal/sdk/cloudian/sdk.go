@@ -10,7 +10,11 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-const ListLimit = 100
+const (
+	ListLimit = 100
+
+	paramGroupID = "groupId"
+)
 
 type Client struct {
 	client *resty.Client
@@ -136,7 +140,7 @@ func NewClient(baseURL string, authHeader string, opts ...func(*Client)) *Client
 // List all users of a group.
 func (client Client) ListUsers(ctx context.Context, groupID string, userID *string) ([]User, error) {
 	params := map[string]string{
-		"groupId":    groupID,
+		paramGroupID: groupID,
 		"userType":   "all",
 		"userStatus": "all",
 		"limit":      strconv.Itoa(ListLimit),
@@ -172,8 +176,8 @@ func (client Client) ListUsers(ctx context.Context, groupID string, userID *stri
 func (client Client) DeleteUser(ctx context.Context, guid GroupUserID) error {
 	resp, err := client.newRequest(ctx).
 		SetQueryParams(map[string]string{
-			"groupId": guid.GroupID,
-			"userId":  guid.UserID,
+			paramGroupID: guid.GroupID,
+			"userId":     guid.UserID,
 		}).
 		Delete("/user")
 	if err != nil {
@@ -213,8 +217,8 @@ func (client Client) GetUser(ctx context.Context, guid GroupUserID) (*User, erro
 
 	resp, err := client.newRequest(ctx).
 		SetQueryParams(map[string]string{
-			"groupId": guid.GroupID,
-			"userId":  guid.UserID,
+			paramGroupID: guid.GroupID,
+			"userId":     guid.UserID,
 		}).
 		SetResult(&user).
 		Get("/user")
@@ -239,7 +243,7 @@ func (client Client) CreateUserCredentials(ctx context.Context, guid GroupUserID
 
 	resp, err := client.newRequest(ctx).
 		SetResult(&securityInfo).
-		SetQueryParams(map[string]string{"groupId": guid.GroupID, "userId": guid.UserID}).
+		SetQueryParams(map[string]string{paramGroupID: guid.GroupID, "userId": guid.UserID}).
 		Put("/user/credentials")
 	if err != nil {
 		return nil, err
@@ -281,7 +285,7 @@ func (client Client) ListUserCredentials(ctx context.Context, guid GroupUserID) 
 	var securityInfo []SecurityInfo
 
 	resp, err := client.newRequest(ctx).
-		SetQueryParams(map[string]string{"groupId": guid.GroupID, "userId": guid.UserID}).
+		SetQueryParams(map[string]string{paramGroupID: guid.GroupID, "userId": guid.UserID}).
 		SetResult(&securityInfo).
 		Get("/user/credentials/list")
 	if err != nil {
@@ -335,7 +339,7 @@ func (client Client) DeleteGroupRecursive(ctx context.Context, groupID string) e
 // Deletes a group if it is without members.
 func (client Client) DeleteGroup(ctx context.Context, groupID string) error {
 	resp, err := client.newRequest(ctx).
-		SetQueryParams(map[string]string{"groupId": groupID}).
+		SetQueryParams(map[string]string{paramGroupID: groupID}).
 		Delete("/group")
 	if err != nil {
 		return err
@@ -388,7 +392,7 @@ func (client Client) UpdateGroup(ctx context.Context, group Group) error {
 func (client Client) GetGroup(ctx context.Context, groupID string) (*Group, error) {
 	var group groupInternal
 	resp, err := client.newRequest(ctx).
-		SetQueryParams(map[string]string{"groupId": groupID}).
+		SetQueryParams(map[string]string{paramGroupID: groupID}).
 		SetResult(&group).
 		Get("/group")
 	if err != nil {
