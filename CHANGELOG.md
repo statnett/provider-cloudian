@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.12](https://github.com/statnett/provider-cloudian/compare/v0.3.11...v0.3.12) (2026-05-18)
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes go packages ([#355](https://github.com/statnett/provider-cloudian/issues/355)) ([226600f](https://github.com/statnett/provider-cloudian/commit/226600f943462da8d0363318ad1c8dcba3d04ed6))
+* **deps:** update module google.golang.org/grpc to v1.81.1 ([#359](https://github.com/statnett/provider-cloudian/issues/359)) ([6c96890](https://github.com/statnett/provider-cloudian/commit/6c96890434da4a9462108d92cf1a8332acbe5ea2))
+
 ## [0.3.11](https://github.com/statnett/provider-cloudian/compare/v0.3.10...v0.3.11) (2026-05-11)
 
 
