@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	xpv1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
+	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 )
 
 // GroupQualityOfServiceLimitsParameters are the configurable fields of a GroupQualityOfServiceLimits.
@@ -35,11 +35,11 @@ type GroupQualityOfServiceLimitsParameters struct {
 	// GroupIDRef references a group to retrieve its groupId.
 	// +optional
 	// +immutable
-	GroupIDRef *xpv1.Reference `json:"groupIdRef,omitempty"`
+	GroupIDRef *xpv2.Reference `json:"groupIdRef,omitempty"`
 
 	// GroupIDSelector selects a group to retrieve its groupId.
 	// +optional
-	GroupIDSelector *xpv1.Selector `json:"groupIdSelector,omitempty"`
+	GroupIDSelector *xpv2.Selector `json:"groupIdSelector,omitempty"`
 
 	// Region in which to apply the quality of service limits. Default region if unspecified.
 	// +optional
@@ -54,14 +54,14 @@ type GroupQualityOfServiceLimitsObservation struct {
 
 // A GroupQualityOfServiceLimitsSpec defines the desired state of a GroupQualityOfServiceLimits.
 type GroupQualityOfServiceLimitsSpec struct {
-	xpv1.ResourceSpec `json:",inline"`
-	ForProvider       GroupQualityOfServiceLimitsParameters `json:"forProvider"`
+	xpv2.ClusterManagedResourceSpec `json:",inline"`
+	ForProvider                     GroupQualityOfServiceLimitsParameters `json:"forProvider"`
 }
 
 // A GroupQualityOfServiceLimitsStatus represents the observed state of a GroupQualityOfServiceLimits.
 type GroupQualityOfServiceLimitsStatus struct {
-	xpv1.ResourceStatus `json:",inline"`
-	AtProvider          GroupQualityOfServiceLimitsObservation `json:"atProvider,omitempty"`
+	xpv2.ManagedResourceStatus `json:",inline"`
+	AtProvider                 GroupQualityOfServiceLimitsObservation `json:"atProvider,omitempty"`
 }
 
 // +kubebuilder:object:root=true
