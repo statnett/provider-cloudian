@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	xpv1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
+	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 )
 
 // AccessKeyParameters are the configurable fields of a AccessKey.
@@ -40,11 +40,11 @@ type AccessKeyParameters struct {
 	// UserIDRef references a user to retrieve its groupId and userId.
 	// +optional
 	// +immutable
-	UserIDRef *xpv1.Reference `json:"userIdRef,omitempty"`
+	UserIDRef *xpv2.Reference `json:"userIdRef,omitempty"`
 
 	// UserIDSelector selects a user to retrieve its groupId and userId.
 	// +optional
-	UserIDSelector *xpv1.Selector `json:"userIdSelector,omitempty"`
+	UserIDSelector *xpv2.Selector `json:"userIdSelector,omitempty"`
 }
 
 // AccessKeyObservation are the observable fields of a AccessKey.
@@ -55,14 +55,14 @@ type AccessKeyObservation struct {
 
 // A AccessKeySpec defines the desired state of a AccessKey.
 type AccessKeySpec struct {
-	xpv1.ResourceSpec `json:",inline"`
-	ForProvider       AccessKeyParameters `json:"forProvider"`
+	xpv2.ClusterManagedResourceSpec `json:",inline"`
+	ForProvider                     AccessKeyParameters `json:"forProvider"`
 }
 
 // A AccessKeyStatus represents the observed state of a AccessKey.
 type AccessKeyStatus struct {
-	xpv1.ResourceStatus `json:",inline"`
-	AtProvider          AccessKeyObservation `json:"atProvider,omitempty"`
+	xpv2.ManagedResourceStatus `json:",inline"`
+	AtProvider                 AccessKeyObservation `json:"atProvider,omitempty"`
 }
 
 // +kubebuilder:object:root=true

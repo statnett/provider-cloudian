@@ -25,13 +25,13 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	xpv1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/controller"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/event"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/resource"
+	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 
 	"github.com/statnett/provider-cloudian/apis/user/v1alpha1"
 	apisv1alpha1 "github.com/statnett/provider-cloudian/apis/v1alpha1"
@@ -152,7 +152,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{}, errors.Wrap(err, errGetGroup)
 	}
 
-	cr.SetConditions(xpv1.Available())
+	cr.SetConditions(xpv2.Available())
 
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
@@ -177,7 +177,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, errors.New(errNotGroup)
 	}
 
-	cr.SetConditions(xpv1.Creating())
+	cr.SetConditions(xpv2.Creating())
 
 	if err := c.cloudianService.CreateGroup(ctx, newCloudianGroup(meta.GetExternalName(mg), cr.Spec.ForProvider)); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
@@ -213,7 +213,7 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalDelete{}, errors.New(errNotGroup)
 	}
 
-	cr.SetConditions(xpv1.Deleting())
+	cr.SetConditions(xpv2.Deleting())
 
 	if err := c.cloudianService.DeleteGroup(ctx, meta.GetExternalName(mg)); err != nil {
 		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteGroup)
