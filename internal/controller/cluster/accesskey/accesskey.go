@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package user
+package accesskey
 
 import (
 	"context"
@@ -33,21 +33,20 @@ import (
 	"github.com/crossplane/crossplane-runtime/v2/pkg/resource"
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 
-	"github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
+	userv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
 	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
 const (
-	errNotUser      = "managed resource is not a User custom resource"
+	errNotAccessKey = "managed resource is not a AccessKey custom resource"
 	errTrackPCUsage = "cannot track ProviderConfig usage"
 	errGetPC        = "cannot get ProviderConfig"
+	errCreateCreds  = "cannot create credentials"
 	errGetCreds     = "cannot get credentials"
+	errDeleteCreds  = "cannot delete credentials"
 
-	errNewClient  = "cannot create new Service"
-	errCreateUser = "cannot create User"
-	errDeleteUser = "cannot delete User"
-	errGetUser    = "cannot get User"
+	errNewClient = "cannot create new Service"
 )
 
 var (
@@ -59,12 +58,12 @@ var (
 	}
 )
 
-// Setup adds a controller that reconciles User managed resources.
+// Setup adds a controller that reconciles AccessKey managed resources.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
-	name := managed.ControllerName(v1alpha1.UserGroupKind)
+	name := managed.ControllerName(userv1alpha1cluster.AccessKeyGroupKind)
 
 	r := managed.NewReconciler(mgr,
-		resource.ManagedKind(v1alpha1.UserGroupVersionKind),
+		resource.ManagedKind(userv1alpha1cluster.AccessKeyGroupVersionKind),
 		managed.WithExternalConnector(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1cluster.ProviderConfigUsage{}),
@@ -78,7 +77,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		Named(name).
 		WithOptions(o.ForControllerRuntime()).
 		WithEventFilter(resource.DesiredStateChanged()).
-		For(&v1alpha1.User{}).
+		For(&userv1alpha1cluster.AccessKey{}).
 		Complete(ratelimiter.NewReconciler(name, r, o.GlobalRateLimiter))
 }
 
@@ -96,9 +95,9 @@ type connector struct {
 // 3. Getting the credentials specified by the ProviderConfig.
 // 4. Using the credentials to form a client.
 func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.ExternalClient, error) {
-	cr, ok := mg.(*v1alpha1.User)
+	cr, ok := mg.(*userv1alpha1cluster.AccessKey)
 	if !ok {
-		return nil, errors.New(errNotUser)
+		return nil, errors.New(errNotAccessKey)
 	}
 
 	if err := c.usage.Track(ctx, cr); err != nil {
@@ -133,32 +132,24 @@ type external struct {
 }
 
 func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
-	cr, ok := mg.(*v1alpha1.User)
+	cr, ok := mg.(*userv1alpha1cluster.AccessKey)
 	if !ok {
-		return managed.ExternalObservation{}, errors.New(errNotUser)
+		return managed.ExternalObservation{}, errors.New(errNotAccessKey)
 	}
 
-	externalName := meta.GetExternalName(cr)
-	if externalName == "" {
-		return managed.ExternalObservation{}, nil
+	if meta.GetExternalName(cr) == "" {
+		return managed.ExternalObservation{ResourceExists: false}, nil
 	}
 
-	group := cr.Spec.ForProvider.GroupID
-	if group == "" {
-		return managed.ExternalObservation{}, nil
-	}
-
-	user, err := c.cloudianService.GetUser(ctx, cloudian.GroupUserID{
-		GroupID: group,
-		UserID:  externalName})
+	creds, err := c.cloudianService.GetUserCredentials(ctx, meta.GetExternalName(cr))
 	if errors.Is(err, cloudian.ErrNotFound) {
 		return managed.ExternalObservation{ResourceExists: false}, nil
 	}
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(err, errGetUser)
+		return managed.ExternalObservation{}, errors.Wrap(err, errGetCreds)
 	}
 
-	cr.Status.AtProvider.CanonicalID = user.CanonicalID
+	cr.Status.AtProvider.ID = meta.GetExternalName(cr)
 	cr.SetConditions(xpv2.Available())
 
 	return managed.ExternalObservation{
@@ -170,57 +161,47 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
+		// TODO: Check Inactivate / Activate
 		ResourceUpToDate: true,
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
-		ConnectionDetails: managed.ConnectionDetails{},
+		ConnectionDetails: connectionDetails(creds),
 	}, nil
 }
 
 func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
-	cr, ok := mg.(*v1alpha1.User)
+	cr, ok := mg.(*userv1alpha1cluster.AccessKey)
 	if !ok {
-		return managed.ExternalCreation{}, errors.New(errNotUser)
+		return managed.ExternalCreation{}, errors.New(errNotAccessKey)
 	}
 
-	user := cloudian.User{
-		GroupUserID: cloudian.GroupUserID{
-			GroupID: cr.Spec.ForProvider.GroupID,
-			UserID:  meta.GetExternalName(mg),
-		},
-		UserType: cloudian.UserTypeStandard,
-	}
-	if err := c.cloudianService.CreateUser(ctx, user); err != nil {
-		return managed.ExternalCreation{}, errors.Wrap(err, errCreateUser)
-	}
+	cr.SetConditions(xpv2.Creating())
 
-	// When Cloudian creates a user, a single access key is created inside it.
-	// Delete the access key, so that the user does not have any non-managed access keys.
-	creds, err := c.cloudianService.ListUserCredentials(ctx, user.GroupUserID)
+	creds, err := c.cloudianService.CreateUserCredentials(ctx, cloudian.GroupUserID{
+		GroupID: cr.Spec.ForProvider.GroupID,
+		UserID:  cr.Spec.ForProvider.UserID,
+	})
 	if err != nil {
-		return managed.ExternalCreation{}, errors.Wrap(err, "failed to list access keys of user")
+		return managed.ExternalCreation{}, errors.Wrap(err, errCreateCreds)
 	}
-	for _, cred := range creds {
-		if err := c.cloudianService.DeleteUserCredentials(ctx, cred.AccessKey); err != nil {
-			return managed.ExternalCreation{}, errors.Wrap(err, "failed to delete initial access key of user")
-		}
-	}
+
+	meta.SetExternalName(cr, creds.AccessKey)
 
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
 		// external resource. These will be stored as the connection secret.
-		ConnectionDetails: managed.ConnectionDetails{},
+		ConnectionDetails: connectionDetails(creds),
 	}, nil
 }
 
 func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
-	cr, ok := mg.(*v1alpha1.User)
+	_, ok := mg.(*userv1alpha1cluster.AccessKey)
 	if !ok {
-		return managed.ExternalUpdate{}, errors.New(errNotUser)
+		return managed.ExternalUpdate{}, errors.New(errNotAccessKey)
 	}
 
-	fmt.Printf("Pretending to Update (no managed fields to update): %+v", cr)
+	// TODO: Update Inactivate / Activate
 
 	return managed.ExternalUpdate{
 		// Optionally return any details that may be required to connect to the
@@ -230,26 +211,16 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 }
 
 func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.ExternalDelete, error) {
-	cr, ok := mg.(*v1alpha1.User)
+	cr, ok := mg.(*userv1alpha1cluster.AccessKey)
 	if !ok {
-		return managed.ExternalDelete{}, errors.New(errNotUser)
+		return managed.ExternalDelete{}, errors.New(errNotAccessKey)
 	}
 
-	guid := cloudian.GroupUserID{
-		GroupID: cr.Spec.ForProvider.GroupID,
-		UserID:  meta.GetExternalName(mg),
-	}
+	cr.SetConditions(xpv2.Deleting())
 
-	creds, err := c.cloudianService.ListUserCredentials(ctx, guid)
-	if err != nil {
-		return managed.ExternalDelete{}, err
-	}
-	if len(creds) > 0 {
-		return managed.ExternalDelete{}, errors.New("User has access keys and cannot be deleted")
-	}
-
-	if err := c.cloudianService.DeleteUser(ctx, guid); err != nil {
-		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteUser)
+	err := c.cloudianService.DeleteUserCredentials(ctx, meta.GetExternalName(cr))
+	if err != nil && !errors.Is(err, cloudian.ErrNotFound) {
+		return managed.ExternalDelete{}, errors.Wrap(err, errGetCreds)
 	}
 
 	return managed.ExternalDelete{}, nil
@@ -257,4 +228,17 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 
 func (c *external) Disconnect(ctx context.Context) error {
 	return nil
+}
+
+func connectionDetails(creds *cloudian.SecurityInfo) managed.ConnectionDetails {
+	return managed.ConnectionDetails{
+		"secretKey": []byte(creds.SecretKey),
+		"config.toml": []byte(fmt.Sprintf(
+			`[default]
+aws_access_key_id = %s
+aws_secret_access_key = %s`,
+			creds.AccessKey,
+			creds.SecretKey,
+		)),
+	}
 }

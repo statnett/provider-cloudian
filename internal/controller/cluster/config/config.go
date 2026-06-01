@@ -24,18 +24,18 @@ import (
 	"github.com/crossplane/crossplane-runtime/v2/pkg/resource"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
+	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
 )
 
 // Setup adds a controller that reconciles ProviderConfigs by accounting for
 // their current usage.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
-	name := providerconfig.ControllerName(v1alpha1.ProviderConfigGroupKind)
+	name := providerconfig.ControllerName(apisv1alpha1cluster.ProviderConfigGroupKind)
 
 	of := resource.ProviderConfigKinds{
-		Config:    v1alpha1.ProviderConfigGroupVersionKind,
-		Usage:     v1alpha1.ProviderConfigUsageGroupVersionKind,
-		UsageList: v1alpha1.ProviderConfigUsageListGroupVersionKind,
+		Config:    apisv1alpha1cluster.ProviderConfigGroupVersionKind,
+		Usage:     apisv1alpha1cluster.ProviderConfigUsageGroupVersionKind,
+		UsageList: apisv1alpha1cluster.ProviderConfigUsageListGroupVersionKind,
 	}
 
 	r := providerconfig.NewReconciler(mgr, of,
@@ -46,7 +46,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
 		WithOptions(o.ForControllerRuntime()).
-		For(&v1alpha1.ProviderConfig{}).
-		Watches(&v1alpha1.ProviderConfigUsage{}, &resource.EnqueueRequestForProviderConfig{}).
+		For(&apisv1alpha1cluster.ProviderConfig{}).
+		Watches(&apisv1alpha1cluster.ProviderConfigUsage{}, &resource.EnqueueRequestForProviderConfig{}).
 		Complete(ratelimiter.NewReconciler(name, r, o.GlobalRateLimiter))
 }
