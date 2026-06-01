@@ -33,8 +33,8 @@ import (
 	"github.com/crossplane/crossplane-runtime/v2/pkg/resource"
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 
-	"github.com/statnett/provider-cloudian/apis/user/v1alpha1"
-	apisv1alpha1 "github.com/statnett/provider-cloudian/apis/v1alpha1"
+	"github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
+	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
@@ -51,7 +51,7 @@ const (
 )
 
 var (
-	newCloudianService = func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error) {
+	newCloudianService = func(providerConfig *apisv1alpha1cluster.ProviderConfig, authHeader string) (*cloudian.Client, error) {
 		return cloudian.NewClient(
 			providerConfig.Spec.Endpoint,
 			authHeader,
@@ -67,7 +67,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		resource.ManagedKind(v1alpha1.UserGroupVersionKind),
 		managed.WithExternalConnector(&connector{
 			kube:         mgr.GetClient(),
-			usage:        resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1.ProviderConfigUsage{}),
+			usage:        resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1cluster.ProviderConfigUsage{}),
 			newServiceFn: newCloudianService}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
@@ -87,7 +87,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 type connector struct {
 	kube         client.Client
 	usage        *resource.LegacyProviderConfigUsageTracker
-	newServiceFn func(providerConfig *apisv1alpha1.ProviderConfig, authHeader string) (*cloudian.Client, error)
+	newServiceFn func(providerConfig *apisv1alpha1cluster.ProviderConfig, authHeader string) (*cloudian.Client, error)
 }
 
 // Connect typically produces an ExternalClient by:
@@ -105,7 +105,7 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.Wrap(err, errTrackPCUsage)
 	}
 
-	pc := &apisv1alpha1.ProviderConfig{}
+	pc := &apisv1alpha1cluster.ProviderConfig{}
 	if err := c.kube.Get(ctx, types.NamespacedName{Name: cr.GetProviderConfigReference().Name}, pc); err != nil {
 		return nil, errors.Wrap(err, errGetPC)
 	}

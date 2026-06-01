@@ -3,7 +3,7 @@ package qualityofservicelimits
 import (
 	"k8s.io/utils/ptr"
 
-	"github.com/statnett/provider-cloudian/apis/user/v1alpha1"
+	"github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 

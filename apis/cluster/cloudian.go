@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package apis contains Kubernetes API for the Cloudian provider.
-package apis
+// Package cluster contains Kubernetes API for the Cloudian provider.
+package cluster
 
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 
-	userv1alpha1 "github.com/statnett/provider-cloudian/apis/user/v1alpha1"
-	cloudianv1alpha1 "github.com/statnett/provider-cloudian/apis/v1alpha1"
+	userv1alpha1 "github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
+	cloudianv1alpha1 "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
 )
 
 func init() {
