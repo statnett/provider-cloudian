@@ -32,6 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 
+	"github.com/statnett/provider-cloudian/apis/cluster"
 	"github.com/statnett/provider-cloudian/internal/version"
 
 	changelogsv1alpha1 "github.com/crossplane/crossplane-runtime/v2/apis/changelogs/proto/v1alpha1"
@@ -42,7 +43,6 @@ import (
 	"github.com/crossplane/crossplane-runtime/v2/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/statemetrics"
 
-	"github.com/statnett/provider-cloudian/apis"
 	cloudian "github.com/statnett/provider-cloudian/internal/controller"
 )
 
@@ -102,7 +102,7 @@ func main() {
 	})
 	kingpin.FatalIfError(err, "Cannot create controller manager")
 
-	kingpin.FatalIfError(apis.AddToScheme(mgr.GetScheme()), "Cannot add Cloudian APIs to scheme")
+	kingpin.FatalIfError(cluster.AddToScheme(mgr.GetScheme()), "Cannot add Cloudian APIs to scheme")
 
 	metricRecorder := managed.NewMRMetricRecorder()
 	stateMetrics := statemetrics.NewMRStateMetrics()
