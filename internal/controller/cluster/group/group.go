@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package accesskey
+package group
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -33,20 +33,22 @@ import (
 	"github.com/crossplane/crossplane-runtime/v2/pkg/resource"
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 
-	"github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
+	userv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
 	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
 const (
-	errNotAccessKey = "managed resource is not a AccessKey custom resource"
+	errNotGroup     = "managed resource is not a Group custom resource"
 	errTrackPCUsage = "cannot track ProviderConfig usage"
 	errGetPC        = "cannot get ProviderConfig"
-	errCreateCreds  = "cannot create credentials"
 	errGetCreds     = "cannot get credentials"
-	errDeleteCreds  = "cannot delete credentials"
 
-	errNewClient = "cannot create new Service"
+	errNewClient   = "cannot create new Service"
+	errCreateGroup = "cannot create Group"
+	errDeleteGroup = "cannot delete Group"
+	errGetGroup    = "cannot get Group"
+	errUpdateGroup = "cannot update Group"
 )
 
 var (
@@ -58,12 +60,12 @@ var (
 	}
 )
 
-// Setup adds a controller that reconciles AccessKey managed resources.
+// Setup adds a controller that reconciles Group managed resources.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
-	name := managed.ControllerName(v1alpha1.AccessKeyGroupKind)
+	name := managed.ControllerName(userv1alpha1cluster.GroupGroupKind)
 
 	r := managed.NewReconciler(mgr,
-		resource.ManagedKind(v1alpha1.AccessKeyGroupVersionKind),
+		resource.ManagedKind(userv1alpha1cluster.GroupGroupVersionKind),
 		managed.WithExternalConnector(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1cluster.ProviderConfigUsage{}),
@@ -77,7 +79,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		Named(name).
 		WithOptions(o.ForControllerRuntime()).
 		WithEventFilter(resource.DesiredStateChanged()).
-		For(&v1alpha1.AccessKey{}).
+		For(&userv1alpha1cluster.Group{}).
 		Complete(ratelimiter.NewReconciler(name, r, o.GlobalRateLimiter))
 }
 
@@ -95,9 +97,9 @@ type connector struct {
 // 3. Getting the credentials specified by the ProviderConfig.
 // 4. Using the credentials to form a client.
 func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.ExternalClient, error) {
-	cr, ok := mg.(*v1alpha1.AccessKey)
+	cr, ok := mg.(*userv1alpha1cluster.Group)
 	if !ok {
-		return nil, errors.New(errNotAccessKey)
+		return nil, errors.New(errNotGroup)
 	}
 
 	if err := c.usage.Track(ctx, cr); err != nil {
@@ -132,24 +134,24 @@ type external struct {
 }
 
 func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
-	cr, ok := mg.(*v1alpha1.AccessKey)
+	cr, ok := mg.(*userv1alpha1cluster.Group)
 	if !ok {
-		return managed.ExternalObservation{}, errors.New(errNotAccessKey)
+		return managed.ExternalObservation{}, errors.New(errNotGroup)
 	}
 
-	if meta.GetExternalName(cr) == "" {
-		return managed.ExternalObservation{ResourceExists: false}, nil
+	externalName := meta.GetExternalName(cr)
+	if externalName == "" {
+		return managed.ExternalObservation{}, nil
 	}
 
-	creds, err := c.cloudianService.GetUserCredentials(ctx, meta.GetExternalName(cr))
+	observedGroup, err := c.cloudianService.GetGroup(ctx, externalName)
 	if errors.Is(err, cloudian.ErrNotFound) {
 		return managed.ExternalObservation{ResourceExists: false}, nil
 	}
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(err, errGetCreds)
+		return managed.ExternalObservation{}, errors.Wrap(err, errGetGroup)
 	}
 
-	cr.Status.AtProvider.ID = meta.GetExternalName(cr)
 	cr.SetConditions(xpv2.Available())
 
 	return managed.ExternalObservation{
@@ -161,47 +163,42 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
-		// TODO: Check Inactivate / Activate
-		ResourceUpToDate: true,
+		ResourceUpToDate: isUpToDate(meta.GetExternalName(mg), cr.Spec.ForProvider, *observedGroup),
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
-		ConnectionDetails: connectionDetails(creds),
+		ConnectionDetails: managed.ConnectionDetails{},
 	}, nil
 }
 
 func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
-	cr, ok := mg.(*v1alpha1.AccessKey)
+	cr, ok := mg.(*userv1alpha1cluster.Group)
 	if !ok {
-		return managed.ExternalCreation{}, errors.New(errNotAccessKey)
+		return managed.ExternalCreation{}, errors.New(errNotGroup)
 	}
 
 	cr.SetConditions(xpv2.Creating())
 
-	creds, err := c.cloudianService.CreateUserCredentials(ctx, cloudian.GroupUserID{
-		GroupID: cr.Spec.ForProvider.GroupID,
-		UserID:  cr.Spec.ForProvider.UserID,
-	})
-	if err != nil {
-		return managed.ExternalCreation{}, errors.Wrap(err, errCreateCreds)
+	if err := c.cloudianService.CreateGroup(ctx, newCloudianGroup(meta.GetExternalName(mg), cr.Spec.ForProvider)); err != nil {
+		return managed.ExternalCreation{}, errors.Wrap(err, errCreateGroup)
 	}
-
-	meta.SetExternalName(cr, creds.AccessKey)
 
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
 		// external resource. These will be stored as the connection secret.
-		ConnectionDetails: connectionDetails(creds),
+		ConnectionDetails: managed.ConnectionDetails{},
 	}, nil
 }
 
 func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
-	_, ok := mg.(*v1alpha1.AccessKey)
+	cr, ok := mg.(*userv1alpha1cluster.Group)
 	if !ok {
-		return managed.ExternalUpdate{}, errors.New(errNotAccessKey)
+		return managed.ExternalUpdate{}, errors.New(errNotGroup)
 	}
 
-	// TODO: Update Inactivate / Activate
+	if err := c.cloudianService.UpdateGroup(ctx, newCloudianGroup(meta.GetExternalName(mg), cr.Spec.ForProvider)); err != nil {
+		return managed.ExternalUpdate{}, errors.Wrap(err, errUpdateGroup)
+	}
 
 	return managed.ExternalUpdate{
 		// Optionally return any details that may be required to connect to the
@@ -211,16 +208,15 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 }
 
 func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.ExternalDelete, error) {
-	cr, ok := mg.(*v1alpha1.AccessKey)
+	cr, ok := mg.(*userv1alpha1cluster.Group)
 	if !ok {
-		return managed.ExternalDelete{}, errors.New(errNotAccessKey)
+		return managed.ExternalDelete{}, errors.New(errNotGroup)
 	}
 
 	cr.SetConditions(xpv2.Deleting())
 
-	err := c.cloudianService.DeleteUserCredentials(ctx, meta.GetExternalName(cr))
-	if err != nil && !errors.Is(err, cloudian.ErrNotFound) {
-		return managed.ExternalDelete{}, errors.Wrap(err, errGetCreds)
+	if err := c.cloudianService.DeleteGroup(ctx, meta.GetExternalName(mg)); err != nil {
+		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteGroup)
 	}
 
 	return managed.ExternalDelete{}, nil
@@ -230,15 +226,21 @@ func (c *external) Disconnect(ctx context.Context) error {
 	return nil
 }
 
-func connectionDetails(creds *cloudian.SecurityInfo) managed.ConnectionDetails {
-	return managed.ConnectionDetails{
-		"secretKey": []byte(creds.SecretKey),
-		"config.toml": []byte(fmt.Sprintf(
-			`[default]
-aws_access_key_id = %s
-aws_secret_access_key = %s`,
-			creds.AccessKey,
-			creds.SecretKey,
-		)),
+func isUpToDate(name string, desired userv1alpha1cluster.GroupParameters, observed cloudian.Group) bool {
+	return newCloudianGroup(name, desired) == observed
+}
+
+func newCloudianGroup(name string, gp userv1alpha1cluster.GroupParameters) cloudian.Group {
+	return cloudian.Group{
+		Active:             gp.Active,
+		GroupID:            name,
+		GroupName:          gp.GroupName,
+		LDAPEnabled:        ptr.Deref(gp.LDAPEnabled, false),
+		LDAPGroup:          ptr.Deref(gp.LDAPGroup, ""),
+		LDAPMatchAttribute: ptr.Deref(gp.LDAPMatchAttribute, ""),
+		LDAPSearch:         ptr.Deref(gp.LDAPSearch, ""),
+		LDAPSearchUserBase: ptr.Deref(gp.LDAPSearchUserBase, ""),
+		LDAPServerURL:      ptr.Deref(gp.LDAPServerURL, ""),
+		LDAPUserDNTemplate: ptr.Deref(gp.LDAPUserDNTemplate, ""),
 	}
 }

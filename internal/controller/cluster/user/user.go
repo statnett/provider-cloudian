@@ -14,10 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package groupqualityofservicelimits
+package user
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -26,27 +27,27 @@ import (
 
 	"github.com/crossplane/crossplane-runtime/v2/pkg/controller"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/event"
+	"github.com/crossplane/crossplane-runtime/v2/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/resource"
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 
-	"github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
+	userv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
 	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
-	qoslimits "github.com/statnett/provider-cloudian/internal/controller/qualityofservicelimits"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
 const (
-	errNotGroupQualityOfServiceLimits = "managed resource is not a GroupQualityOfServiceLimits custom resource"
-	errTrackPCUsage                   = "cannot track ProviderConfig usage"
-	errGetPC                          = "cannot get ProviderConfig"
-	errGetCreds                       = "cannot get credentials"
+	errNotUser      = "managed resource is not a User custom resource"
+	errTrackPCUsage = "cannot track ProviderConfig usage"
+	errGetPC        = "cannot get ProviderConfig"
+	errGetCreds     = "cannot get credentials"
 
-	errNewClient = "cannot create new Service"
-	errCreateQOS = "cannot create QOS"
-	errDeleteQOS = "cannot delete QOS"
-	errGetQOS    = "cannot get QOS"
+	errNewClient  = "cannot create new Service"
+	errCreateUser = "cannot create User"
+	errDeleteUser = "cannot delete User"
+	errGetUser    = "cannot get User"
 )
 
 var (
@@ -58,12 +59,12 @@ var (
 	}
 )
 
-// Setup adds a controller that reconciles GroupQualityOfServiceLimits managed resources.
+// Setup adds a controller that reconciles User managed resources.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
-	name := managed.ControllerName(v1alpha1.GroupQualityOfServiceLimitsGroupKind)
+	name := managed.ControllerName(userv1alpha1cluster.UserGroupKind)
 
 	r := managed.NewReconciler(mgr,
-		resource.ManagedKind(v1alpha1.GroupQualityOfServiceLimitsGroupVersionKind),
+		resource.ManagedKind(userv1alpha1cluster.UserGroupVersionKind),
 		managed.WithExternalConnector(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1cluster.ProviderConfigUsage{}),
@@ -77,7 +78,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		Named(name).
 		WithOptions(o.ForControllerRuntime()).
 		WithEventFilter(resource.DesiredStateChanged()).
-		For(&v1alpha1.GroupQualityOfServiceLimits{}).
+		For(&userv1alpha1cluster.User{}).
 		Complete(ratelimiter.NewReconciler(name, r, o.GlobalRateLimiter))
 }
 
@@ -95,9 +96,9 @@ type connector struct {
 // 3. Getting the credentials specified by the ProviderConfig.
 // 4. Using the credentials to form a client.
 func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.ExternalClient, error) {
-	cr, ok := mg.(*v1alpha1.GroupQualityOfServiceLimits)
+	cr, ok := mg.(*userv1alpha1cluster.User)
 	if !ok {
-		return nil, errors.New(errNotGroupQualityOfServiceLimits)
+		return nil, errors.New(errNotUser)
 	}
 
 	if err := c.usage.Track(ctx, cr); err != nil {
@@ -132,35 +133,33 @@ type external struct {
 }
 
 func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
-	cr, ok := mg.(*v1alpha1.GroupQualityOfServiceLimits)
+	cr, ok := mg.(*userv1alpha1cluster.User)
 	if !ok {
-		return managed.ExternalObservation{}, errors.New(errNotGroupQualityOfServiceLimits)
+		return managed.ExternalObservation{}, errors.New(errNotUser)
 	}
 
-	groupID := cr.Spec.ForProvider.GroupID
-	if groupID == "" {
+	externalName := meta.GetExternalName(cr)
+	if externalName == "" {
 		return managed.ExternalObservation{}, nil
 	}
 
-	guid := cloudian.GroupUserID{
-		GroupID: groupID,
-		UserID:  "*",
+	group := cr.Spec.ForProvider.GroupID
+	if group == "" {
+		return managed.ExternalObservation{}, nil
 	}
-	qos, err := c.cloudianService.GetQOS(ctx, guid, cr.Spec.ForProvider.Region)
 
+	user, err := c.cloudianService.GetUser(ctx, cloudian.GroupUserID{
+		GroupID: group,
+		UserID:  externalName})
 	if errors.Is(err, cloudian.ErrNotFound) {
 		return managed.ExternalObservation{ResourceExists: false}, nil
 	}
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(err, errGetQOS)
+		return managed.ExternalObservation{}, errors.Wrap(err, errGetUser)
 	}
 
+	cr.Status.AtProvider.CanonicalID = user.CanonicalID
 	cr.SetConditions(xpv2.Available())
-
-	expected, err := qoslimits.ToCloudianQOS(cr.Spec.ForProvider.QOS)
-	if err != nil {
-		return managed.ExternalObservation{}, err
-	}
 
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
@@ -171,8 +170,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		// Return false when the external resource exists, but it not up to date
 		// with the desired managed resource state. This lets the managed
 		// resource reconciler know that it needs to call Update.
-		ResourceUpToDate: expected.Warning.Equal(qos.Warning) &&
-			expected.Hard.Equal(qos.Hard),
+		ResourceUpToDate: true,
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
@@ -181,22 +179,32 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 }
 
 func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
-	cr, ok := mg.(*v1alpha1.GroupQualityOfServiceLimits)
+	cr, ok := mg.(*userv1alpha1cluster.User)
 	if !ok {
-		return managed.ExternalCreation{}, errors.New(errNotGroupQualityOfServiceLimits)
+		return managed.ExternalCreation{}, errors.New(errNotUser)
 	}
 
-	qos, err := qoslimits.ToCloudianQOS(cr.Spec.ForProvider.QOS)
+	user := cloudian.User{
+		GroupUserID: cloudian.GroupUserID{
+			GroupID: cr.Spec.ForProvider.GroupID,
+			UserID:  meta.GetExternalName(mg),
+		},
+		UserType: cloudian.UserTypeStandard,
+	}
+	if err := c.cloudianService.CreateUser(ctx, user); err != nil {
+		return managed.ExternalCreation{}, errors.Wrap(err, errCreateUser)
+	}
+
+	// When Cloudian creates a user, a single access key is created inside it.
+	// Delete the access key, so that the user does not have any non-managed access keys.
+	creds, err := c.cloudianService.ListUserCredentials(ctx, user.GroupUserID)
 	if err != nil {
-		return managed.ExternalCreation{}, err
+		return managed.ExternalCreation{}, errors.Wrap(err, "failed to list access keys of user")
 	}
-
-	guid := cloudian.GroupUserID{
-		GroupID: cr.Spec.ForProvider.GroupID,
-		UserID:  "*",
-	}
-	if err := c.cloudianService.SetQOS(ctx, guid, cr.Spec.ForProvider.Region, qos); err != nil {
-		return managed.ExternalCreation{}, errors.Wrap(err, errCreateQOS)
+	for _, cred := range creds {
+		if err := c.cloudianService.DeleteUserCredentials(ctx, cred.AccessKey); err != nil {
+			return managed.ExternalCreation{}, errors.Wrap(err, "failed to delete initial access key of user")
+		}
 	}
 
 	return managed.ExternalCreation{
@@ -207,23 +215,12 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 }
 
 func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
-	cr, ok := mg.(*v1alpha1.GroupQualityOfServiceLimits)
+	cr, ok := mg.(*userv1alpha1cluster.User)
 	if !ok {
-		return managed.ExternalUpdate{}, errors.New(errNotGroupQualityOfServiceLimits)
+		return managed.ExternalUpdate{}, errors.New(errNotUser)
 	}
 
-	qos, err := qoslimits.ToCloudianQOS(cr.Spec.ForProvider.QOS)
-	if err != nil {
-		return managed.ExternalUpdate{}, err
-	}
-
-	guid := cloudian.GroupUserID{
-		GroupID: cr.Spec.ForProvider.GroupID,
-		UserID:  "*",
-	}
-	if err := c.cloudianService.SetQOS(ctx, guid, cr.Spec.ForProvider.Region, qos); err != nil {
-		return managed.ExternalUpdate{}, errors.Wrap(err, errCreateQOS)
-	}
+	fmt.Printf("Pretending to Update (no managed fields to update): %+v", cr)
 
 	return managed.ExternalUpdate{
 		// Optionally return any details that may be required to connect to the
@@ -233,20 +230,26 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 }
 
 func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.ExternalDelete, error) {
-	cr, ok := mg.(*v1alpha1.GroupQualityOfServiceLimits)
+	cr, ok := mg.(*userv1alpha1cluster.User)
 	if !ok {
-		return managed.ExternalDelete{}, errors.New(errNotGroupQualityOfServiceLimits)
+		return managed.ExternalDelete{}, errors.New(errNotUser)
 	}
-
-	cr.SetConditions(xpv2.Deleting())
 
 	guid := cloudian.GroupUserID{
 		GroupID: cr.Spec.ForProvider.GroupID,
-		UserID:  "*",
+		UserID:  meta.GetExternalName(mg),
 	}
-	err := c.cloudianService.DeleteQOS(ctx, guid, cr.Spec.ForProvider.Region)
-	if err != nil && !errors.Is(err, cloudian.ErrNotFound) {
-		return managed.ExternalDelete{}, errors.Wrap(err, errGetCreds)
+
+	creds, err := c.cloudianService.ListUserCredentials(ctx, guid)
+	if err != nil {
+		return managed.ExternalDelete{}, err
+	}
+	if len(creds) > 0 {
+		return managed.ExternalDelete{}, errors.New("User has access keys and cannot be deleted")
+	}
+
+	if err := c.cloudianService.DeleteUser(ctx, guid); err != nil {
+		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteUser)
 	}
 
 	return managed.ExternalDelete{}, nil
