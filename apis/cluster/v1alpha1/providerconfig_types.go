@@ -19,9 +19,10 @@ package v1alpha1
 import (
 	"reflect"
 
-	pcv1alpha1common "github.com/statnett/provider-cloudian/apis/common/providerconfig/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	pcv1alpha1common "github.com/statnett/provider-cloudian/apis/common/providerconfig/v1alpha1"
 )
 
 // +kubebuilder:object:root=true

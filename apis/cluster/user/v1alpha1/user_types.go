@@ -20,9 +20,10 @@ import (
 	"reflect"
 
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
-	userv1alpha1common "github.com/statnett/provider-cloudian/apis/common/user/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	userv1alpha1common "github.com/statnett/provider-cloudian/apis/common/user/v1alpha1"
 )
 
 // A UserSpec defines the desired state of a User.

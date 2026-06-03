@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
+
 	userv1alpha1common "github.com/statnett/provider-cloudian/apis/common/user/v1alpha1"
 )
 
