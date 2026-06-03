@@ -19,33 +19,10 @@ package v1alpha1
 import (
 	"reflect"
 
+	pcv1alpha1common "github.com/statnett/provider-cloudian/apis/common/providerconfig/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-
-	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 )
-
-// A ProviderConfigSpec defines the desired state of a ProviderConfig.
-type ProviderConfigSpec struct {
-	// Endpoint is an url with protocol, hostname and port (no slash at the end) of the Cloudian API.
-	Endpoint string `json:"endpoint"`
-	// AuthHeader is the value of the Authorization header in requests to Cloudian API.
-	AuthHeader ProviderCredentials `json:"authHeader"`
-}
-
-// ProviderCredentials required to authenticate.
-type ProviderCredentials struct {
-	// Source of the provider credentials.
-	// +kubebuilder:validation:Enum=None;Secret;InjectedIdentity;Environment;Filesystem
-	Source xpv2.CredentialsSource `json:"source"`
-
-	xpv2.CommonCredentialSelectors `json:",inline"`
-}
-
-// A ProviderConfigStatus reflects the observed state of a ProviderConfig.
-type ProviderConfigStatus struct {
-	xpv2.ProviderConfigStatus `json:",inline"`
-}
 
 // +kubebuilder:object:root=true
 
@@ -58,8 +35,8 @@ type ProviderConfig struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ProviderConfigSpec   `json:"spec"`
-	Status ProviderConfigStatus `json:"status,omitempty"`
+	Spec   pcv1alpha1common.ProviderConfigSpec   `json:"spec"`
+	Status pcv1alpha1common.ProviderConfigStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

@@ -19,44 +19,16 @@ package v1alpha1
 import (
 	"reflect"
 
+	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
+	userv1alpha1common "github.com/statnett/provider-cloudian/apis/common/user/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-
-	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 )
-
-// UserParameters are the configurable fields of a User.
-type UserParameters struct {
-	// Group for the new user.
-	// +optional
-	// +immutable
-	GroupID string `json:"groupId,omitempty"`
-
-	// GroupIDRef is a reference to a group to retrieve its groupId.
-	// +optional
-	// +immutable
-	GroupIDRef *xpv2.Reference `json:"groupIdRef,omitempty"`
-
-	// GroupIDSelector selects reference to a group to retrieve its groupId.
-	// +optional
-	GroupIDSelector *xpv2.Selector `json:"groupIdSelector,omitempty"`
-}
-
-// UserObservation are the observable fields of a User.
-type UserObservation struct {
-	CanonicalID string `json:"canonicalId,omitempty"`
-}
 
 // A UserSpec defines the desired state of a User.
 type UserSpec struct {
 	xpv2.ClusterManagedResourceSpec `json:",inline"`
-	ForProvider                     UserParameters `json:"forProvider"`
-}
-
-// A UserStatus represents the observed state of a User.
-type UserStatus struct {
-	xpv2.ManagedResourceStatus `json:",inline"`
-	AtProvider                 UserObservation `json:"atProvider,omitempty"`
+	ForProvider                     userv1alpha1common.UserParameters `json:"forProvider"`
 }
 
 // +kubebuilder:object:root=true
@@ -72,8 +44,8 @@ type User struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   UserSpec   `json:"spec"`
-	Status UserStatus `json:"status,omitempty"`
+	Spec   UserSpec                      `json:"spec"`
+	Status userv1alpha1common.UserStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

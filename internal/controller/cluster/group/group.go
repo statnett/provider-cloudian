@@ -35,6 +35,7 @@ import (
 
 	userv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
 	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
+	userv1alpha1common "github.com/statnett/provider-cloudian/apis/common/user/v1alpha1"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
@@ -226,11 +227,11 @@ func (c *external) Disconnect(ctx context.Context) error {
 	return nil
 }
 
-func isUpToDate(name string, desired userv1alpha1cluster.GroupParameters, observed cloudian.Group) bool {
+func isUpToDate(name string, desired userv1alpha1common.GroupParameters, observed cloudian.Group) bool {
 	return newCloudianGroup(name, desired) == observed
 }
 
-func newCloudianGroup(name string, gp userv1alpha1cluster.GroupParameters) cloudian.Group {
+func newCloudianGroup(name string, gp userv1alpha1common.GroupParameters) cloudian.Group {
 	return cloudian.Group{
 		Active:             gp.Active,
 		GroupID:            name,

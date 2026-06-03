@@ -3,11 +3,11 @@ package qualityofservicelimits
 import (
 	"k8s.io/utils/ptr"
 
-	userv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
+	userv1alpha1common "github.com/statnett/provider-cloudian/apis/common/user/v1alpha1"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
-func ToCloudianQOS(qos userv1alpha1cluster.QOS) (cloudian.QualityOfService, error) {
+func ToCloudianQOS(qos userv1alpha1common.QOS) (cloudian.QualityOfService, error) {
 	var err error
 	cQOS := cloudian.QualityOfService{}
 
@@ -20,7 +20,7 @@ func ToCloudianQOS(qos userv1alpha1cluster.QOS) (cloudian.QualityOfService, erro
 	return cQOS, nil
 }
 
-func ToCloudianLimits(limits *userv1alpha1cluster.QualityOfServiceLimits) (cloudian.QualityOfServiceLimits, error) {
+func ToCloudianLimits(limits *userv1alpha1common.QualityOfServiceLimits) (cloudian.QualityOfServiceLimits, error) {
 	if limits == nil {
 		return cloudian.QualityOfServiceLimits{}, nil
 	}

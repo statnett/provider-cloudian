@@ -23,50 +23,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
+	userv1alpha1common "github.com/statnett/provider-cloudian/apis/common/user/v1alpha1"
 )
-
-// UserQualityOfServiceLimitsParameters are the configurable fields of a UserQualityOfServiceLimits.
-type UserQualityOfServiceLimitsParameters struct {
-	// GroupID of the quality of service limits.
-	// +optional
-	// +immutable
-	GroupID string `json:"groupId,omitempty"`
-
-	// UserID of the quality of service limits.
-	// +optional
-	// +immutable
-	UserID string `json:"userId,omitempty"`
-
-	// UserIDRef references a user to retrieve its groupId and userId.
-	// +optional
-	// +immutable
-	UserIDRef *xpv2.Reference `json:"userIdRef,omitempty"`
-
-	// UserIDSelector selects a user to retrieve its groupId and userId.
-	// +optional
-	UserIDSelector *xpv2.Selector `json:"userIdSelector,omitempty"`
-
-	// Region in which to apply the quality of service limits. Default region if unspecified.
-	// +optional
-	Region string `json:"region,omitempty"`
-
-	QOS `json:",inline"`
-}
-
-// UserQualityOfServiceLimitsObservation are the observable fields of a UserQualityOfServiceLimits.
-type UserQualityOfServiceLimitsObservation struct {
-}
 
 // A UserQualityOfServiceLimitsSpec defines the desired state of a UserQualityOfServiceLimits.
 type UserQualityOfServiceLimitsSpec struct {
 	xpv2.ClusterManagedResourceSpec `json:",inline"`
-	ForProvider                     UserQualityOfServiceLimitsParameters `json:"forProvider"`
-}
-
-// A UserQualityOfServiceLimitsStatus represents the observed state of a UserQualityOfServiceLimits.
-type UserQualityOfServiceLimitsStatus struct {
-	xpv2.ManagedResourceStatus `json:",inline"`
-	AtProvider                 UserQualityOfServiceLimitsObservation `json:"atProvider,omitempty"`
+	ForProvider                     userv1alpha1common.UserQualityOfServiceLimitsParameters `json:"forProvider"`
 }
 
 // +kubebuilder:object:root=true
@@ -82,8 +45,8 @@ type UserQualityOfServiceLimits struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   UserQualityOfServiceLimitsSpec   `json:"spec"`
-	Status UserQualityOfServiceLimitsStatus `json:"status,omitempty"`
+	Spec   UserQualityOfServiceLimitsSpec                      `json:"spec"`
+	Status userv1alpha1common.UserQualityOfServiceLimitsStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

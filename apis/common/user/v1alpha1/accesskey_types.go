@@ -1,0 +1,57 @@
+/*
+Copyright 2022 The Crossplane Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package v1alpha1
+
+// +kubebuilder:object:generate=true
+
+import (
+	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
+)
+
+// AccessKeyParameters are the configurable fields of a AccessKey.
+type AccessKeyParameters struct {
+	// GroupID of the access key.
+	// +optional
+	// +immutable
+	GroupID string `json:"groupId,omitempty"`
+
+	// UserId of the access key.
+	// +optional
+	// +immutable
+	UserID string `json:"userId,omitempty"`
+
+	// UserIDRef references a user to retrieve its groupId and userId.
+	// +optional
+	// +immutable
+	UserIDRef *xpv2.Reference `json:"userIdRef,omitempty"`
+
+	// UserIDSelector selects a user to retrieve its groupId and userId.
+	// +optional
+	UserIDSelector *xpv2.Selector `json:"userIdSelector,omitempty"`
+}
+
+// AccessKeyObservation are the observable fields of a AccessKey.
+type AccessKeyObservation struct {
+	// ID is the S3 Access Key ID, with a corresponding SecretKey.
+	ID string `json:"id,omitempty"`
+}
+
+// A AccessKeyStatus represents the observed state of a AccessKey.
+type AccessKeyStatus struct {
+	xpv2.ManagedResourceStatus `json:",inline"`
+	AtProvider                 AccessKeyObservation `json:"atProvider,omitempty"`
+}

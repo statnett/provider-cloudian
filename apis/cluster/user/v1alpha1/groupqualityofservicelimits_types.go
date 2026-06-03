@@ -23,45 +23,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
+	userv1alpha1common "github.com/statnett/provider-cloudian/apis/common/user/v1alpha1"
 )
-
-// GroupQualityOfServiceLimitsParameters are the configurable fields of a GroupQualityOfServiceLimits.
-type GroupQualityOfServiceLimitsParameters struct {
-	// GroupID of the quality of service limits.
-	// +optional
-	// +immutable
-	GroupID string `json:"groupId,omitempty"`
-
-	// GroupIDRef references a group to retrieve its groupId.
-	// +optional
-	// +immutable
-	GroupIDRef *xpv2.Reference `json:"groupIdRef,omitempty"`
-
-	// GroupIDSelector selects a group to retrieve its groupId.
-	// +optional
-	GroupIDSelector *xpv2.Selector `json:"groupIdSelector,omitempty"`
-
-	// Region in which to apply the quality of service limits. Default region if unspecified.
-	// +optional
-	Region string `json:"region,omitempty"`
-
-	QOS `json:",inline"`
-}
-
-// GroupQualityOfServiceLimitsObservation are the observable fields of a GroupQualityOfServiceLimits.
-type GroupQualityOfServiceLimitsObservation struct {
-}
 
 // A GroupQualityOfServiceLimitsSpec defines the desired state of a GroupQualityOfServiceLimits.
 type GroupQualityOfServiceLimitsSpec struct {
 	xpv2.ClusterManagedResourceSpec `json:",inline"`
-	ForProvider                     GroupQualityOfServiceLimitsParameters `json:"forProvider"`
-}
-
-// A GroupQualityOfServiceLimitsStatus represents the observed state of a GroupQualityOfServiceLimits.
-type GroupQualityOfServiceLimitsStatus struct {
-	xpv2.ManagedResourceStatus `json:",inline"`
-	AtProvider                 GroupQualityOfServiceLimitsObservation `json:"atProvider,omitempty"`
+	ForProvider                     userv1alpha1common.GroupQualityOfServiceLimitsParameters `json:"forProvider"`
 }
 
 // +kubebuilder:object:root=true
@@ -77,8 +45,8 @@ type GroupQualityOfServiceLimits struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GroupQualityOfServiceLimitsSpec   `json:"spec"`
-	Status GroupQualityOfServiceLimitsStatus `json:"status,omitempty"`
+	Spec   GroupQualityOfServiceLimitsSpec                      `json:"spec"`
+	Status userv1alpha1common.GroupQualityOfServiceLimitsStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

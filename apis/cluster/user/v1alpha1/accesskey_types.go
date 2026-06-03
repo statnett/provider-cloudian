@@ -23,46 +23,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
+	userv1alpha1common "github.com/statnett/provider-cloudian/apis/common/user/v1alpha1"
 )
-
-// AccessKeyParameters are the configurable fields of a AccessKey.
-type AccessKeyParameters struct {
-	// GroupID of the access key.
-	// +optional
-	// +immutable
-	GroupID string `json:"groupId,omitempty"`
-
-	// UserId of the access key.
-	// +optional
-	// +immutable
-	UserID string `json:"userId,omitempty"`
-
-	// UserIDRef references a user to retrieve its groupId and userId.
-	// +optional
-	// +immutable
-	UserIDRef *xpv2.Reference `json:"userIdRef,omitempty"`
-
-	// UserIDSelector selects a user to retrieve its groupId and userId.
-	// +optional
-	UserIDSelector *xpv2.Selector `json:"userIdSelector,omitempty"`
-}
-
-// AccessKeyObservation are the observable fields of a AccessKey.
-type AccessKeyObservation struct {
-	// ID is the S3 Access Key ID, with a corresponding SecretKey.
-	ID string `json:"id,omitempty"`
-}
 
 // A AccessKeySpec defines the desired state of a AccessKey.
 type AccessKeySpec struct {
 	xpv2.ClusterManagedResourceSpec `json:",inline"`
-	ForProvider                     AccessKeyParameters `json:"forProvider"`
-}
-
-// A AccessKeyStatus represents the observed state of a AccessKey.
-type AccessKeyStatus struct {
-	xpv2.ManagedResourceStatus `json:",inline"`
-	AtProvider                 AccessKeyObservation `json:"atProvider,omitempty"`
+	ForProvider                     userv1alpha1common.AccessKeyParameters `json:"forProvider"`
 }
 
 // +kubebuilder:object:root=true
@@ -78,8 +45,8 @@ type AccessKey struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AccessKeySpec   `json:"spec"`
-	Status AccessKeyStatus `json:"status,omitempty"`
+	Spec   AccessKeySpec                      `json:"spec"`
+	Status userv1alpha1common.AccessKeyStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
