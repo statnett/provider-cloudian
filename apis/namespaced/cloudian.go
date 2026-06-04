@@ -26,10 +26,11 @@ import (
 
 // AddToScheme adds all Resources to the Scheme
 func AddToScheme(s *runtime.Scheme) error {
-	var schemeCallbacks runtime.SchemeBuilder = []func(*runtime.Scheme) error{
-		cloudianv1alpha1.SchemeBuilder.AddToScheme,
-		userv1alpha1.SchemeBuilder.AddToScheme,
+	if err := cloudianv1alpha1.AddKnownTypes(s); err != nil {
+		return err
 	}
-
-	return schemeCallbacks.AddToScheme(s)
+	if err := userv1alpha1.AddKnownTypes(s); err != nil {
+		return err
+	}
+	return nil
 }
