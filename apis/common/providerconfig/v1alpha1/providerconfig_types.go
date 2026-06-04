@@ -1,0 +1,45 @@
+/*
+Copyright 2020 The Crossplane Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package v1alpha1
+
+// +kubebuilder:object:generate=true
+
+import (
+	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
+)
+
+// A ProviderConfigSpec defines the desired state of a ProviderConfig.
+type ProviderConfigSpec struct {
+	// Endpoint is an url with protocol, hostname and port (no slash at the end) of the Cloudian API.
+	Endpoint string `json:"endpoint"`
+	// AuthHeader is the value of the Authorization header in requests to Cloudian API.
+	AuthHeader ProviderCredentials `json:"authHeader"`
+}
+
+// ProviderCredentials required to authenticate.
+type ProviderCredentials struct {
+	// Source of the provider credentials.
+	// +kubebuilder:validation:Enum=None;Secret;InjectedIdentity;Environment;Filesystem
+	Source xpv2.CredentialsSource `json:"source"`
+
+	xpv2.CommonCredentialSelectors `json:",inline"`
+}
+
+// A ProviderConfigStatus reflects the observed state of a ProviderConfig.
+type ProviderConfigStatus struct {
+	xpv2.ProviderConfigStatus `json:",inline"`
+}

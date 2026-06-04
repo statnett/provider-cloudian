@@ -1,5 +1,6 @@
 package v1alpha1
 
+// +kubebuilder:object:generate=true
 import resource "k8s.io/apimachinery/pkg/api/resource"
 
 // +kubebuilder:validation:Pattern=`^(0|((0|[1-9][0-9]*)[KMGT]i))$`
