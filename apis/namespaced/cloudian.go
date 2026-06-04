@@ -24,18 +24,12 @@ import (
 	cloudianv1alpha1 "github.com/statnett/provider-cloudian/apis/namespaced/v1alpha1"
 )
 
-func init() {
-	// Register the types with the Scheme so the components can map objects to GroupVersionKinds and back
-	AddToSchemes = append(AddToSchemes,
-		cloudianv1alpha1.SchemeBuilder.AddToScheme,
-		userv1alpha1.SchemeBuilder.AddToScheme,
-	)
-}
-
-// AddToSchemes may be used to add all resources defined in the project to a Scheme
-var AddToSchemes runtime.SchemeBuilder
-
 // AddToScheme adds all Resources to the Scheme
 func AddToScheme(s *runtime.Scheme) error {
-	return AddToSchemes.AddToScheme(s)
+	var schemeCallbacks runtime.SchemeBuilder = []func(*runtime.Scheme) error{
+		cloudianv1alpha1.SchemeBuilder.AddToScheme,
+		userv1alpha1.SchemeBuilder.AddToScheme,
+	}
+
+	return schemeCallbacks.AddToScheme(s)
 }
