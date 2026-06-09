@@ -14,24 +14,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controller
+package namespaced
 
 import (
 	"github.com/crossplane/crossplane-runtime/v2/pkg/controller"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	controllercluster "github.com/statnett/provider-cloudian/internal/controller/cluster"
-	controllernamespaced "github.com/statnett/provider-cloudian/internal/controller/namespaced"
+	"github.com/statnett/provider-cloudian/internal/controller/namespaced/accesskey"
+	"github.com/statnett/provider-cloudian/internal/controller/namespaced/config"
+	"github.com/statnett/provider-cloudian/internal/controller/namespaced/group"
+	"github.com/statnett/provider-cloudian/internal/controller/namespaced/groupqualityofservicelimits"
+	"github.com/statnett/provider-cloudian/internal/controller/namespaced/user"
+	"github.com/statnett/provider-cloudian/internal/controller/namespaced/userqualityofservicelimits"
 )
 
 // Setup creates all Cloudian controllers with the supplied logger and adds them to
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
-	if err := controllercluster.Setup(mgr, o); err != nil {
-		return err
-	}
-	if err := controllernamespaced.Setup(mgr, o); err != nil {
-		return err
+	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		accesskey.Setup,
+		config.Setup,
+		group.Setup,
+		groupqualityofservicelimits.Setup,
+		user.Setup,
+		userqualityofservicelimits.Setup,
+	} {
+		if err := setup(mgr, o); err != nil {
+			return err
+		}
 	}
 	return nil
 }
