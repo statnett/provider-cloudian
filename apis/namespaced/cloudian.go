@@ -24,18 +24,20 @@ import (
 	cloudianv1alpha1 "github.com/statnett/provider-cloudian/apis/namespaced/v1alpha1"
 )
 
-func init() {
-	// Register the types with the Scheme so the components can map objects to GroupVersionKinds and back
-	AddToSchemes = append(AddToSchemes,
-		cloudianv1alpha1.SchemeBuilder.AddToScheme,
-		userv1alpha1.SchemeBuilder.AddToScheme,
-	)
-}
+var (
+	// SchemeBuilder is used to add go types to the GroupVersionKind scheme.
+	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
 
-// AddToSchemes may be used to add all resources defined in the project to a Scheme
-var AddToSchemes runtime.SchemeBuilder
+	// AddToScheme may be used to add all namespace-scoped resources defined in the project to a Scheme.
+	AddToScheme = SchemeBuilder.AddToScheme
+)
 
-// AddToScheme adds all Resources to the Scheme
-func AddToScheme(s *runtime.Scheme) error {
-	return AddToSchemes.AddToScheme(s)
+func addKnownTypes(scheme *runtime.Scheme) error {
+	for _, sb := range []runtime.SchemeBuilder{cloudianv1alpha1.SchemeBuilder, userv1alpha1.SchemeBuilder} {
+		if err := sb.AddToScheme(scheme); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
