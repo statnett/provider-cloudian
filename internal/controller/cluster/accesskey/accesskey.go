@@ -18,7 +18,6 @@ package accesskey
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -35,6 +34,8 @@ import (
 
 	userv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
 	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
+	controllercommon "github.com/statnett/provider-cloudian/internal/controller/common"
+	accesskeycontrollercommon "github.com/statnett/provider-cloudian/internal/controller/common/accesskey"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
@@ -49,15 +50,6 @@ const (
 	errNewClient = "cannot create new Service"
 )
 
-var (
-	newCloudianService = func(providerConfig *apisv1alpha1cluster.ProviderConfig, authHeader string) (*cloudian.Client, error) {
-		return cloudian.NewClient(
-			providerConfig.Spec.Endpoint,
-			authHeader,
-		), nil
-	}
-)
-
 // Setup adds a controller that reconciles AccessKey managed resources.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	name := managed.ControllerName(userv1alpha1cluster.AccessKeyGroupKind)
@@ -67,7 +59,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		managed.WithExternalConnector(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1cluster.ProviderConfigUsage{}),
-			newServiceFn: newCloudianService}),
+			newServiceFn: controllercommon.NewCloudianService}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
 		//nolint:staticcheck // SA1004 crossplane-runtime still depends on deprecated API
@@ -86,7 +78,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 type connector struct {
 	kube         client.Client
 	usage        *resource.LegacyProviderConfigUsageTracker
-	newServiceFn func(providerConfig *apisv1alpha1cluster.ProviderConfig, authHeader string) (*cloudian.Client, error)
+	newServiceFn func(providerConfigEndpoint string, authHeader string) (*cloudian.Client, error)
 }
 
 // Connect typically produces an ExternalClient by:
@@ -115,7 +107,7 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.Wrap(err, errGetCreds)
 	}
 
-	svc, err := c.newServiceFn(pc, string(authHeader))
+	svc, err := c.newServiceFn(pc.Spec.Endpoint, string(authHeader))
 	if err != nil {
 		return nil, errors.Wrap(err, errNewClient)
 	}
@@ -166,7 +158,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 
 		// Return any details that may be required to connect to the external
 		// resource. These will be stored as the connection secret.
-		ConnectionDetails: connectionDetails(creds),
+		ConnectionDetails: accesskeycontrollercommon.ConnectionDetails(creds),
 	}, nil
 }
 
@@ -191,7 +183,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
 		// external resource. These will be stored as the connection secret.
-		ConnectionDetails: connectionDetails(creds),
+		ConnectionDetails: accesskeycontrollercommon.ConnectionDetails(creds),
 	}, nil
 }
 
@@ -228,17 +220,4 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 
 func (c *external) Disconnect(ctx context.Context) error {
 	return nil
-}
-
-func connectionDetails(creds *cloudian.SecurityInfo) managed.ConnectionDetails {
-	return managed.ConnectionDetails{
-		"secretKey": []byte(creds.SecretKey),
-		"config.toml": []byte(fmt.Sprintf(
-			`[default]
-aws_access_key_id = %s
-aws_secret_access_key = %s`,
-			creds.AccessKey,
-			creds.SecretKey,
-		)),
-	}
 }
