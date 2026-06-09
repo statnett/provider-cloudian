@@ -35,6 +35,7 @@ import (
 
 	userv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
 	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
+	controllercommon "github.com/statnett/provider-cloudian/internal/controller/common"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
@@ -50,15 +51,6 @@ const (
 	errGetUser    = "cannot get User"
 )
 
-var (
-	newCloudianService = func(providerConfig *apisv1alpha1cluster.ProviderConfig, authHeader string) (*cloudian.Client, error) {
-		return cloudian.NewClient(
-			providerConfig.Spec.Endpoint,
-			authHeader,
-		), nil
-	}
-)
-
 // Setup adds a controller that reconciles User managed resources.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	name := managed.ControllerName(userv1alpha1cluster.UserGroupKind)
@@ -68,7 +60,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		managed.WithExternalConnector(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1cluster.ProviderConfigUsage{}),
-			newServiceFn: newCloudianService}),
+			newServiceFn: controllercommon.NewCloudianService}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
 		//nolint:staticcheck // SA1004 crossplane-runtime still depends on deprecated API
@@ -87,7 +79,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 type connector struct {
 	kube         client.Client
 	usage        *resource.LegacyProviderConfigUsageTracker
-	newServiceFn func(providerConfig *apisv1alpha1cluster.ProviderConfig, authHeader string) (*cloudian.Client, error)
+	newServiceFn func(providerConfigString string, authHeader string) (*cloudian.Client, error)
 }
 
 // Connect typically produces an ExternalClient by:
@@ -116,7 +108,7 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.Wrap(err, errGetCreds)
 	}
 
-	svc, err := c.newServiceFn(pc, string(authHeader))
+	svc, err := c.newServiceFn(pc.Spec.Endpoint, string(authHeader))
 	if err != nil {
 		return nil, errors.Wrap(err, errNewClient)
 	}

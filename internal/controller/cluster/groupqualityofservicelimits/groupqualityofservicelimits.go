@@ -33,7 +33,8 @@ import (
 
 	userv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/user/v1alpha1"
 	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
-	qoslimits "github.com/statnett/provider-cloudian/internal/controller/cluster/qualityofservicelimits"
+	controllercommon "github.com/statnett/provider-cloudian/internal/controller/common"
+	qoslimitscommon "github.com/statnett/provider-cloudian/internal/controller/common/qualityofservicelimits"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
@@ -49,13 +50,6 @@ const (
 	errGetQOS    = "cannot get QOS"
 )
 
-var newCloudianService = func(providerConfig *apisv1alpha1cluster.ProviderConfig, authHeader string) (*cloudian.Client, error) {
-	return cloudian.NewClient(
-		providerConfig.Spec.Endpoint,
-		authHeader,
-	), nil
-}
-
 // Setup adds a controller that reconciles GroupQualityOfServiceLimits managed resources.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	name := managed.ControllerName(userv1alpha1cluster.GroupQualityOfServiceLimitsGroupKind)
@@ -65,7 +59,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		managed.WithExternalConnector(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1cluster.ProviderConfigUsage{}),
-			newServiceFn: newCloudianService,
+			newServiceFn: controllercommon.NewCloudianService,
 		}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
@@ -85,7 +79,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 type connector struct {
 	kube         client.Client
 	usage        *resource.LegacyProviderConfigUsageTracker
-	newServiceFn func(providerConfig *apisv1alpha1cluster.ProviderConfig, authHeader string) (*cloudian.Client, error)
+	newServiceFn func(providerConfigEndpoint string, authHeader string) (*cloudian.Client, error)
 }
 
 // Connect typically produces an ExternalClient by:
@@ -114,7 +108,7 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.Wrap(err, errGetCreds)
 	}
 
-	svc, err := c.newServiceFn(pc, string(authHeader))
+	svc, err := c.newServiceFn(pc.Spec.Endpoint, string(authHeader))
 	if err != nil {
 		return nil, errors.Wrap(err, errNewClient)
 	}
@@ -156,7 +150,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 
 	cr.SetConditions(xpv2.Available())
 
-	expected, err := qoslimits.ToCloudianQOS(cr.Spec.ForProvider.QOS)
+	expected, err := qoslimitscommon.ToCloudianQOS(cr.Spec.ForProvider.QOS)
 	if err != nil {
 		return managed.ExternalObservation{}, err
 	}
@@ -185,7 +179,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalCreation{}, errors.New(errNotGroupQualityOfServiceLimits)
 	}
 
-	qos, err := qoslimits.ToCloudianQOS(cr.Spec.ForProvider.QOS)
+	qos, err := qoslimitscommon.ToCloudianQOS(cr.Spec.ForProvider.QOS)
 	if err != nil {
 		return managed.ExternalCreation{}, err
 	}
@@ -211,7 +205,7 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		return managed.ExternalUpdate{}, errors.New(errNotGroupQualityOfServiceLimits)
 	}
 
-	qos, err := qoslimits.ToCloudianQOS(cr.Spec.ForProvider.QOS)
+	qos, err := qoslimitscommon.ToCloudianQOS(cr.Spec.ForProvider.QOS)
 	if err != nil {
 		return managed.ExternalUpdate{}, err
 	}
