@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.13](https://github.com/statnett/provider-cloudian/compare/v0.3.12...v0.3.13) (2026-06-15)
+
+
+### Features
+
+* add namespaced controllers ([#382](https://github.com/statnett/provider-cloudian/issues/382)) ([8cc9b0f](https://github.com/statnett/provider-cloudian/commit/8cc9b0fab1cc8850a15acfcb837b4c7e4400fc52))
+* add namespaced MRs ([#375](https://github.com/statnett/provider-cloudian/issues/375)) ([a0a3488](https://github.com/statnett/provider-cloudian/commit/a0a3488bee4406abd9d1bb1f5a7eb2e6d95ae134))
+* add namespaced schemas in main ([#389](https://github.com/statnett/provider-cloudian/issues/389)) ([24ea197](https://github.com/statnett/provider-cloudian/commit/24ea197ec35f63dee1273ebff84b0618a560d39a))
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes go packages to v0.36.2 ([#388](https://github.com/statnett/provider-cloudian/issues/388)) ([1a82e6d](https://github.com/statnett/provider-cloudian/commit/1a82e6d530f480d91bf1eae9252f2549d241dc6b))
+* **deps:** update module github.com/crossplane/crossplane-runtime/v2 to v2.3.2 ([#383](https://github.com/statnett/provider-cloudian/issues/383)) ([4057a58](https://github.com/statnett/provider-cloudian/commit/4057a58ce788eb26866efffd5b124e153aa03458))
+* **deps:** update module github.com/crossplane/crossplane/apis/v2 to v2.3.2 ([#385](https://github.com/statnett/provider-cloudian/issues/385)) ([7df8d33](https://github.com/statnett/provider-cloudian/commit/7df8d33f39af9546a71dcaf3ea5485bd857188b0))
+
 ## [0.3.12](https://github.com/statnett/provider-cloudian/compare/v0.3.11...v0.3.12) (2026-05-29)
 
 
