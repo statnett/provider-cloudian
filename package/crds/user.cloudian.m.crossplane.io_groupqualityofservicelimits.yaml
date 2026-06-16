@@ -4,18 +4,18 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.21.0
-  name: userqualityofservicelimits.user.m.cloudian.crossplane.io
+  name: groupqualityofservicelimits.user.cloudian.m.crossplane.io
 spec:
-  group: user.m.cloudian.crossplane.io
+  group: user.cloudian.m.crossplane.io
   names:
     categories:
     - crossplane
     - managed
     - cloudian
-    kind: UserQualityOfServiceLimits
-    listKind: UserQualityOfServiceLimitsList
-    plural: userqualityofservicelimits
-    singular: userqualityofservicelimits
+    kind: GroupQualityOfServiceLimits
+    listKind: GroupQualityOfServiceLimitsList
+    plural: groupqualityofservicelimits
+    singular: groupqualityofservicelimits
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -34,8 +34,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: UserQualityOfServiceLimits represents the quality of service
-          limits for a Cloudian user, within a region.
+        description: GroupQualityOfServiceLimits represents the quality of service
+          limits for a Cloudian group, within a region.
         properties:
           apiVersion:
             description: |-
@@ -55,60 +55,18 @@ spec:
           metadata:
             type: object
           spec:
-            description: A UserQualityOfServiceLimitsSpec defines the desired state
-              of a UserQualityOfServiceLimits.
+            description: A GroupQualityOfServiceLimitsSpec defines the desired state
+              of a GroupQualityOfServiceLimits.
             properties:
               forProvider:
-                description: UserQualityOfServiceLimitsParameters are the configurable
-                  fields of a UserQualityOfServiceLimits.
+                description: GroupQualityOfServiceLimitsParameters are the configurable
+                  fields of a GroupQualityOfServiceLimits.
                 properties:
                   groupId:
                     description: GroupID of the quality of service limits.
                     type: string
-                  hard:
-                    description: Hard is the hard limit.
-                    properties:
-                      inboundBytesPerMin:
-                        description: InboundBytesPerMin is the limit for inbound data
-                          per minute in bytes.
-                        nullable: true
-                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
-                        type: string
-                      outboundBytesPerMin:
-                        description: OutboundKiBsPerMin is the limit for outbound
-                          data per minute in bytes.
-                        nullable: true
-                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
-                        type: string
-                      requestsPerMin:
-                        description: RequestsPerMin is the limit for number of HTTP
-                          requests per minute.
-                        format: int32
-                        nullable: true
-                        type: integer
-                      storageQuotaBytes:
-                        description: StorageQuotaBytes is the limit for total stored
-                          data in bytes.
-                        nullable: true
-                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
-                        type: string
-                      storageQuotaCount:
-                        description: StorageQuotaCount is the limit for total number
-                          of objects.
-                        format: int32
-                        nullable: true
-                        type: integer
-                    type: object
-                  region:
-                    description: Region in which to apply the quality of service limits.
-                      Default region if unspecified.
-                    type: string
-                  userId:
-                    description: UserID of the quality of service limits.
-                    type: string
-                  userIdRef:
-                    description: UserIDRef references a user to retrieve its groupId
-                      and userId.
+                  groupIdRef:
+                    description: GroupIDRef references a group to retrieve its groupId.
                     properties:
                       name:
                         description: Name of the referenced object.
@@ -141,9 +99,8 @@ spec:
                     required:
                     - name
                     type: object
-                  userIdSelector:
-                    description: UserIDSelector selects a user to retrieve its groupId
-                      and userId.
+                  groupIdSelector:
+                    description: GroupIDSelector selects a group to retrieve its groupId.
                     properties:
                       matchControllerRef:
                         description: |-
@@ -182,6 +139,44 @@ spec:
                             type: string
                         type: object
                     type: object
+                  hard:
+                    description: Hard is the hard limit.
+                    properties:
+                      inboundBytesPerMin:
+                        description: InboundBytesPerMin is the limit for inbound data
+                          per minute in bytes.
+                        nullable: true
+                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
+                        type: string
+                      outboundBytesPerMin:
+                        description: OutboundKiBsPerMin is the limit for outbound
+                          data per minute in bytes.
+                        nullable: true
+                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
+                        type: string
+                      requestsPerMin:
+                        description: RequestsPerMin is the limit for number of HTTP
+                          requests per minute.
+                        format: int32
+                        nullable: true
+                        type: integer
+                      storageQuotaBytes:
+                        description: StorageQuotaBytes is the limit for total stored
+                          data in bytes.
+                        nullable: true
+                        pattern: ^(0|((0|[1-9][0-9]*)[KMGT]i))$
+                        type: string
+                      storageQuotaCount:
+                        description: StorageQuotaCount is the limit for total number
+                          of objects.
+                        format: int32
+                        nullable: true
+                        type: integer
+                    type: object
+                  region:
+                    description: Region in which to apply the quality of service limits.
+                      Default region if unspecified.
+                    type: string
                   warning:
                     description: Warning is the soft limit that triggers a warning.
                     properties:
@@ -276,12 +271,12 @@ spec:
             - forProvider
             type: object
           status:
-            description: A UserQualityOfServiceLimitsStatus represents the observed
-              state of a UserQualityOfServiceLimits.
+            description: A GroupQualityOfServiceLimitsStatus represents the observed
+              state of a GroupQualityOfServiceLimits.
             properties:
               atProvider:
-                description: UserQualityOfServiceLimitsObservation are the observable
-                  fields of a UserQualityOfServiceLimits.
+                description: GroupQualityOfServiceLimitsObservation are the observable
+                  fields of a GroupQualityOfServiceLimits.
                 type: object
               conditions:
                 description: Conditions of the resource.
