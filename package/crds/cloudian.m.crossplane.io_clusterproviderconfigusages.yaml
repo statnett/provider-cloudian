@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.21.0
-  name: clusterproviderconfigusages.m.cloudian.crossplane.io
+  name: clusterproviderconfigusages.cloudian.m.crossplane.io
 spec:
-  group: m.cloudian.crossplane.io
+  group: cloudian.m.crossplane.io
   names:
     categories:
     - crossplane

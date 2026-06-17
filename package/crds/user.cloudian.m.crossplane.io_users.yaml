@@ -4,18 +4,18 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.21.0
-  name: accesskeys.user.m.cloudian.crossplane.io
+  name: users.user.cloudian.m.crossplane.io
 spec:
-  group: user.m.cloudian.crossplane.io
+  group: user.cloudian.m.crossplane.io
   names:
     categories:
     - crossplane
     - managed
     - cloudian
-    kind: AccessKey
-    listKind: AccessKeyList
-    plural: accesskeys
-    singular: accesskey
+    kind: User
+    listKind: UserList
+    plural: users
+    singular: user
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -34,7 +34,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: AccessKey represents an access key for a Cloudian user.
+        description: User represents a Cloudian user.
         properties:
           apiVersion:
             description: |-
@@ -54,21 +54,17 @@ spec:
           metadata:
             type: object
           spec:
-            description: A AccessKeySpec defines the desired state of a AccessKey.
+            description: A UserSpec defines the desired state of a User.
             properties:
               forProvider:
-                description: AccessKeyParameters are the configurable fields of a
-                  AccessKey.
+                description: UserParameters are the configurable fields of a User.
                 properties:
                   groupId:
-                    description: GroupID of the access key.
+                    description: Group for the new user.
                     type: string
-                  userId:
-                    description: UserId of the access key.
-                    type: string
-                  userIdRef:
-                    description: UserIDRef references a user to retrieve its groupId
-                      and userId.
+                  groupIdRef:
+                    description: GroupIDRef is a reference to a group to retrieve
+                      its groupId.
                     properties:
                       name:
                         description: Name of the referenced object.
@@ -101,9 +97,9 @@ spec:
                     required:
                     - name
                     type: object
-                  userIdSelector:
-                    description: UserIDSelector selects a user to retrieve its groupId
-                      and userId.
+                  groupIdSelector:
+                    description: GroupIDSelector selects reference to a group to retrieve
+                      its groupId.
                     properties:
                       matchControllerRef:
                         description: |-
@@ -202,14 +198,12 @@ spec:
             - forProvider
             type: object
           status:
-            description: A AccessKeyStatus represents the observed state of a AccessKey.
+            description: A UserStatus represents the observed state of a User.
             properties:
               atProvider:
-                description: AccessKeyObservation are the observable fields of a AccessKey.
+                description: UserObservation are the observable fields of a User.
                 properties:
-                  id:
-                    description: ID is the S3 Access Key ID, with a corresponding
-                      SecretKey.
+                  canonicalId:
                     type: string
                 type: object
               conditions:
