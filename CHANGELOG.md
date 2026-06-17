@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.14](https://github.com/statnett/provider-cloudian/compare/v0.3.13...v0.3.14) (2026-06-17)
+
+
+### Bug Fixes
+
+* correct group for namespaced resources ([#392](https://github.com/statnett/provider-cloudian/issues/392)) ([14f0e29](https://github.com/statnett/provider-cloudian/commit/14f0e2972adf8af2a0863ba5af7054d8bb83a76f))
+
 ## [0.3.13](https://github.com/statnett/provider-cloudian/compare/v0.3.12...v0.3.13) (2026-06-15)
 
 
