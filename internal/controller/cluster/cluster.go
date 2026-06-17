@@ -32,12 +32,12 @@ import (
 // with the supplied logger and adds them to the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
-		accesskey.Setup,
-		config.Setup,
-		group.Setup,
-		groupqualityofservicelimits.Setup,
-		user.Setup,
-		userqualityofservicelimits.Setup,
+		accesskey.SetupGated,
+		config.SetupGated,
+		group.SetupGated,
+		groupqualityofservicelimits.SetupGated,
+		user.SetupGated,
+		userqualityofservicelimits.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err

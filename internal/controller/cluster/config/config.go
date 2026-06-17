@@ -27,6 +27,17 @@ import (
 	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
 )
 
+// SetupGated registers controller setup with the gate, waiting for the
+// required CRD
+func SetupGated(mgr ctrl.Manager, o controller.Options) error {
+	o.Gate.Register(func() {
+		if err := Setup(mgr, o); err != nil {
+			panic(err)
+		}
+	}, apisv1alpha1cluster.ProviderConfigGroupVersionKind, apisv1alpha1cluster.ProviderConfigUsageGroupVersionKind)
+	return nil
+}
+
 // Setup adds a controller that reconciles ProviderConfigs by accounting for
 // their current usage.
 func Setup(mgr ctrl.Manager, o controller.Options) error {

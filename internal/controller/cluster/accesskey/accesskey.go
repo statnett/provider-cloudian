@@ -50,6 +50,17 @@ const (
 	errNewClient = "cannot create new Service"
 )
 
+// SetupGated registers controller setup with the gate, waiting for the
+// required CRD
+func SetupGated(mgr ctrl.Manager, o controller.Options) error {
+	o.Gate.Register(func() {
+		if err := Setup(mgr, o); err != nil {
+			panic(err)
+		}
+	}, userv1alpha1cluster.AccessKeyGroupVersionKind)
+	return nil
+}
+
 // Setup adds a controller that reconciles AccessKey managed resources.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	name := managed.ControllerName(userv1alpha1cluster.AccessKeyGroupKind)
