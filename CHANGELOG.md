@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.15](https://github.com/statnett/provider-cloudian/compare/v0.3.14...v0.3.15) (2026-06-18)
+
+
+### Features
+
+* implement safe start capability ([#395](https://github.com/statnett/provider-cloudian/issues/395)) ([76b1507](https://github.com/statnett/provider-cloudian/commit/76b1507eedff9628736cccfe7d50762854237cfc))
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes go packages to a95e086 ([#397](https://github.com/statnett/provider-cloudian/issues/397)) ([d1d5121](https://github.com/statnett/provider-cloudian/commit/d1d51210805c5dea92c66de25988cccb59622918))
+
 ## [0.3.14](https://github.com/statnett/provider-cloudian/compare/v0.3.13...v0.3.14) (2026-06-17)
 
 
