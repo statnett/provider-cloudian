@@ -46,7 +46,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 	return nil
 }
 
-// Setup creates all Cloudian controllers with safe-start support
+// SetupGated creates all Cloudian controllers with safe-start support
 // and adds them to the supplied manager.
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
