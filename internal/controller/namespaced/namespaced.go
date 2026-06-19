@@ -32,6 +32,24 @@ import (
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		accesskey.Setup,
+		config.Setup,
+		group.Setup,
+		groupqualityofservicelimits.Setup,
+		user.Setup,
+		userqualityofservicelimits.Setup,
+	} {
+		if err := setup(mgr, o); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Setup creates all Cloudian controllers with safe-start support
+// and adds them to the supplied manager.
+func SetupGated(mgr ctrl.Manager, o controller.Options) error {
+	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		accesskey.SetupGated,
 		config.SetupGated,
 		group.SetupGated,

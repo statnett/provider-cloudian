@@ -159,8 +159,8 @@ func main() {
 
 	if canSafeStart {
 		o.Gate = new(gate.Gate[schema.GroupVersionKind])
-		kingpin.FatalIfError(controllercluster.Setup(mgr, o), "Cannot setup Cluster Cloudian controllers")
-		kingpin.FatalIfError(controllernamespaced.Setup(mgr, o), "Cannot setup Namespaced Cloudian controllers")
+		kingpin.FatalIfError(controllercluster.SetupGated(mgr, o), "Cannot setup Cluster Cloudian controllers")
+		kingpin.FatalIfError(controllernamespaced.SetupGated(mgr, o), "Cannot setup Namespaced Cloudian controllers")
 		kingpin.FatalIfError(customresourcesgate.Setup(mgr, o), "Cannot setup CRD gate controller")
 	} else {
 		log.Info("Provider has missing RBAC permissions for watching CRDs, controller SafeStart capability will be disabled")
