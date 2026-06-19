@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.16](https://github.com/statnett/provider-cloudian/compare/v0.3.15...v0.3.16) (2026-06-19)
+
+
+### Bug Fixes
+
+* panic in non-safe start ([#399](https://github.com/statnett/provider-cloudian/issues/399)) ([f454090](https://github.com/statnett/provider-cloudian/commit/f45409069b4257d5179b5403ada951aabd89da32))
+
 ## [0.3.15](https://github.com/statnett/provider-cloudian/compare/v0.3.14...v0.3.15) (2026-06-18)
 
 
