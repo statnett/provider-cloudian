@@ -10,4 +10,4 @@ metadata:
       A Crossplane provider for Cloudian.
 spec:
   capabilities:
-    - safe-start
+    - SafeStart
