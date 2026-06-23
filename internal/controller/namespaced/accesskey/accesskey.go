@@ -43,11 +43,12 @@ const (
 	errNotAccessKey = "managed resource is not a AccessKey custom resource"
 	errTrackPCUsage = "cannot track ProviderConfig usage"
 	errGetPC        = "cannot get ProviderConfig"
-	errCreateCreds  = "cannot create credentials"
 	errGetCreds     = "cannot get credentials"
-	errDeleteCreds  = "cannot delete credentials"
 
-	errNewClient = "cannot create new Service"
+	errNewClient       = "cannot create new Service"
+	errCreateAccessKey = "cannot create AccessKey"
+	errDeleteAccessKey = "cannot delete AccessKey"
+	errGetAccessKey    = "cannot get AccessKey"
 )
 
 // SetupGated registers controller setup with the gate, waiting for the
@@ -149,7 +150,7 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 		return managed.ExternalObservation{ResourceExists: false}, nil
 	}
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(err, errGetCreds)
+		return managed.ExternalObservation{}, errors.Wrap(err, errGetAccessKey)
 	}
 
 	cr.Status.AtProvider.ID = meta.GetExternalName(cr)
@@ -186,7 +187,7 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		UserID:  cr.Spec.ForProvider.UserID,
 	})
 	if err != nil {
-		return managed.ExternalCreation{}, errors.Wrap(err, errCreateCreds)
+		return managed.ExternalCreation{}, errors.Wrap(err, errCreateAccessKey)
 	}
 
 	meta.SetExternalName(cr, creds.AccessKey)
@@ -223,7 +224,7 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 
 	err := c.cloudianService.DeleteUserCredentials(ctx, meta.GetExternalName(cr))
 	if err != nil && !errors.Is(err, cloudian.ErrNotFound) {
-		return managed.ExternalDelete{}, errors.Wrap(err, errGetCreds)
+		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteAccessKey)
 	}
 
 	return managed.ExternalDelete{}, nil
