@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.17](https://github.com/statnett/provider-cloudian/compare/v0.3.16...v0.3.17) (2026-06-23)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/crossplane/crossplane-runtime/v2 to v2.3.3 ([#402](https://github.com/statnett/provider-cloudian/issues/402)) ([0136460](https://github.com/statnett/provider-cloudian/commit/01364600ebc344662e85267fb26d0277e4b78c09))
+* **deps:** update module github.com/crossplane/crossplane/apis/v2 to v2.3.3 ([#403](https://github.com/statnett/provider-cloudian/issues/403)) ([d3f3b88](https://github.com/statnett/provider-cloudian/commit/d3f3b88747a7b19c6e4e8ecae41091a6890f7fbb))
+* provider capabilities ([#404](https://github.com/statnett/provider-cloudian/issues/404)) ([1afc808](https://github.com/statnett/provider-cloudian/commit/1afc808ea97e98c4fe8eb8ffef136a076c8decba))
+
 ## [0.3.16](https://github.com/statnett/provider-cloudian/compare/v0.3.15...v0.3.16) (2026-06-19)
 
 
