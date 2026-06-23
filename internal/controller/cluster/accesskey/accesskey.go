@@ -43,9 +43,7 @@ const (
 	errNotAccessKey = "managed resource is not a AccessKey custom resource"
 	errTrackPCUsage = "cannot track ProviderConfig usage"
 	errGetPC        = "cannot get ProviderConfig"
-	errCreateCreds  = "cannot create credentials"
 	errGetCreds     = "cannot get credentials"
-	errDeleteCreds  = "cannot delete credentials"
 
 	errNewClient = "cannot create new Service"
 	errCreateAccessKey = "cannot create AccessKey"
