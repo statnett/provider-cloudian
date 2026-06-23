@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.18](https://github.com/statnett/provider-cloudian/compare/v0.3.17...v0.3.18) (2026-06-23)
+
+
+### Bug Fixes
+
+* remove client-side rate limiting ([#407](https://github.com/statnett/provider-cloudian/issues/407)) ([96ba193](https://github.com/statnett/provider-cloudian/commit/96ba1933f90358140e2407770bfd8db3d189fff3))
+
 ## [0.3.17](https://github.com/statnett/provider-cloudian/compare/v0.3.16...v0.3.17) (2026-06-23)
 
 
