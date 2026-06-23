@@ -45,7 +45,7 @@ const (
 	errGetPC        = "cannot get ProviderConfig"
 	errGetCreds     = "cannot get credentials"
 
-	errNewClient = "cannot create new Service"
+	errNewClient       = "cannot create new Service"
 	errCreateAccessKey = "cannot create AccessKey"
 	errDeleteAccessKey = "cannot delete AccessKey"
 	errGetAccessKey    = "cannot get AccessKey"
