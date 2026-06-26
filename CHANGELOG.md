@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.19](https://github.com/statnett/provider-cloudian/compare/v0.3.18...v0.3.19) (2026-06-26)
+
+
+### Bug Fixes
+
+* accesskey errors ([#409](https://github.com/statnett/provider-cloudian/issues/409)) ([f1b51f2](https://github.com/statnett/provider-cloudian/commit/f1b51f2dca79e1c769cb7c644cb412cc6a865ee2))
+
 ## [0.3.18](https://github.com/statnett/provider-cloudian/compare/v0.3.17...v0.3.18) (2026-06-23)
 
 
