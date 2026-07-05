@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.19](https://github.com/statnett/provider-cloudian/compare/v0.3.18...v0.3.19) (2026-07-05)
+
+
+### Bug Fixes
+
+* accesskey errors ([#409](https://github.com/statnett/provider-cloudian/issues/409)) ([f1b51f2](https://github.com/statnett/provider-cloudian/commit/f1b51f2dca79e1c769cb7c644cb412cc6a865ee2))
+* **deps:** update k8s.io/utils digest to be93311 ([#414](https://github.com/statnett/provider-cloudian/issues/414)) ([1d40528](https://github.com/statnett/provider-cloudian/commit/1d405286d0bbc074af9b08fab83200330c5e8dab))
+* **deps:** update module google.golang.org/grpc to v1.82.0 ([#418](https://github.com/statnett/provider-cloudian/issues/418)) ([9866c81](https://github.com/statnett/provider-cloudian/commit/9866c819b9915ad41ed923a68b88d7b34431b568))
+
 ## [0.3.18](https://github.com/statnett/provider-cloudian/compare/v0.3.17...v0.3.18) (2026-06-23)
 
 
