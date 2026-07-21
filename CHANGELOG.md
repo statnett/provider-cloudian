@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.20](https://github.com/statnett/provider-cloudian/compare/v0.3.19...v0.3.20) (2026-07-21)
+
+
+### Bug Fixes
+
+* **deps:** update k8s.io/utils digest to cf1189d ([#422](https://github.com/statnett/provider-cloudian/issues/422)) ([a9e5f05](https://github.com/statnett/provider-cloudian/commit/a9e5f05bc29473971cad121d66ea428d9926f2af))
+* **deps:** update module google.golang.org/grpc to v1.82.1 ([#430](https://github.com/statnett/provider-cloudian/issues/430)) ([e3a6f9a](https://github.com/statnett/provider-cloudian/commit/e3a6f9afb085c1c24093666f79b6fb5aeb094f5d))
+
 ## [0.3.19](https://github.com/statnett/provider-cloudian/compare/v0.3.18...v0.3.19) (2026-07-05)
 
 
