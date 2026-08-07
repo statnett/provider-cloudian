@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.20](https://github.com/statnett/provider-cloudian/compare/v0.3.19...v0.3.20) (2026-08-07)
+
+
+### Bug Fixes
+
+* **deps:** update k8s.io/utils digest to cf1189d ([#422](https://github.com/statnett/provider-cloudian/issues/422)) ([a9e5f05](https://github.com/statnett/provider-cloudian/commit/a9e5f05bc29473971cad121d66ea428d9926f2af))
+* **deps:** update kubernetes go packages to v0.36.3 ([#437](https://github.com/statnett/provider-cloudian/issues/437)) ([86d0bd5](https://github.com/statnett/provider-cloudian/commit/86d0bd515e35c0456b3540b4e35c733e4f323116))
+* **deps:** update module github.com/crossplane/crossplane/apis/v2 to v2.3.4 ([#438](https://github.com/statnett/provider-cloudian/issues/438)) ([99e94c2](https://github.com/statnett/provider-cloudian/commit/99e94c244e78a315a102e2be19c1efc1c1247ab1))
+* **deps:** update module google.golang.org/grpc to v1.82.1 ([#430](https://github.com/statnett/provider-cloudian/issues/430)) ([e3a6f9a](https://github.com/statnett/provider-cloudian/commit/e3a6f9afb085c1c24093666f79b6fb5aeb094f5d))
+* **deps:** update module google.golang.org/grpc to v1.83.0 ([#444](https://github.com/statnett/provider-cloudian/issues/444)) ([251fa86](https://github.com/statnett/provider-cloudian/commit/251fa86fed9e70b0a55ed88c56c3ad377bc16f21))
+
 ## [0.3.19](https://github.com/statnett/provider-cloudian/compare/v0.3.18...v0.3.19) (2026-07-05)
 
 
