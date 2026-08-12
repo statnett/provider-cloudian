@@ -15,6 +15,7 @@ import (
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
+//nolint:gocyclo
 func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*cloudian.Client, error) {
 	switch mgC := mg.(type) {
 	//nolint:staticcheck // SA1019
