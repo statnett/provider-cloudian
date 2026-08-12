@@ -49,6 +49,7 @@ const (
 	errCreateQOS = "cannot create QOS"
 	errDeleteQOS = "cannot delete QOS"
 	errGetQOS    = "cannot get QOS"
+	errUpdateQOS = "cannot update QOS"
 )
 
 // SetupGated registers controller setup with the gate, waiting for the
@@ -235,7 +236,7 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		UserID:  "*",
 	}
 	if err := c.cloudianService.SetQOS(ctx, guid, cr.Spec.ForProvider.Region, qos); err != nil {
-		return managed.ExternalUpdate{}, errors.Wrap(err, errCreateQOS)
+		return managed.ExternalUpdate{}, errors.Wrap(err, errUpdateQOS)
 	}
 
 	return managed.ExternalUpdate{
@@ -259,7 +260,7 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.Ext
 	}
 	err := c.cloudianService.DeleteQOS(ctx, guid, cr.Spec.ForProvider.Region)
 	if err != nil && !errors.Is(err, cloudian.ErrNotFound) {
-		return managed.ExternalDelete{}, errors.Wrap(err, errGetCreds)
+		return managed.ExternalDelete{}, errors.Wrap(err, errDeleteQOS)
 	}
 
 	return managed.ExternalDelete{}, nil
