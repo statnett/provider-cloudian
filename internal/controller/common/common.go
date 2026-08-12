@@ -26,14 +26,13 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 			return nil, errors.New("providerConfigRef is not given")
 		}
 
-		switch pcRef.Kind {
-		case "ClusterProviderConfig":
+		if pcRef.Kind == "ClusterProviderConfig" {
 			cpc := &apisv1alpha1cluster.ProviderConfig{}
 			if err := c.Get(ctx, types.NamespacedName{Name: pcRef.Name}, cpc); err != nil {
 				return nil, errors.Wrap(err, "cannot get referenced ClusterProviderConfig")
 			}
 			return buildConfigFromSpec(ctx, c, mgC, cpc.Spec)
-		default:
+		} else {
 			pc := &apisv1alpha1namespaced.ProviderConfig{}
 			if err := c.Get(ctx, types.NamespacedName{Name: pcRef.Name, Namespace: mg.GetNamespace()}, pc); err != nil {
 				return nil, errors.Wrap(err, "cannot get referenced ProviderConfig")
