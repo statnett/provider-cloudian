@@ -33,6 +33,7 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 		CurrentValue: mg.Spec.ForProvider.GroupID,
 		Reference:    mg.Spec.ForProvider.GroupIDRef,
 		Selector:     mg.Spec.ForProvider.GroupIDSelector,
+		Namespace:    mg.Namespace,
 		To:           reference.To{Managed: &Group{}, List: &GroupList{}},
 		Extract:      reference.ExternalName(),
 	})
@@ -54,6 +55,7 @@ func (mg *GroupQualityOfServiceLimits) ResolveReferences(ctx context.Context, c 
 		CurrentValue: mg.Spec.ForProvider.GroupID,
 		Reference:    mg.Spec.ForProvider.GroupIDRef,
 		Selector:     mg.Spec.ForProvider.GroupIDSelector,
+		Namespace:    mg.Namespace,
 		To:           reference.To{Managed: &Group{}, List: &GroupList{}},
 		Extract:      reference.ExternalName(),
 	})
@@ -75,6 +77,7 @@ func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) err
 		CurrentValue: mg.Spec.ForProvider.UserID,
 		Reference:    mg.Spec.ForProvider.UserIDRef,
 		Selector:     mg.Spec.ForProvider.UserIDSelector,
+		Namespace:    mg.Namespace,
 		To:           reference.To{Managed: &User{}, List: &UserList{}},
 		Extract:      reference.ExternalName(),
 	})
@@ -88,6 +91,7 @@ func (mg *AccessKey) ResolveReferences(ctx context.Context, c client.Reader) err
 	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
 		Reference: mg.Spec.ForProvider.UserIDRef,
 		Selector:  mg.Spec.ForProvider.UserIDSelector,
+		Namespace: mg.Namespace,
 		To:        reference.To{Managed: &User{}, List: &UserList{}},
 		Extract: func(mg resource.Managed) string {
 			user, ok := mg.(*User)
@@ -114,6 +118,7 @@ func (mg *UserQualityOfServiceLimits) ResolveReferences(ctx context.Context, c c
 		CurrentValue: mg.Spec.ForProvider.UserID,
 		Reference:    mg.Spec.ForProvider.UserIDRef,
 		Selector:     mg.Spec.ForProvider.UserIDSelector,
+		Namespace:    mg.Namespace,
 		To:           reference.To{Managed: &User{}, List: &UserList{}},
 		Extract:      reference.ExternalName(),
 	})
@@ -127,6 +132,7 @@ func (mg *UserQualityOfServiceLimits) ResolveReferences(ctx context.Context, c c
 	rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
 		Reference: mg.Spec.ForProvider.UserIDRef,
 		Selector:  mg.Spec.ForProvider.UserIDSelector,
+		Namespace: mg.Namespace,
 		To:        reference.To{Managed: &User{}, List: &UserList{}},
 		Extract: func(mg resource.Managed) string {
 			user, ok := mg.(*User)
