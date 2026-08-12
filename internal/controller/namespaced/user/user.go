@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -35,7 +34,6 @@ import (
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 
 	userv1alpha1namespaced "github.com/statnett/provider-cloudian/apis/namespaced/user/v1alpha1"
-	apisv1alpha1namespaced "github.com/statnett/provider-cloudian/apis/namespaced/v1alpha1"
 	controllercommon "github.com/statnett/provider-cloudian/internal/controller/common"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
@@ -43,10 +41,7 @@ import (
 const (
 	errNotUser      = "managed resource is not a User custom resource"
 	errTrackPCUsage = "cannot track ProviderConfig usage"
-	errGetPC        = "cannot get ProviderConfig"
-	errGetCreds     = "cannot get credentials"
 
-	errNewClient  = "cannot create new Service"
 	errCreateUser = "cannot create User"
 	errDeleteUser = "cannot delete User"
 	errGetUser    = "cannot get User"
@@ -69,9 +64,8 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 
 	reconcilerOpts := []managed.ReconcilerOption{
 		managed.WithExternalConnector(&connector{
-			kube:         mgr.GetClient(),
-			usage:        resource.NewProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1namespaced.ProviderConfigUsage{}),
-			newServiceFn: controllercommon.NewCloudianService}),
+			kube: mgr.GetClient(),
+		}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
 		//nolint:staticcheck // SA1004 crossplane-runtime still depends on deprecated API
@@ -97,9 +91,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 // A connector is expected to produce an ExternalClient when its Connect method
 // is called.
 type connector struct {
-	kube         client.Client
-	usage        *resource.ProviderConfigUsageTracker
-	newServiceFn func(providerConfigEndpoint string, authHeader string) (*cloudian.Client, error)
+	kube client.Client
 }
 
 // Connect typically produces an ExternalClient by:
@@ -113,26 +105,10 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.New(errNotUser)
 	}
 
-	if err := c.usage.Track(ctx, cr); err != nil {
-		return nil, errors.Wrap(err, errTrackPCUsage)
-	}
-
-	pc := &apisv1alpha1namespaced.ProviderConfig{}
-	if err := c.kube.Get(ctx, types.NamespacedName{Name: cr.GetProviderConfigReference().Name}, pc); err != nil {
-		return nil, errors.Wrap(err, errGetPC)
-	}
-
-	cd := pc.Spec.AuthHeader
-	authHeader, err := resource.CommonCredentialExtractor(ctx, cd.Source, c.kube, cd.CommonCredentialSelectors)
+	svc, err := controllercommon.GetClient(ctx, c.kube, cr)
 	if err != nil {
-		return nil, errors.Wrap(err, errGetCreds)
+		return nil, err
 	}
-
-	svc, err := c.newServiceFn(pc.Spec.Endpoint, string(authHeader))
-	if err != nil {
-		return nil, errors.Wrap(err, errNewClient)
-	}
-
 	return &external{cloudianService: svc}, nil
 }
 
