@@ -67,8 +67,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	name := managed.ControllerName(userv1alpha1namespaced.GroupGroupKind)
 
-	r := managed.NewReconciler(mgr,
-		resource.ManagedKind(userv1alpha1namespaced.GroupGroupVersionKind),
+	reconcilerOpts := []managed.ReconcilerOption{
 		managed.WithExternalConnector(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1namespaced.ProviderConfigUsage{}),
@@ -76,7 +75,12 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
 		//nolint:staticcheck // SA1004 crossplane-runtime still depends on deprecated API
-		managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))))
+		managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))),
+	}
+
+	r := managed.NewReconciler(mgr,
+		resource.ManagedKind(userv1alpha1namespaced.GroupGroupVersionKind),
+		reconilerOpts...)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
