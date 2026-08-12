@@ -48,12 +48,9 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 func buildConfigFromSpec(ctx context.Context, c client.Client, m resource.ModernManaged, spec pcv1alpha1common.ProviderConfigSpec) (*cloudian.Client, error) {
 	cd := spec.AuthHeader
 
-	switch cd.Source { // Don't allow cross namespace secret reference
-	case xpv2.CredentialsSourceSecret:
-		if cd.SecretRef != nil {
-			cd.SecretRef.Namespace = m.GetNamespace()
-		}
-	default:
+	// Don't allow cross namespace secret reference
+	if cd.Source == xpv2.CredentialsSourceSecret && cd.SecretRef != nil {
+		cd.SecretRef.Namespace = m.GetNamespace()
 	}
 
 	authHeader, err := resource.CommonCredentialExtractor(ctx, cd.Source, c, cd.CommonCredentialSelectors)
