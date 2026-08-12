@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -43,10 +42,7 @@ import (
 const (
 	errNotGroup     = "managed resource is not a Group custom resource"
 	errTrackPCUsage = "cannot track ProviderConfig usage"
-	errGetPC        = "cannot get ProviderConfig"
-	errGetCreds     = "cannot get credentials"
 
-	errNewClient   = "cannot create new Service"
 	errCreateGroup = "cannot create Group"
 	errDeleteGroup = "cannot delete Group"
 	errGetGroup    = "cannot get Group"
@@ -70,9 +66,9 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 
 	reconcilerOpts := []managed.ReconcilerOption{
 		managed.WithExternalConnector(&connector{
-			kube:         mgr.GetClient(),
-			usage:        resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1cluster.ProviderConfigUsage{}),
-			newServiceFn: controllercommon.NewCloudianService}),
+			kube:  mgr.GetClient(),
+			usage: resource.NewLegacyProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1cluster.ProviderConfigUsage{}),
+		}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
 		//nolint:staticcheck // SA1004 crossplane-runtime still depends on deprecated API
@@ -98,9 +94,8 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 // A connector is expected to produce an ExternalClient when its Connect method
 // is called.
 type connector struct {
-	kube         client.Client
-	usage        *resource.LegacyProviderConfigUsageTracker
-	newServiceFn func(providerConfigEndpoint string, authHeader string) (*cloudian.Client, error)
+	kube  client.Client
+	usage *resource.LegacyProviderConfigUsageTracker
 }
 
 // Connect typically produces an ExternalClient by:
@@ -118,22 +113,10 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.Wrap(err, errTrackPCUsage)
 	}
 
-	pc := &apisv1alpha1cluster.ProviderConfig{}
-	if err := c.kube.Get(ctx, types.NamespacedName{Name: cr.GetProviderConfigReference().Name}, pc); err != nil {
-		return nil, errors.Wrap(err, errGetPC)
-	}
-
-	cd := pc.Spec.AuthHeader
-	authHeader, err := resource.CommonCredentialExtractor(ctx, cd.Source, c.kube, cd.CommonCredentialSelectors)
+	svc, err := controllercommon.GetClient(ctx, c.kube, cr)
 	if err != nil {
-		return nil, errors.Wrap(err, errGetCreds)
+		return nil, err
 	}
-
-	svc, err := c.newServiceFn(pc.Spec.Endpoint, string(authHeader))
-	if err != nil {
-		return nil, errors.Wrap(err, errNewClient)
-	}
-
 	return &external{cloudianService: svc}, nil
 }
 
