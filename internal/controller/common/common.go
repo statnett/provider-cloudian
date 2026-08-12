@@ -6,17 +6,18 @@ import (
 	"github.com/crossplane/crossplane-runtime/v2/pkg/resource"
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 	"github.com/pkg/errors"
-	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	apisv1alpha1cluster "github.com/statnett/provider-cloudian/apis/cluster/v1alpha1"
 	pcv1alpha1common "github.com/statnett/provider-cloudian/apis/common/providerconfig/v1alpha1"
 	apisv1alpha1namespaced "github.com/statnett/provider-cloudian/apis/namespaced/v1alpha1"
+	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
 )
 
 func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*cloudian.Client, error) {
 	switch mgC := mg.(type) {
+	//nolint:staticcheck // SA1019
 	case resource.LegacyManaged:
 		return nil, errors.New("legacy managed resource not supported")
 	case resource.ModernManaged:
@@ -52,6 +53,7 @@ func buildConfigFromSpec(ctx context.Context, c client.Client, m resource.Modern
 		if cd.SecretRef != nil {
 			cd.SecretRef.Namespace = m.GetNamespace()
 		}
+	default:
 	}
 
 	authHeader, err := resource.CommonCredentialExtractor(ctx, cd.Source, c, cd.CommonCredentialSelectors)
