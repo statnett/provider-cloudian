@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.21](https://github.com/statnett/provider-cloudian/compare/v0.3.20...v0.3.21) (2026-08-12)
+
+
+### Bug Fixes
+
+* management policies flag ([#449](https://github.com/statnett/provider-cloudian/issues/449)) ([691dc61](https://github.com/statnett/provider-cloudian/commit/691dc61a1e443b5b8673fb16f49dbc7d476cd779))
+
 ## [0.3.20](https://github.com/statnett/provider-cloudian/compare/v0.3.19...v0.3.20) (2026-08-07)
 
 
