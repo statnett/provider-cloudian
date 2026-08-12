@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.22](https://github.com/statnett/provider-cloudian/compare/v0.3.21...v0.3.22) (2026-08-12)
+
+
+### Bug Fixes
+
+* error messages ([#452](https://github.com/statnett/provider-cloudian/issues/452)) ([1a8cafb](https://github.com/statnett/provider-cloudian/commit/1a8cafb5b0eaa0de126f118a75133bb32eef8c47))
+* use correct provider config kind ([#454](https://github.com/statnett/provider-cloudian/issues/454)) ([953c01e](https://github.com/statnett/provider-cloudian/commit/953c01e61a422d474f33491d1cb9c211311c968c))
+
 ## [0.3.21](https://github.com/statnett/provider-cloudian/compare/v0.3.20...v0.3.21) (2026-08-12)
 
 
