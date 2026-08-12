@@ -48,7 +48,7 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 				return nil, errors.Wrap(err, "cannot get referenced ClusterProviderConfig")
 			}
 
-			t := resource.NewProviderConfigUsageTracker(c, &apisv1alpha1namespaced.ProviderConfigUsage{})
+			t := resource.NewProviderConfigUsageTracker(c, &apisv1alpha1namespaced.ClusterProviderConfigUsage{})
 			if err := t.Track(ctx, mgC); err != nil {
 				return nil, errors.Wrap(err, "cannot track ProviderConfig usage")
 			}
@@ -60,7 +60,7 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 				return nil, errors.Wrap(err, "cannot get referenced ProviderConfig")
 			}
 
-			t := resource.NewProviderConfigUsageTracker(c, &apisv1alpha1namespaced.ClusterProviderConfigUsage{})
+			t := resource.NewProviderConfigUsageTracker(c, &apisv1alpha1namespaced.ProviderConfigUsage{})
 			if err := t.Track(ctx, mgC); err != nil {
 				return nil, errors.Wrap(err, "cannot track ClusterProviderConfig usage")
 			}
