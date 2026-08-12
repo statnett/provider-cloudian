@@ -33,7 +33,6 @@ import (
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 
 	userv1alpha1namespaced "github.com/statnett/provider-cloudian/apis/namespaced/user/v1alpha1"
-	apisv1alpha1namespaced "github.com/statnett/provider-cloudian/apis/namespaced/v1alpha1"
 	controllercommon "github.com/statnett/provider-cloudian/internal/controller/common"
 	groupcontrollercommon "github.com/statnett/provider-cloudian/internal/controller/common/group"
 	"github.com/statnett/provider-cloudian/internal/sdk/cloudian"
@@ -66,8 +65,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 
 	reconcilerOpts := []managed.ReconcilerOption{
 		managed.WithExternalConnector(&connector{
-			kube:  mgr.GetClient(),
-			usage: resource.NewProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1namespaced.ProviderConfigUsage{}),
+			kube: mgr.GetClient(),
 		}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
@@ -94,8 +92,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 // A connector is expected to produce an ExternalClient when its Connect method
 // is called.
 type connector struct {
-	kube  client.Client
-	usage *resource.ProviderConfigUsageTracker
+	kube client.Client
 }
 
 // Connect typically produces an ExternalClient by:
@@ -107,10 +104,6 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 	cr, ok := mg.(*userv1alpha1namespaced.Group)
 	if !ok {
 		return nil, errors.New(errNotGroup)
-	}
-
-	if err := c.usage.Track(ctx, cr); err != nil {
-		return nil, errors.Wrap(err, errTrackPCUsage)
 	}
 
 	svc, err := controllercommon.GetClient(ctx, c.kube, cr)
