@@ -80,7 +80,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 
 	r := managed.NewReconciler(mgr,
 		resource.ManagedKind(userv1alpha1namespaced.GroupGroupVersionKind),
-		reconilerOpts...)
+		reconcilerOpts...)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
