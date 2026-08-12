@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.23](https://github.com/statnett/provider-cloudian/compare/v0.3.22...v0.3.23) (2026-08-12)
+
+
+### Bug Fixes
+
+* resolve namespaced references ([#455](https://github.com/statnett/provider-cloudian/issues/455)) ([81d8019](https://github.com/statnett/provider-cloudian/commit/81d8019f042e08cd095a28d84d38f4e64adc5ca5))
+
 ## [0.3.22](https://github.com/statnett/provider-cloudian/compare/v0.3.21...v0.3.22) (2026-08-12)
 
 
