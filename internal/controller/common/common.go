@@ -42,7 +42,8 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 			return nil, errors.New("providerConfigRef is not given")
 		}
 
-		if pcRef.Kind == "ClusterProviderConfig" {
+		switch pcRef.Kind {
+		case "ClusterProviderConfig":
 			cpc := &apisv1alpha1namespaced.ClusterProviderConfig{}
 			if err := c.Get(ctx, types.NamespacedName{Name: pcRef.Name}, cpc); err != nil {
 				return nil, errors.Wrap(err, "cannot get referenced ClusterProviderConfig")
@@ -54,7 +55,7 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 			}
 
 			return buildConfigFromSpec(ctx, c, nil, cpc.Spec)
-		} else {
+		case "ProviderConfig":
 			pc := &apisv1alpha1namespaced.ProviderConfig{}
 			if err := c.Get(ctx, types.NamespacedName{Name: pcRef.Name, Namespace: mg.GetNamespace()}, pc); err != nil {
 				return nil, errors.Wrap(err, "cannot get referenced ProviderConfig")
@@ -66,6 +67,8 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 			}
 
 			return buildConfigFromSpec(ctx, c, new(mg.GetNamespace()), pc.Spec)
+		default:
+			return nil, errors.New("unknown providerConfigRef Kind")
 		}
 	default:
 		return nil, errors.New("unknown managed resource type")
