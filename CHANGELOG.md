@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.24](https://github.com/statnett/provider-cloudian/compare/v0.3.23...v0.3.24) (2026-08-13)
+
+
+### Bug Fixes
+
+* MR metrics with MR state recorder ([#451](https://github.com/statnett/provider-cloudian/issues/451)) ([d9775ac](https://github.com/statnett/provider-cloudian/commit/d9775accf3e9b9170a0c19d1bbbfa11f649a9e91))
+
 ## [0.3.23](https://github.com/statnett/provider-cloudian/compare/v0.3.22...v0.3.23) (2026-08-12)
 
 
