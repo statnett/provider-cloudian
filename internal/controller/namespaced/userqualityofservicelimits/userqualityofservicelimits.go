@@ -29,6 +29,7 @@ import (
 	"github.com/crossplane/crossplane-runtime/v2/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/resource"
+	"github.com/crossplane/crossplane-runtime/v2/pkg/statemetrics"
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 
 	userv1alpha1namespaced "github.com/statnett/provider-cloudian/apis/namespaced/user/v1alpha1"
@@ -79,6 +80,11 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 	r := managed.NewReconciler(mgr,
 		resource.ManagedKind(userv1alpha1namespaced.UserQualityOfServiceLimitsGroupVersionKind),
 		reconcilerOpts...)
+
+	if err := mgr.Add(statemetrics.NewMRStateRecorder(
+		mgr.GetClient(), o.Logger, o.MetricOptions.MRStateMetrics, &userv1alpha1namespaced.UserQualityOfServiceLimitsList{}, o.MetricOptions.PollStateMetricInterval)); err != nil {
+		return err
+	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
