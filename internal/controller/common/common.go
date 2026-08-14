@@ -49,9 +49,8 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 				return nil, errors.Wrap(err, "cannot get referenced ClusterProviderConfig")
 			}
 
-			t := resource.NewProviderConfigUsageTracker(c, &apisv1alpha1namespaced.ClusterProviderConfigUsage{})
-			if err := t.Track(ctx, mgC); err != nil {
-				return nil, errors.Wrap(err, "cannot track ProviderConfig usage")
+			if err := trackProviderConfigUsage(ctx, c, mgC); err != nil {
+				return nil, err
 			}
 
 			return buildConfigFromSpec(ctx, c, nil, cpc.Spec)
@@ -61,9 +60,8 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 				return nil, errors.Wrap(err, "cannot get referenced ProviderConfig")
 			}
 
-			t := resource.NewProviderConfigUsageTracker(c, &apisv1alpha1namespaced.ProviderConfigUsage{})
-			if err := t.Track(ctx, mgC); err != nil {
-				return nil, errors.Wrap(err, "cannot track ClusterProviderConfig usage")
+			if err := trackProviderConfigUsage(ctx, c, mgC); err != nil {
+				return nil, err
 			}
 
 			return buildConfigFromSpec(ctx, c, new(mg.GetNamespace()), pc.Spec)
@@ -73,6 +71,20 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 	default:
 		return nil, errors.New("unknown managed resource type")
 	}
+}
+
+func trackProviderConfigUsage(ctx context.Context, c client.Client, mg resource.ModernManaged) error {
+	var usage resource.TypedProviderConfigUsage = &apisv1alpha1namespaced.ProviderConfigUsage{}
+	if mg.GetNamespace() == "" {
+		usage = &apisv1alpha1namespaced.ClusterProviderConfigUsage{}
+	}
+
+	t := resource.NewProviderConfigUsageTracker(c, usage)
+	if err := t.Track(ctx, mg); err != nil {
+		return errors.Wrap(err, "cannot track ProviderConfig usage")
+	}
+
+	return nil
 }
 
 func buildConfigFromSpec(ctx context.Context, c client.Client, ns *string, spec pcv1alpha1common.ProviderConfigSpec) (*cloudian.Client, error) {
