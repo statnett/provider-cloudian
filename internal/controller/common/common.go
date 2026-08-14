@@ -84,7 +84,7 @@ func trackProviderConfigUsage(ctx context.Context, c client.Client, mg resource.
 		return errors.Wrap(err, "cannot track ProviderConfig usage")
 	}
 
-	return  nil
+	return nil
 }
 
 func buildConfigFromSpec(ctx context.Context, c client.Client, ns *string, spec pcv1alpha1common.ProviderConfigSpec) (*cloudian.Client, error) {
