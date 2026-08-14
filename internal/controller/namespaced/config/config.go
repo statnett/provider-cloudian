@@ -27,15 +27,6 @@ import (
 	apisv1alpha1namespaced "github.com/statnett/provider-cloudian/apis/namespaced/v1alpha1"
 )
 
-// Setup adds a controller that reconciles ProviderConfigs and
-// ClusterProviderConfigs by accounting for their current usage.
-func Setup(mgr ctrl.Manager, o controller.Options) error {
-	if err := setupNamespacedProviderConfig(mgr, o); err != nil {
-		return err
-	}
-	return setupClusterProviderConfig(mgr, o)
-}
-
 // SetupGated registers controller setup with the gate, waiting for the
 // required CRDs.
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
@@ -50,6 +41,15 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		apisv1alpha1namespaced.ClusterProviderConfigGroupVersionKind,
 		apisv1alpha1namespaced.ClusterProviderConfigUsageGroupVersionKind)
 	return nil
+}
+
+// Setup adds a controller that reconciles ProviderConfigs and
+// ClusterProviderConfigs by accounting for their current usage.
+func Setup(mgr ctrl.Manager, o controller.Options) error {
+	if err := setupNamespacedProviderConfig(mgr, o); err != nil {
+		return err
+	}
+	return setupClusterProviderConfig(mgr, o)
 }
 
 func setupNamespacedProviderConfig(mgr ctrl.Manager, o controller.Options) error {
