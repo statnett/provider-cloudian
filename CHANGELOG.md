@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.25](https://github.com/statnett/provider-cloudian/compare/v0.3.24...v0.3.25) (2026-08-14)
+
+
+### Bug Fixes
+
+* add missing reconciler for ClusterProviderConfig ([#463](https://github.com/statnett/provider-cloudian/issues/463)) ([b8f0a36](https://github.com/statnett/provider-cloudian/commit/b8f0a36af6977851ca594c1645e7759a5f69904a))
+
 ## [0.3.24](https://github.com/statnett/provider-cloudian/compare/v0.3.23...v0.3.24) (2026-08-13)
 
 
