@@ -74,16 +74,14 @@ func GetClient(ctx context.Context, c client.Client, mg resource.Managed) (*clou
 }
 
 func trackProviderConfigUsage(ctx context.Context, c client.Client, mg resource.ModernManaged) error {
+	var usage resource.TypedProviderConfigUsage = &apisv1alpha1namespaced.ProviderConfigUsage{}
 	if mg.GetNamespace() == "" {
-		t := resource.NewProviderConfigUsageTracker(c, &apisv1alpha1namespaced.ClusterProviderConfigUsage{})
-		if err := t.Track(ctx, mg); err != nil {
-			return errors.Wrap(err, "cannot track ProviderConfig usage")
-		}
-	} else {
-		t := resource.NewProviderConfigUsageTracker(c, &apisv1alpha1namespaced.ProviderConfigUsage{})
-		if err := t.Track(ctx, mg); err != nil {
-			return errors.Wrap(err, "cannot track ClusterProviderConfig usage")
-		}
+		usage = &apisv1alpha1namespaced.ClusterProviderConfigUsage{}
+	}
+
+	t := resource.NewProviderConfigUsageTracker(c, usage)
+	if err := t.Track(ctx, mg); err != nil {
+		return errors.Wrap(err, "cannot track ProviderConfig usage")
 	}
 
 	return  nil
