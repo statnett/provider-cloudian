@@ -33,7 +33,8 @@ import (
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		accesskey.Setup,
-		config.Setup,
+		config.SetupProviderConfig,
+		config.SetupClusterProviderConfig,
 		group.Setup,
 		groupqualityofservicelimits.Setup,
 		user.Setup,
@@ -51,7 +52,8 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		accesskey.SetupGated,
-		config.SetupGated,
+		config.SetupProviderConfigGated,
+		config.SetupClusterProviderConfigGated,
 		group.SetupGated,
 		groupqualityofservicelimits.SetupGated,
 		user.SetupGated,

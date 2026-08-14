@@ -27,26 +27,26 @@ import (
 	apisv1alpha1namespaced "github.com/statnett/provider-cloudian/apis/namespaced/v1alpha1"
 )
 
-// SetupProviderConfigGated registers controller setup with the gate, waiting for the
+// SetupClusterProviderConfigGated registers controller setup with the gate, waiting for the
 // required CRD
-func SetupProviderConfigGated(mgr ctrl.Manager, o controller.Options) error {
+func SetupClusterProviderConfigGated(mgr ctrl.Manager, o controller.Options) error {
 	o.Gate.Register(func() {
-		if err := SetupProviderConfig(mgr, o); err != nil {
+		if err := SetupClusterProviderConfig(mgr, o); err != nil {
 			panic(err)
 		}
-	}, apisv1alpha1namespaced.ProviderConfigGroupVersionKind, apisv1alpha1namespaced.ProviderConfigUsageGroupVersionKind)
+	}, apisv1alpha1namespaced.ClusterProviderConfigGroupVersionKind, apisv1alpha1namespaced.ClusterProviderConfigUsageGroupVersionKind)
 	return nil
 }
 
-// SetupProviderConfig adds a controller that reconciles ProviderConfigs by accounting for
+// SetupClusterProviderConfig adds a controller that reconciles ClusterProviderConfigs by accounting for
 // their current usage.
-func SetupProviderConfig(mgr ctrl.Manager, o controller.Options) error {
-	name := providerconfig.ControllerName(apisv1alpha1namespaced.ProviderConfigGroupKind)
+func SetupClusterProviderConfig(mgr ctrl.Manager, o controller.Options) error {
+	name := providerconfig.ControllerName(apisv1alpha1namespaced.ClusterProviderConfigGroupKind)
 
 	of := resource.ProviderConfigKinds{
-		Config:    apisv1alpha1namespaced.ProviderConfigGroupVersionKind,
-		Usage:     apisv1alpha1namespaced.ProviderConfigUsageGroupVersionKind,
-		UsageList: apisv1alpha1namespaced.ProviderConfigUsageListGroupVersionKind,
+		Config:    apisv1alpha1namespaced.ClusterProviderConfigGroupVersionKind,
+		Usage:     apisv1alpha1namespaced.ClusterProviderConfigUsageGroupVersionKind,
+		UsageList: apisv1alpha1namespaced.ClusterProviderConfigUsageListGroupVersionKind,
 	}
 
 	r := providerconfig.NewReconciler(mgr, of,
@@ -57,7 +57,7 @@ func SetupProviderConfig(mgr ctrl.Manager, o controller.Options) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
 		WithOptions(o.ForControllerRuntime()).
-		For(&apisv1alpha1namespaced.ProviderConfig{}).
-		Watches(&apisv1alpha1namespaced.ProviderConfigUsage{}, &resource.EnqueueRequestForProviderConfig{}).
+		For(&apisv1alpha1namespaced.ClusterProviderConfig{}).
+		Watches(&apisv1alpha1namespaced.ClusterProviderConfigUsage{}, &resource.EnqueueRequestForProviderConfig{}).
 		Complete(ratelimiter.NewReconciler(name, r, o.GlobalRateLimiter))
 }
