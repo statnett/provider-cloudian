@@ -28,19 +28,31 @@ import (
 )
 
 // SetupGated registers controller setup with the gate, waiting for the
-// required CRD
+// required CRDs.
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	o.Gate.Register(func() {
 		if err := Setup(mgr, o); err != nil {
-			panic(err)
+			mgr.GetLogger().Error(err, "unable to setup reconcilers",
+				"gvk", apisv1alpha1namespaced.ProviderConfigGroupVersionKind.String(),
+				"gvk", apisv1alpha1namespaced.ClusterProviderConfigGroupVersionKind.String())
 		}
-	}, apisv1alpha1namespaced.ProviderConfigGroupVersionKind, apisv1alpha1namespaced.ProviderConfigUsageGroupVersionKind)
+	}, apisv1alpha1namespaced.ProviderConfigGroupVersionKind,
+		apisv1alpha1namespaced.ProviderConfigUsageGroupVersionKind,
+		apisv1alpha1namespaced.ClusterProviderConfigGroupVersionKind,
+		apisv1alpha1namespaced.ClusterProviderConfigUsageGroupVersionKind)
 	return nil
 }
 
-// Setup adds a controller that reconciles ProviderConfigs by accounting for
-// their current usage.
+// Setup adds a controller that reconciles ProviderConfigs and
+// ClusterProviderConfigs by accounting for their current usage.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
+	if err := setupNamespacedProviderConfig(mgr, o); err != nil {
+		return err
+	}
+	return setupClusterProviderConfig(mgr, o)
+}
+
+func setupNamespacedProviderConfig(mgr ctrl.Manager, o controller.Options) error {
 	name := providerconfig.ControllerName(apisv1alpha1namespaced.ProviderConfigGroupKind)
 
 	of := resource.ProviderConfigKinds{
@@ -59,5 +71,27 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		WithOptions(o.ForControllerRuntime()).
 		For(&apisv1alpha1namespaced.ProviderConfig{}).
 		Watches(&apisv1alpha1namespaced.ProviderConfigUsage{}, &resource.EnqueueRequestForProviderConfig{}).
+		Complete(ratelimiter.NewReconciler(name, r, o.GlobalRateLimiter))
+}
+
+func setupClusterProviderConfig(mgr ctrl.Manager, o controller.Options) error {
+	name := providerconfig.ControllerName(apisv1alpha1namespaced.ClusterProviderConfigGroupKind)
+
+	of := resource.ProviderConfigKinds{
+		Config:    apisv1alpha1namespaced.ClusterProviderConfigGroupVersionKind,
+		Usage:     apisv1alpha1namespaced.ClusterProviderConfigUsageGroupVersionKind,
+		UsageList: apisv1alpha1namespaced.ClusterProviderConfigUsageListGroupVersionKind,
+	}
+
+	r := providerconfig.NewReconciler(mgr, of,
+		providerconfig.WithLogger(o.Logger.WithValues("controller", name)),
+		//nolint:staticcheck // SA1004 crossplane-runtime still depends on deprecated API
+		providerconfig.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))))
+
+	return ctrl.NewControllerManagedBy(mgr).
+		Named(name).
+		WithOptions(o.ForControllerRuntime()).
+		For(&apisv1alpha1namespaced.ClusterProviderConfig{}).
+		Watches(&apisv1alpha1namespaced.ClusterProviderConfigUsage{}, &resource.EnqueueRequestForProviderConfig{}).
 		Complete(ratelimiter.NewReconciler(name, r, o.GlobalRateLimiter))
 }
