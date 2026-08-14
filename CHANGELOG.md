@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.26](https://github.com/statnett/provider-cloudian/compare/v0.3.25...v0.3.26) (2026-08-14)
+
+
+### Bug Fixes
+
+* ensure correct ProviderConfigUsage based on if managed resource … ([#465](https://github.com/statnett/provider-cloudian/issues/465)) ([5d0d9b8](https://github.com/statnett/provider-cloudian/commit/5d0d9b81ca43177e31dac4e3cd8a592c10c84a1a))
+
 ## [0.3.25](https://github.com/statnett/provider-cloudian/compare/v0.3.24...v0.3.25) (2026-08-14)
 
 
