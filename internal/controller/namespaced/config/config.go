@@ -95,4 +95,3 @@ func setupClusterProviderConfig(mgr ctrl.Manager, o controller.Options) error {
 		Watches(&apisv1alpha1namespaced.ClusterProviderConfigUsage{}, &resource.EnqueueRequestForProviderConfig{}).
 		Complete(ratelimiter.NewReconciler(name, r, o.GlobalRateLimiter))
 }
-
