@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.27](https://github.com/statnett/provider-cloudian/compare/v0.3.26...v0.3.27) (2026-08-21)
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes go packages to v0.36.4 ([#476](https://github.com/statnett/provider-cloudian/issues/476)) ([23bf3d7](https://github.com/statnett/provider-cloudian/commit/23bf3d7f43585f5d31ec5f564cdff5c9977fe164))
+* **deps:** update module github.com/crossplane/crossplane-runtime/v2 to v2.4.0 ([#474](https://github.com/statnett/provider-cloudian/issues/474)) ([3a2c080](https://github.com/statnett/provider-cloudian/commit/3a2c080c35bbe275a707ca09f9a9f59e8ecc710c))
+* **deps:** update module github.com/crossplane/crossplane/apis/v2 to v2.4.0 ([#475](https://github.com/statnett/provider-cloudian/issues/475)) ([45a5cf8](https://github.com/statnett/provider-cloudian/commit/45a5cf8d9bed142f4000f9a11a8b0bba5d1eca03))
+* **deps:** update module google.golang.org/grpc to v1.83.1 ([#469](https://github.com/statnett/provider-cloudian/issues/469)) ([ba0a2c4](https://github.com/statnett/provider-cloudian/commit/ba0a2c4ea2e428a78aca2010d22fb3884a63a8c7))
+
 ## [0.3.26](https://github.com/statnett/provider-cloudian/compare/v0.3.25...v0.3.26) (2026-08-14)
 
 
