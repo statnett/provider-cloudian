@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.33](https://github.com/statnett/provider-cloudian/compare/v0.3.32...v0.3.33) (2026-10-26)
+
+
+### Bug Fixes
+
+* **deps:** update k8s.io/utils digest to ca04ba5 ([#524](https://github.com/statnett/provider-cloudian/issues/524)) ([1cd91eb](https://github.com/statnett/provider-cloudian/commit/1cd91ebf82e8cf1999530a6058969e823d82fad6))
+* **deps:** update module github.com/crossplane/crossplane-runtime/v2 to v2.4.3 ([#522](https://github.com/statnett/provider-cloudian/issues/522)) ([a15270c](https://github.com/statnett/provider-cloudian/commit/a15270c8e9ae82733b96a8f11372fbf141e9256c))
+* **deps:** update module github.com/crossplane/crossplane/apis/v2 to v2.4.3 ([#523](https://github.com/statnett/provider-cloudian/issues/523)) ([6cd15a1](https://github.com/statnett/provider-cloudian/commit/6cd15a1589152e37db7e4ab3f86b7443a8c3a4ef))
+
 ## [0.3.32](https://github.com/statnett/provider-cloudian/compare/v0.3.31...v0.3.32) (2026-10-08)
 
 
