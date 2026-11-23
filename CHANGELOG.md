@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.35](https://github.com/statnett/provider-cloudian/compare/v0.3.34...v0.3.35) (2026-11-23)
+
+
+### Bug Fixes
+
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.25.3 ([#549](https://github.com/statnett/provider-cloudian/issues/549)) ([5821c82](https://github.com/statnett/provider-cloudian/commit/5821c82a8525fc943c178b19d17cce7167bdc310))
+
 ## [0.3.34](https://github.com/statnett/provider-cloudian/compare/v0.3.33...v0.3.34) (2026-11-02)
 
 
